@@ -1,0 +1,20 @@
+{
+  "..\\node_modules\\next\\dist\\client\\dev\\hot-reloader\\app\\use-websocket.js -> @vercel/turbopack-ecmascript-runtime/browser/dev/hmr-client/hmr-client.ts": {
+    "id": "..\\node_modules\\next\\dist\\client\\dev\\hot-reloader\\app\\use-websocket.js -> @vercel/turbopack-ecmascript-runtime/browser/dev/hmr-client/hmr-client.ts",
+    "files": [
+      "static/chunks/_app-pages-browser_node_modules_next_dist_client_dev_noop-turbopack-hmr_js.js"
+    ]
+  },
+  "components\\pages\\RealEstatePage.tsx -> @/components/CinematicHero": {
+    "id": "components\\pages\\RealEstatePage.tsx -> @/components/CinematicHero",
+    "files": [
+      "static/chunks/_app-pages-browser_src_components_CinematicHero_tsx-_a9151.js"
+    ]
+  },
+  "components\\pages\\TravelPage.tsx -> @/components/CinematicHero": {
+    "id": "components\\pages\\TravelPage.tsx -> @/components/CinematicHero",
+    "files": [
+      "static/chunks/_app-pages-browser_src_components_CinematicHero_tsx-_a9150.js"
+    ]
+  }
+}

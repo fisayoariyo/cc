@@ -1,0 +1,186 @@
+@custom-variant dark (&:is(.dark *));
+
+/* DotCharis — design-vibe: light, airy, warm (Charis Consult) */
+:root {
+  --font-size: 16px;
+
+  /* Brand (from design-vibe) */
+  --surface: #ffffff;
+  --surface-card: #ffffff;
+  --brand: #be6427;
+  --brand-trust: #4a9c7a; /* maps to --color-brand-trust in @theme */
+  --text-primary: #1f2a24;
+  --text-secondary: #3f4a44;
+  --line-subtle: #f0ede6;
+
+  /* shadcn semantic mapping */
+  --background: var(--surface);
+  --foreground: var(--text-primary);
+  --card: var(--surface-card);
+  --card-foreground: var(--text-primary);
+  --popover: #fffdf9;
+  --popover-foreground: var(--text-primary);
+  --primary: var(--brand);
+  --primary-foreground: #ffffff;
+  --secondary: color-mix(in srgb, var(--brand-trust) 12%, var(--surface));
+  --secondary-foreground: var(--text-primary);
+  --muted: color-mix(in srgb, var(--line-subtle) 85%, var(--surface));
+  --muted-foreground: var(--text-secondary);
+  --accent: color-mix(in srgb, var(--brand-trust) 18%, var(--surface));
+  --accent-foreground: #1a5c42;
+  --destructive: #d4183d;
+  --destructive-foreground: #ffffff;
+  --border: var(--line-subtle);
+  --input: transparent;
+  --input-background: #fffdf9;
+  --switch-background: #d4cfc4;
+  --font-weight-medium: 500;
+  --font-weight-normal: 400;
+  --ring: color-mix(in srgb, var(--brand) 45%, transparent);
+  --chart-1: #e88a5f;
+  --chart-2: #4a9c7a;
+  --chart-3: #c9a227;
+  --chart-4: #6b9bd1;
+  --chart-5: #b8956a;
+  --radius: 0.625rem;
+  --sidebar: var(--surface-card);
+  --sidebar-foreground: var(--text-primary);
+  --sidebar-primary: var(--brand);
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: var(--muted);
+  --sidebar-accent-foreground: var(--text-primary);
+  --sidebar-border: var(--line-subtle);
+  --sidebar-ring: var(--ring);
+}
+
+/* Keep UI light: no heavy dark shell (design-vibe) */
+.dark {
+  --background: #ffffff;
+  --foreground: var(--text-primary);
+  --card: #fffdf9;
+  --card-foreground: var(--text-primary);
+  --popover: #fffdf9;
+  --popover-foreground: var(--text-primary);
+  --primary: var(--brand);
+  --primary-foreground: #ffffff;
+  --secondary: color-mix(in srgb, var(--brand-trust) 14%, var(--surface));
+  --secondary-foreground: var(--text-primary);
+  --muted: var(--line-subtle);
+  --muted-foreground: var(--text-secondary);
+  --accent: color-mix(in srgb, var(--brand-trust) 20%, var(--surface));
+  --accent-foreground: #1a5c42;
+  --destructive: #c42d4a;
+  --destructive-foreground: #ffffff;
+  --border: var(--line-subtle);
+  --input: var(--line-subtle);
+  --ring: color-mix(in srgb, var(--brand) 50%, transparent);
+  --sidebar: #fffdf9;
+  --sidebar-foreground: var(--text-primary);
+  --sidebar-primary: var(--brand);
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: var(--muted);
+  --sidebar-accent-foreground: var(--text-primary);
+  --sidebar-border: var(--line-subtle);
+  --sidebar-ring: var(--ring);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-input-background: var(--input-background);
+  --color-switch-background: var(--switch-background);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-brand: var(--brand);
+  --color-brand-trust: var(--brand-trust);
+  --color-surface: var(--surface);
+  --color-surface-card: var(--surface-card);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+  }
+
+  html {
+    font-size: var(--font-size);
+  }
+
+  h1 {
+    font-size: var(--text-2xl);
+    font-weight: var(--font-weight-medium);
+    line-height: 1.5;
+  }
+
+  h2 {
+    font-size: var(--text-xl);
+    font-weight: var(--font-weight-medium);
+    line-height: 1.5;
+  }
+
+  h3 {
+    font-size: var(--text-lg);
+    font-weight: var(--font-weight-medium);
+    line-height: 1.5;
+  }
+
+  h4 {
+    font-size: var(--text-base);
+    font-weight: var(--font-weight-medium);
+    line-height: 1.5;
+  }
+
+  label {
+    font-size: var(--text-base);
+    font-weight: var(--font-weight-medium);
+    line-height: 1.5;
+  }
+
+  button {
+    font-size: var(--text-base);
+    font-weight: var(--font-weight-medium);
+    line-height: 1.5;
+  }
+
+  input {
+    font-size: var(--text-base);
+    font-weight: var(--font-weight-normal);
+    line-height: 1.5;
+  }
+}
