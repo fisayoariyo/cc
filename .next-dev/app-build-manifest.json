@@ -35,6 +35,36 @@
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/chunks/app/(site)/dashboard/page.js"
+    ],
+    "/(site)/(travel)/travels/dashboard/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/(site)/(travel)/travels/dashboard/page.js"
+    ],
+    "/(site)/(travel)/travels/dashboard/layout": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/(site)/(travel)/travels/dashboard/layout.js"
+    ],
+    "/(site)/(travel)/travels/dashboard/applications/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/(site)/(travel)/travels/dashboard/applications/page.js"
+    ],
+    "/(site)/(travel)/travels/dashboard/updates/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/(site)/(travel)/travels/dashboard/updates/page.js"
+    ],
+    "/(site)/(travel)/travels/dashboard/profile/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/(site)/(travel)/travels/dashboard/profile/page.js"
+    ],
+    "/(site)/(travel)/travels/dashboard/loading": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/(site)/(travel)/travels/dashboard/loading.js"
     ]
   }
 }
