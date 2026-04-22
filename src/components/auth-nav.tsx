@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { motion } from 'motion/react';
@@ -20,10 +20,6 @@ function dashboardHref(role: ProfileRole | null): string {
   return '/dashboard';
 }
 
-function useSupabaseBrowser(): SupabaseClient | null {
-  return useMemo(() => createClient(), []);
-}
-
 export function AuthNav({
   navOnDarkImage,
   initialState,
@@ -32,10 +28,18 @@ export function AuthNav({
   initialState?: AuthNavInitialState;
 }) {
   const router = useRouter();
-  const supabase = useSupabaseBrowser();
+  const [supabase, setSupabase] = useState<SupabaseClient | null>(null);
   const [userId, setUserId] = useState<string | null>(initialState?.userId ?? null);
   const [role, setRole] = useState<ProfileRole | null>(initialState?.role ?? null);
   const [loading, setLoading] = useState(initialState?.resolved ? false : true);
+
+  useEffect(() => {
+    if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+      setLoading(false);
+      return;
+    }
+    setSupabase(createClient());
+  }, []);
 
   const load = useCallback(async () => {
     if (!supabase) return;
@@ -137,10 +141,18 @@ export function AuthNavMobile({
   initialState?: AuthNavInitialState;
 }) {
   const router = useRouter();
-  const supabase = useSupabaseBrowser();
+  const [supabase, setSupabase] = useState<SupabaseClient | null>(null);
   const [userId, setUserId] = useState<string | null>(initialState?.userId ?? null);
   const [role, setRole] = useState<ProfileRole | null>(initialState?.role ?? null);
   const [ready, setReady] = useState(initialState?.resolved ? true : false);
+
+  useEffect(() => {
+    if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+      setReady(true);
+      return;
+    }
+    setSupabase(createClient());
+  }, []);
 
   const load = useCallback(async () => {
     if (!supabase) return;
