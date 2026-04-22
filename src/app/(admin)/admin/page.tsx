@@ -1,32 +1,41 @@
 import Link from 'next/link';
 import { Building2, Hammer, Inbox, Plane, Users } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import {
-  countPropertiesByStatus,
-  getAllAgentsForAdmin,
-  getAllInquiriesForAdmin,
-  getAllTravelApplicationsForAdmin,
-  getConstructionProjectsForAdmin,
-} from '@/lib/supabase/data';
+import { createClient } from '@/lib/supabase/server';
 
 export default async function AdminDashboardPage() {
-  const counts = await countPropertiesByStatus();
-  const agents = await getAllAgentsForAdmin();
-  const travel = await getAllTravelApplicationsForAdmin();
-  const construction = await getConstructionProjectsForAdmin();
-  const inquiries = await getAllInquiriesForAdmin();
+  const supabase = await createClient();
+  const [
+    activeListingsRes,
+    pendingListingsRes,
+    pendingAgentsRes,
+    missingAgentStatusRes,
+    travelRes,
+    constructionRes,
+    openInquiriesRes,
+  ] = await Promise.all([
+    supabase.from('properties').select('id', { count: 'exact', head: true }).eq('status', 'active'),
+    supabase.from('properties').select('id', { count: 'exact', head: true }).eq('status', 'pending'),
+    supabase.from('profiles').select('id', { count: 'exact', head: true }).eq('role', 'agent').eq('status', 'pending'),
+    supabase.from('profiles').select('id', { count: 'exact', head: true }).eq('role', 'agent').is('status', null),
+    supabase.from('travel_applications').select('id', { count: 'exact', head: true }),
+    supabase.from('construction_projects').select('id', { count: 'exact', head: true }),
+    supabase.from('inquiries').select('id', { count: 'exact', head: true }).eq('status', 'new'),
+  ]);
 
-  const pendingAgents = agents.filter((a) => a.status === 'pending' || !a.status).length;
-  const activeListings = counts.active ?? 0;
-  const pendingListings = counts.pending ?? 0;
-  const openInquiries = inquiries.filter((q) => q.status === 'new').length;
+  const activeListings = activeListingsRes.count ?? 0;
+  const pendingListings = pendingListingsRes.count ?? 0;
+  const pendingAgents = (pendingAgentsRes.count ?? 0) + (missingAgentStatusRes.count ?? 0);
+  const travelCount = travelRes.count ?? 0;
+  const constructionCount = constructionRes.count ?? 0;
+  const openInquiries = openInquiriesRes.count ?? 0;
 
   const stats = [
     { label: 'Active listings', value: String(activeListings), href: '/admin/listings', icon: Building2 },
     { label: 'Pending listings', value: String(pendingListings), href: '/admin/listings', icon: Building2 },
     { label: 'Pending agents', value: String(pendingAgents), href: '/admin/agents', icon: Users },
-    { label: 'Travel applications', value: String(travel.length), href: '/admin/travel-applications', icon: Plane },
-    { label: 'Construction projects', value: String(construction.length), href: '/admin/construction-projects', icon: Hammer },
+    { label: 'Travel applications', value: String(travelCount), href: '/admin/travel-applications', icon: Plane },
+    { label: 'Construction projects', value: String(constructionCount), href: '/admin/construction-projects', icon: Hammer },
     { label: 'Open inquiries', value: String(openInquiries), href: '/admin/inquiries', icon: Inbox },
   ];
 

@@ -1,10 +1,4 @@
 {
   "/(site)/page": "app/(site)/page.js",
-  "/(auth)/register/page": "app/(auth)/register/page.js",
-  "/(site)/(travel)/travels/page": "app/(site)/(travel)/travels/page.js",
-  "/(site)/dashboard/page": "app/(site)/dashboard/page.js",
-  "/(site)/(travel)/travels/dashboard/page": "app/(site)/(travel)/travels/dashboard/page.js",
-  "/(site)/(travel)/travels/dashboard/applications/page": "app/(site)/(travel)/travels/dashboard/applications/page.js",
-  "/(site)/(travel)/travels/dashboard/updates/page": "app/(site)/(travel)/travels/dashboard/updates/page.js",
-  "/(site)/(travel)/travels/dashboard/profile/page": "app/(site)/(travel)/travels/dashboard/profile/page.js"
+  "/(site)/(travel)/travels/dashboard/page": "app/(site)/(travel)/travels/dashboard/page.js"
 }

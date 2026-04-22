@@ -1,7 +1,6 @@
-import Navigation from '@/components/Navigation';
-import Footer from '@/components/Footer';
 import { createClient } from '@/lib/supabase/server';
 import type { AuthNavInitialState } from '@/components/auth-nav';
+import { SiteShellClient } from '@/components/site-shell-client';
 
 export async function SiteShell({ children }: { children: React.ReactNode }) {
   let initialAuthState: AuthNavInitialState = { userId: null, role: null, resolved: true };
@@ -25,10 +24,6 @@ export async function SiteShell({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <Navigation initialAuthState={initialAuthState} />
-      {children}
-      <Footer />
-    </div>
+    <SiteShellClient initialAuthState={initialAuthState}>{children}</SiteShellClient>
   );
 }

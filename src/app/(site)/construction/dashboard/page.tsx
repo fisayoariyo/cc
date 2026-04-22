@@ -1,35 +1,23 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { redirect } from 'next/navigation';
-import { createClient } from '@/lib/supabase/server';
 import { constructionStageLabel } from '@/lib/construction-stages';
 import { getConstructionHistoryByProjectIds, getConstructionProjectsForClient, getNotificationsForUser } from '@/lib/supabase/data';
+import { getViewerContext } from '@/lib/supabase/dashboard-access';
 
 export const metadata: Metadata = {
   title: 'Construction dashboard',
 };
 
 export default async function ConstructionDashboardPage() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return null;
+  const viewer = await getViewerContext();
+  if (!viewer) return null;
 
-  const { data: service } = await supabase
-    .from('client_services')
-    .select('id')
-    .eq('user_id', user.id)
-    .eq('service', 'construction')
-    .maybeSingle();
-  if (!service) redirect('/dashboard');
-  const projects = await getConstructionProjectsForClient(user.id);
+  const projects = await getConstructionProjectsForClient(viewer.userId);
   const history = await getConstructionHistoryByProjectIds(projects.map((p) => p.id));
-  const notices = await getNotificationsForUser(user.id, 5);
+  const notices = await getNotificationsForUser(viewer.userId, 5);
 
   return (
-    <div className="min-h-screen bg-background pt-20 sm:pt-24 px-4 sm:px-6 pb-16">
-      <div className="max-w-4xl mx-auto space-y-6">
+    <div className="w-full space-y-6">
         <div>
           <h1 className="text-2xl sm:text-3xl font-light text-foreground">Construction client dashboard</h1>
           <p className="text-muted-foreground mt-1 text-sm sm:text-base">
@@ -83,7 +71,6 @@ export default async function ConstructionDashboardPage() {
             Switch service
           </Link>
         </div>
-      </div>
     </div>
   );
 }

@@ -1,9 +1,9 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { createClient } from '@/lib/supabase/server';
 import { Button } from '@/components/ui/button';
 import { getNotificationsForUser, getPropertiesForAgent } from '@/lib/supabase/data';
 import { AgentListingsManager, AgentPaymentGate, AgentPendingReviewCard } from './agent-dashboard-controls';
+import { getViewerContext } from '@/lib/supabase/dashboard-access';
 
 export const metadata: Metadata = {
   title: 'Agent dashboard',
@@ -15,38 +15,28 @@ export default async function AgentDashboardPage({
   searchParams: Promise<{ payment?: string }>;
 }) {
   const { payment } = await searchParams;
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return null;
+  const viewer = await getViewerContext();
+  if (!viewer) return null;
 
-  const [profileRes, rows, notices] = await Promise.all([
-    supabase
-      .from('profiles')
-      .select('id, full_name, email, role, status, onboarding_paid, phone_number, passport_number, created_at, updated_at')
-      .eq('id', user.id)
-      .maybeSingle(),
-    getPropertiesForAgent(user.id),
-    getNotificationsForUser(user.id, 5),
+  const [rows, notices] = await Promise.all([
+    getPropertiesForAgent(viewer.userId),
+    getNotificationsForUser(viewer.userId, 5),
   ]);
-  const profile = profileRes.data;
-  const canManageListings = profile?.status === 'verified' && profile?.onboarding_paid;
+  const canManageListings = viewer.status === 'verified' && viewer.onboardingPaid;
 
   return (
-    <div className="min-h-screen bg-background pt-20 sm:pt-24 px-4 sm:px-6 pb-16">
-      <div className="max-w-5xl mx-auto space-y-8">
+    <div className="space-y-8">
         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
           <div>
             <h1 className="text-2xl sm:text-3xl font-light text-foreground">Agent dashboard</h1>
             <p className="text-muted-foreground mt-1 text-sm sm:text-base max-w-xl">
-              {profile?.full_name ? `${profile.full_name} — ` : ''}
+              {viewer.fullName ? `${viewer.fullName} — ` : ''}
               Verification:{' '}
-              <span className="text-foreground font-medium capitalize">{profile?.status ?? 'pending'}</span>
+              <span className="text-foreground font-medium capitalize">{viewer.status ?? 'pending'}</span>
               {' | '}
               Payment:{' '}
               <span className="text-foreground font-medium capitalize">
-                {profile?.onboarding_paid ? 'paid' : 'pending'}
+                {viewer.onboardingPaid ? 'paid' : 'pending'}
               </span>
             </p>
           </div>
@@ -68,8 +58,8 @@ export default async function AgentDashboardPage({
           </p>
         ) : null}
 
-        {profile?.status !== 'verified' ? <AgentPendingReviewCard /> : null}
-        {profile?.status === 'verified' && !profile?.onboarding_paid ? <AgentPaymentGate /> : null}
+        {viewer.status !== 'verified' ? <AgentPendingReviewCard /> : null}
+        {viewer.status === 'verified' && !viewer.onboardingPaid ? <AgentPaymentGate /> : null}
         <div className="rounded-2xl border border-border bg-card p-4 shadow-sm">
           <h2 className="text-base font-medium text-foreground mb-2">Recent updates</h2>
           {notices.length === 0 ? (
@@ -86,7 +76,6 @@ export default async function AgentDashboardPage({
           )}
         </div>
         {canManageListings ? <AgentListingsManager rows={rows} /> : null}
-      </div>
     </div>
   );
 }

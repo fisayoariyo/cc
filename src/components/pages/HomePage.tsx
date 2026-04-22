@@ -33,11 +33,15 @@ export default function HomePage() {
 
   return (
     <div ref={containerRef} className="min-h-screen bg-background">
-      {/* Hero — bright, sunlit */}
+      {/* Hero — dark cinematic direction */}
       <motion.section
         style={{ y: heroY, opacity: heroOpacity }}
-        className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-background via-[#fff8f0] to-[#ffe8d4]"
+        className="relative min-h-screen flex items-center justify-center overflow-hidden bg-[#07192f]"
       >
+        <div
+          aria-hidden
+          className="absolute inset-0 bg-[radial-gradient(circle_at_78%_72%,rgba(244,141,32,0.32),transparent_36%),radial-gradient(circle_at_28%_22%,rgba(56,112,206,0.22),transparent_34%),linear-gradient(180deg,#0A1F3A_0%,#0B2444_58%,#132B4D_100%)]"
+        />
         <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden>
           {heroParticlesMounted &&
             HERO_PARTICLES.map((p, i) => (
@@ -55,7 +59,7 @@ export default function HomePage() {
                   repeat: Infinity,
                   delay: i * 0.2,
                 }}
-                className="absolute w-2 h-2 rounded-full bg-primary/50"
+                className="absolute h-1.5 w-1.5 rounded-full bg-[#f39a1d]/40 blur-[0.2px]"
                 style={{
                   left: `${p.left}%`,
                   top: `${p.top}%`,
@@ -63,31 +67,22 @@ export default function HomePage() {
               />
             ))}
         </div>
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_18%,rgba(255,255,255,0.07),transparent_48%)]" />
 
-        <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-8 text-center">
+        <div className="relative z-10 mx-auto max-w-6xl px-6 pt-16 text-center lg:px-8">
           <motion.div
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1, delay: 0.2 }}
           >
-            <motion.h1 className="text-6xl md:text-8xl lg:text-9xl font-medium text-foreground mb-6 leading-tight">
-              {['Your', 'Property.', 'Your', 'Journey.'].map((word, index) => (
-                <motion.span
-                  key={index}
-                  initial={{ opacity: 0, y: 30 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.8, delay: 0.4 + index * 0.15 }}
-                  className="inline-block mr-6"
-                >
-                  {word}
-                </motion.span>
-              ))}
-              <br />
+            <motion.h1 className="mb-5 text-5xl font-light leading-[1.14] tracking-[-0.02em] text-white md:text-7xl lg:text-8xl">
+              <span className="block">Your Property. Your</span>
+              <span className="block">Journey.</span>
               <motion.span
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 1, delay: 1.2 }}
-                className="text-primary"
+                className="mt-2 block text-[#f39a1d]"
               >
                 One Consultant.
               </motion.span>
@@ -97,7 +92,7 @@ export default function HomePage() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 1, delay: 1.5 }}
-              className="text-xl md:text-2xl text-muted-foreground mb-12 max-w-3xl mx-auto"
+              className="mx-auto mb-10 max-w-3xl text-base text-white/85 md:text-xl"
             >
               Real Estate • Construction • Travel & Mobility
             </motion.p>
@@ -106,35 +101,26 @@ export default function HomePage() {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 1, delay: 1.8 }}
-              className="flex flex-col sm:flex-row gap-4 justify-center"
+              className="flex flex-col justify-center gap-3 sm:flex-row"
             >
               <motion.button
                 type="button"
-                whileHover={{ scale: 1.05, backgroundColor: 'rgb(232, 138, 95)' }}
+                whileHover={{ scale: 1.03, backgroundColor: '#e48915' }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => router.push('/real-estate')}
-                className="group px-10 py-5 bg-primary text-primary-foreground text-base font-medium rounded-full transition-all inline-flex items-center shadow-md shadow-primary/20 cursor-pointer"
+                className="group inline-flex cursor-pointer items-center rounded-full bg-[#f39a1d] px-8 py-3.5 text-sm font-semibold text-white shadow-[0_12px_28px_rgba(243,154,29,0.26)] transition-all"
               >
                 Browse Properties
-                <ArrowRight size={20} className="ml-2 group-hover:translate-x-2 transition-transform" />
+                <ArrowRight size={16} className="ml-2 transition-transform group-hover:translate-x-1.5" />
               </motion.button>
               <motion.button
                 type="button"
-                whileHover={{ scale: 1.05 }}
+                whileHover={{ scale: 1.03 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => router.push('/travels')}
-                className="px-10 py-5 bg-card/80 backdrop-blur-sm text-foreground text-base font-medium rounded-full border border-border shadow-sm inline-flex items-center justify-center cursor-pointer"
+                className="inline-flex cursor-pointer items-center justify-center rounded-full border border-white/25 bg-white/14 px-8 py-3.5 text-sm font-semibold text-white backdrop-blur-sm"
               >
                 Plan Your Trip
-              </motion.button>
-              <motion.button
-                type="button"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => router.push('/register?role=client&service=construction')}
-                className="px-10 py-5 bg-card/80 backdrop-blur-sm text-foreground text-base font-medium rounded-full border border-border shadow-sm inline-flex items-center justify-center cursor-pointer"
-              >
-                Start a Build
               </motion.button>
             </motion.div>
 
@@ -144,10 +130,10 @@ export default function HomePage() {
               transition={{ duration: 0.8, delay: 2.1 }}
               className="mt-5 flex flex-wrap justify-center gap-2"
             >
-              <Link href="/register?role=client&service=travel" className="text-xs rounded-full border border-border px-3 py-1 hover:bg-card">
+              <Link href="/register?role=client&service=travel" className="rounded-full border border-white/20 px-3 py-1 text-xs text-white/90 hover:bg-white/10">
                 New Travel Client
               </Link>
-              <Link href="/register?role=client&service=real_estate" className="text-xs rounded-full border border-border px-3 py-1 hover:bg-card">
+              <Link href="/register?role=client&service=real_estate" className="rounded-full border border-white/20 px-3 py-1 text-xs text-white/90 hover:bg-white/10">
                 New Real Estate Client
               </Link>
             </motion.div>

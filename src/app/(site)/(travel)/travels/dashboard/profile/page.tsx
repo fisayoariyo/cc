@@ -1,22 +1,23 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
+import { TravelProfileActions } from './profile-actions';
+import { getViewerContext } from '@/lib/supabase/dashboard-access';
 
 export const metadata: Metadata = {
   title: 'Travel profile',
 };
 
 export default async function TravelProfilePage() {
+  const viewer = await getViewerContext();
+  if (!viewer) return null;
+
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return null;
 
   const { data: profile } = await supabase
     .from('profiles')
     .select('full_name, email, role, phone_number, passport_number')
-    .eq('id', user.id)
+    .eq('id', viewer.userId)
     .maybeSingle();
 
   return (
@@ -34,7 +35,7 @@ export default async function TravelProfilePage() {
           </div>
           <div>
             <dt className="text-muted-foreground">Email</dt>
-            <dd className="font-medium text-foreground">{profile?.email || user.email || 'Not set'}</dd>
+            <dd className="font-medium text-foreground">{profile?.email || viewer.email || 'Not set'}</dd>
           </div>
           <div>
             <dt className="text-muted-foreground">Phone</dt>
@@ -59,6 +60,8 @@ export default async function TravelProfilePage() {
           Contact support
         </Link>
       </section>
+
+      <TravelProfileActions />
     </div>
   );
 }

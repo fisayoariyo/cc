@@ -106,6 +106,12 @@ export default function RealEstatePage({ featuredProperties }: { featuredPropert
             >
               Become Agent
             </Link>
+            <Link
+              href="/register?role=client&service=construction"
+              className="inline-flex items-center px-8 py-4 bg-card text-foreground text-sm font-medium rounded-full border border-border hover:bg-muted transition-colors"
+            >
+              Start a Build
+            </Link>
           </motion.div>
         </div>
       </section>

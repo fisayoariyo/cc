@@ -1,8 +1,12 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { useEffect } from 'react';
+import { usePathname, useRouter } from 'next/navigation';
 import { Bell, CircleHelp, FileText, LayoutDashboard, UserCircle } from 'lucide-react';
+import Image from 'next/image';
+import logoLockupColor from '@/assets/CC Logo Lockup (color).svg';
+import { SidebarAccountMenu } from '@/components/dashboard/SidebarAccountMenu';
 
 const ITEMS = [
   { href: '/travels/dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -21,12 +25,16 @@ function isActive(pathname: string, href: string): boolean {
 
 export function TravelDashboardSidebar({ fullName }: { fullName?: string | null }) {
   const pathname = usePathname();
+  const router = useRouter();
+
+  useEffect(() => {
+    ITEMS.forEach((item) => router.prefetch(item.href));
+  }, [router]);
 
   return (
-    <aside className="h-full rounded-2xl border border-border bg-card p-4 shadow-sm">
-      <div className="mb-6 px-2">
-        <h2 className="text-base font-semibold text-foreground">Travel Workspace</h2>
-        <p className="mt-1 text-xs text-muted-foreground">Client dashboard</p>
+    <aside className="h-full rounded-2xl bg-white px-4 py-5">
+      <div className="mb-8 px-2">
+        <Image src={logoLockupColor} alt="DotCharis Consult" className="h-11 w-auto object-contain" priority />
       </div>
 
       <nav className="space-y-2">
@@ -37,9 +45,9 @@ export function TravelDashboardSidebar({ fullName }: { fullName?: string | null 
               key={item.href}
               href={item.href}
               prefetch
-              className={`flex items-center gap-2 rounded-xl px-3 py-2 text-sm transition-colors ${
+              className={`flex h-[44px] items-center gap-2 rounded-[10px] px-3 py-2 text-sm transition-colors ${
                 active
-                  ? 'bg-primary text-primary-foreground'
+                  ? 'bg-primary text-primary-foreground shadow-[0_6px_14px_rgba(3,98,77,0.18)]'
                   : 'text-muted-foreground hover:bg-muted hover:text-foreground'
               }`}
             >
@@ -50,10 +58,7 @@ export function TravelDashboardSidebar({ fullName }: { fullName?: string | null 
         })}
       </nav>
 
-      <div className="mt-8 rounded-xl border border-border bg-muted/30 px-3 py-2">
-        <p className="text-xs text-muted-foreground">Signed in as</p>
-        <p className="text-sm font-medium text-foreground truncate">{fullName || 'Travel Client'}</p>
-      </div>
+      <SidebarAccountMenu fullName={fullName} fallbackLabel="Travel Client" />
     </aside>
   );
 }

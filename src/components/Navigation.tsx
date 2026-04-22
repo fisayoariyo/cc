@@ -49,8 +49,8 @@ export default function Navigation({ initialAuthState }: { initialAuthState: Aut
     { name: 'Contact', path: '/contact' },
   ];
 
-  /** Full-bleed image heroes (CinematicHero) need light nav text; bright home hero uses dark text. */
-  const navOnDarkImage = !isScrolled && ['/real-estate', '/travels'].includes(pathname);
+  /** Full-bleed dark heroes need light nav text. */
+  const navOnDarkImage = !isScrolled && ['/', '/real-estate', '/travels'].includes(pathname);
 
   return (
     <motion.nav

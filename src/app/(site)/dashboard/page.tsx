@@ -44,8 +44,8 @@ export default async function DashboardResolverPage({
   const errorMessage = params.error;
 
   return (
-    <div className="min-h-screen bg-background pt-20 sm:pt-24 px-4 sm:px-6 pb-16">
-      <div className="max-w-3xl mx-auto space-y-6">
+    <div className="min-h-screen bg-background px-4 sm:px-6 py-6 sm:py-8">
+      <div className="w-full space-y-6">
         <div>
           <h1 className="text-2xl sm:text-3xl font-light text-foreground">Choose your client workspace</h1>
           <p className="text-muted-foreground mt-1 text-sm sm:text-base">

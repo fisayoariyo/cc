@@ -1,25 +1,22 @@
 import type { Metadata } from 'next';
-import { createClient } from '@/lib/supabase/server';
 import { TravelApplicationForm } from '@/app/(site)/dashboard/travel-form';
 import { DocumentUploadForm } from '@/app/(site)/dashboard/document-upload-form';
 import { Badge } from '@/components/ui/badge';
 import { getDocumentsForClient, getStageHistoryForApplications, getTravelApplicationsForClient } from '@/lib/supabase/data';
 import { getStageLabel } from '@/lib/travel-stages';
+import { getViewerContext } from '@/lib/supabase/dashboard-access';
 
 export const metadata: Metadata = {
   title: 'Travel applications',
 };
 
 export default async function TravelApplicationsPage() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return null;
+  const viewer = await getViewerContext();
+  if (!viewer) return null;
 
   const [applications, docs] = await Promise.all([
-    getTravelApplicationsForClient(user.id),
-    getDocumentsForClient(user.id),
+    getTravelApplicationsForClient(viewer.userId),
+    getDocumentsForClient(viewer.userId),
   ]);
 
   const historyMap = await getStageHistoryForApplications(applications.map((a) => a.id));

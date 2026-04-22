@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { ArrowLeft } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Travel help',
@@ -8,6 +9,14 @@ export const metadata: Metadata = {
 export default function TravelHelpPage() {
   return (
     <div className="space-y-6">
+      <Link
+        href="/travels/dashboard/profile"
+        className="inline-flex items-center gap-1.5 text-sm text-foreground/90 hover:text-foreground sm:hidden"
+      >
+        <ArrowLeft size={16} />
+        Go back
+      </Link>
+
       <section className="rounded-2xl border border-border bg-card p-4 sm:p-6 shadow-sm">
         <h1 className="text-2xl font-semibold text-foreground">Help & support</h1>
         <p className="mt-1 text-sm text-muted-foreground">

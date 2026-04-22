@@ -1,40 +1,29 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { redirect } from 'next/navigation';
-import { createClient } from '@/lib/supabase/server';
 import { getCompareProperties, getFavoriteProperties, getNotificationsForUser, getSavedSearches } from '@/lib/supabase/data';
+import { getViewerContext } from '@/lib/supabase/dashboard-access';
 
 export const metadata: Metadata = {
   title: 'Real estate dashboard',
 };
 
 export default async function RealEstateDashboardPage() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return null;
+  const viewer = await getViewerContext();
+  if (!viewer) return null;
 
-  const [{ data: profile }, { data: services }, favorites, compare, searches, notices] = await Promise.all([
-    supabase.from('profiles').select('full_name').eq('id', user.id).maybeSingle(),
-    supabase.from('client_services').select('service').eq('user_id', user.id).eq('service', 'real_estate'),
-    getFavoriteProperties(user.id),
-    getCompareProperties(user.id),
-    getSavedSearches(user.id),
-    getNotificationsForUser(user.id, 5),
+  const [favorites, compare, searches, notices] = await Promise.all([
+    getFavoriteProperties(viewer.userId),
+    getCompareProperties(viewer.userId),
+    getSavedSearches(viewer.userId),
+    getNotificationsForUser(viewer.userId, 5),
   ]);
 
-  if (!services?.length) {
-    redirect('/dashboard');
-  }
-
   return (
-    <div className="min-h-screen bg-background pt-20 sm:pt-24 px-4 sm:px-6 pb-16">
-      <div className="max-w-5xl mx-auto space-y-8">
+    <div className="w-full space-y-8">
         <div>
           <h1 className="text-2xl sm:text-3xl font-light text-foreground">Real estate client dashboard</h1>
           <p className="text-muted-foreground mt-1 text-sm sm:text-base">
-            Welcome back{profile?.full_name ? `, ${profile.full_name}` : ''}. Manage saved searches, favorites, and
+            Welcome back{viewer.fullName ? `, ${viewer.fullName}` : ''}. Manage saved searches, favorites, and
             compare list.
           </p>
         </div>
@@ -95,7 +84,6 @@ export default async function RealEstateDashboardPage() {
             </ul>
           )}
         </div>
-      </div>
     </div>
   );
 }

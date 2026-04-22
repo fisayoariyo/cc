@@ -11,60 +11,30 @@
       "static/chunks/main-app.js",
       "static/chunks/app/(site)/layout.js"
     ],
-    "/(site)/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/(site)/page.js"
-    ],
-    "/(site)/(travel)/travels/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/(site)/(travel)/travels/page.js"
-    ],
-    "/(auth)/layout": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/(auth)/layout.js"
-    ],
-    "/(auth)/register/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/(auth)/register/page.js"
-    ],
-    "/(site)/dashboard/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/(site)/dashboard/page.js"
-    ],
-    "/(site)/(travel)/travels/dashboard/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/(site)/(travel)/travels/dashboard/page.js"
-    ],
     "/(site)/(travel)/travels/dashboard/layout": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/chunks/app/(site)/(travel)/travels/dashboard/layout.js"
+    ],
+    "/(site)/(travel)/travels/dashboard/loading": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/(site)/(travel)/travels/dashboard/loading.js"
     ],
     "/(site)/(travel)/travels/dashboard/applications/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/chunks/app/(site)/(travel)/travels/dashboard/applications/page.js"
     ],
-    "/(site)/(travel)/travels/dashboard/updates/page": [
+    "/(site)/(travel)/travels/dashboard/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/(site)/(travel)/travels/dashboard/updates/page.js"
+      "static/chunks/app/(site)/(travel)/travels/dashboard/page.js"
     ],
-    "/(site)/(travel)/travels/dashboard/profile/page": [
+    "/(site)/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/(site)/(travel)/travels/dashboard/profile/page.js"
-    ],
-    "/(site)/(travel)/travels/dashboard/loading": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/(site)/(travel)/travels/dashboard/loading.js"
+      "static/chunks/app/(site)/page.js"
     ]
   }
 }

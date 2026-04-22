@@ -19,8 +19,8 @@ export default async function AgentEditListingPage({ params }: Props) {
   }
 
   return (
-    <div className="min-h-screen bg-background pt-20 sm:pt-24 px-4 sm:px-6 pb-16">
-      <div className="max-w-2xl mx-auto space-y-6">
+    <div className="space-y-6">
+      <div className="max-w-2xl space-y-6">
         <div>
           <h1 className="text-2xl font-light text-foreground">Edit listing</h1>
           <p className="text-muted-foreground text-sm mt-1">{property.title}</p>

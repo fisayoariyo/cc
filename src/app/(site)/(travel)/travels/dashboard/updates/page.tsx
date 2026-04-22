@@ -1,19 +1,16 @@
 import type { Metadata } from 'next';
-import { createClient } from '@/lib/supabase/server';
 import { getNotificationsForUser } from '@/lib/supabase/data';
+import { getViewerContext } from '@/lib/supabase/dashboard-access';
 
 export const metadata: Metadata = {
   title: 'Travel updates',
 };
 
 export default async function TravelUpdatesPage() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return null;
+  const viewer = await getViewerContext();
+  if (!viewer) return null;
 
-  const notices = await getNotificationsForUser(user.id, 20);
+  const notices = await getNotificationsForUser(viewer.userId, 20);
 
   return (
     <div className="space-y-6">
