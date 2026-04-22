@@ -1,6 +1,6 @@
 'use client';
 
-import { FormEvent, useEffect, useMemo, useState } from 'react';
+import { FormEvent, useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { createClient } from '@/lib/supabase/client';
@@ -9,9 +9,10 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import logoLockupColor from '@/assets/CC Logo Lockup (color).svg';
+import type { SupabaseClient } from '@supabase/supabase-js';
 
 export function ResetPasswordForm() {
-  const supabase = useMemo(() => createClient(), []);
+  const [supabase, setSupabase] = useState<SupabaseClient | null>(null);
   const [ready, setReady] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
@@ -20,6 +21,17 @@ export function ResetPasswordForm() {
   const [confirmPassword, setConfirmPassword] = useState('');
 
   useEffect(() => {
+    // Prevent SSR/pre-render crashes if env is missing at build time.
+    if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+      setError('Configuration missing. Please contact support.');
+      setReady(true);
+      return;
+    }
+    setSupabase(createClient());
+  }, []);
+
+  useEffect(() => {
+    if (!supabase) return;
     void (async () => {
       const { data } = await supabase.auth.getSession();
       if (!data.session) {
@@ -27,7 +39,7 @@ export function ResetPasswordForm() {
       }
       setReady(true);
     })();
-  }, [supabase.auth]);
+  }, [supabase]);
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
@@ -39,6 +51,10 @@ export function ResetPasswordForm() {
     }
     if (password !== confirmPassword) {
       setError('Passwords do not match.');
+      return;
+    }
+    if (!supabase) {
+      setError('Configuration missing. Please contact support.');
       return;
     }
     setPending(true);

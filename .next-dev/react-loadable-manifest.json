@@ -8,13 +8,7 @@
   "components\\pages\\RealEstatePage.tsx -> @/components/CinematicHero": {
     "id": "components\\pages\\RealEstatePage.tsx -> @/components/CinematicHero",
     "files": [
-      "static/chunks/_app-pages-browser_src_components_CinematicHero_tsx-_a9151.js"
-    ]
-  },
-  "components\\pages\\TravelPage.tsx -> @/components/CinematicHero": {
-    "id": "components\\pages\\TravelPage.tsx -> @/components/CinematicHero",
-    "files": [
-      "static/chunks/_app-pages-browser_src_components_CinematicHero_tsx-_a9150.js"
+      "static/chunks/_app-pages-browser_src_components_CinematicHero_tsx.js"
     ]
   }
 }

@@ -64,8 +64,10 @@ export function AuthNav({
     if (!supabase) return;
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange(() => {
-      void load();
+    } = supabase.auth.onAuthStateChange((event) => {
+      if (event === 'SIGNED_IN' || event === 'SIGNED_OUT' || event === 'USER_UPDATED') {
+        void load();
+      }
     });
     return () => subscription.unsubscribe();
   }, [supabase, load]);
@@ -165,8 +167,10 @@ export function AuthNavMobile({
     if (!supabase) return;
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange(() => {
-      void load();
+    } = supabase.auth.onAuthStateChange((event) => {
+      if (event === 'SIGNED_IN' || event === 'SIGNED_OUT' || event === 'USER_UPDATED') {
+        void load();
+      }
     });
     return () => subscription.unsubscribe();
   }, [supabase, load]);
