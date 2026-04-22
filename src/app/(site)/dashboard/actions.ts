@@ -1,6 +1,7 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
+import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import type { ClientServiceType } from '@/lib/types/database';
 import { firstStageForService, getStageLabel, normalizeTravelServiceType } from '@/lib/travel-stages';
@@ -22,6 +23,22 @@ export async function addClientService(service: ClientServiceType) {
 
   revalidatePath('/dashboard');
   return { ok: true };
+}
+
+export async function addClientServiceAndContinue(service: ClientServiceType): Promise<void> {
+  const result = await addClientService(service);
+  if (result && 'error' in result) {
+    const message = typeof result.error === 'string' ? result.error : 'Could not add service.';
+    redirect(`/dashboard?error=${encodeURIComponent(message)}`);
+  }
+
+  if (service === 'travel') {
+    redirect('/travels/dashboard');
+  }
+  if (service === 'real_estate') {
+    redirect('/real-estate/dashboard');
+  }
+  redirect('/construction/dashboard');
 }
 
 export type TravelFormState = { error: string } | { success: true } | null;

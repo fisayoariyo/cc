@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { getClientServices } from '@/lib/supabase/data';
-import { addClientService } from './actions';
+import { addClientServiceAndContinue } from './actions';
 
 const SERVICE_ROUTES = {
   travel: '/travels/dashboard',
@@ -16,7 +16,11 @@ const SERVICE_LABELS = {
   construction: 'Construction',
 } as const;
 
-export default async function DashboardResolverPage() {
+export default async function DashboardResolverPage({
+  searchParams,
+}: {
+  searchParams?: Promise<{ error?: string }>;
+}) {
   const supabase = await createClient();
   const {
     data: { user },
@@ -36,6 +40,9 @@ export default async function DashboardResolverPage() {
     redirect(SERVICE_ROUTES[services[0]]);
   }
 
+  const params = (await searchParams) ?? {};
+  const errorMessage = params.error;
+
   return (
     <div className="min-h-screen bg-background pt-20 sm:pt-24 px-4 sm:px-6 pb-16">
       <div className="max-w-3xl mx-auto space-y-6">
@@ -45,6 +52,11 @@ export default async function DashboardResolverPage() {
             {profile?.full_name ? `${profile.full_name}, ` : ''}pick one service to continue. You can add more anytime.
           </p>
         </div>
+        {errorMessage ? (
+          <div className="rounded-xl border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive">
+            {errorMessage}
+          </div>
+        ) : null}
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {(Object.keys(SERVICE_ROUTES) as Array<keyof typeof SERVICE_ROUTES>).map((service) => {
@@ -60,12 +72,7 @@ export default async function DashboardResolverPage() {
                     Open dashboard
                   </Link>
                 ) : (
-                  <form
-                    action={async () => {
-                      'use server';
-                      await addClientService(service);
-                    }}
-                  >
+                  <form action={addClientServiceAndContinue.bind(null, service)}>
                     <button
                       type="submit"
                       className="inline-flex rounded-full px-4 py-2 text-sm border border-border hover:bg-muted"
