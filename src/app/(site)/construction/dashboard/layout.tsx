@@ -21,7 +21,6 @@ export default async function ConstructionDashboardLayout({
       navItems={[
         { href: '/construction/dashboard', label: 'Dashboard' },
         { href: '/contact', label: 'Start new inquiry' },
-        { href: '/dashboard', label: 'Switch service' },
         { href: '/contact', label: 'Help & support' },
       ]}
       primaryActionHref="/contact"
@@ -31,4 +30,3 @@ export default async function ConstructionDashboardLayout({
     </DesktopServiceShell>
   );
 }
-

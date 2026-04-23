@@ -1,9 +1,11 @@
 import Link from 'next/link';
+import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { getClientServices } from '@/lib/supabase/data';
 import { getViewerContext } from '@/lib/supabase/dashboard-access';
 import { addClientServiceAndContinue } from './actions';
 import { CONSTRUCTION_CONSULTATION_URL } from '@/lib/consultation';
+import { isClientDashboardService, LAST_CLIENT_SERVICE_COOKIE } from '@/lib/last-client-service';
 
 const SERVICE_ROUTES = {
   travel: '/travels/dashboard',
@@ -26,6 +28,8 @@ export default async function DashboardResolverPage({
   if (viewer.role === 'agent') redirect(viewer.status === 'verified' ? '/agent' : '/agent/under-review');
 
   const services = (await getClientServices(viewer.userId)).map((s) => s.service);
+  const cookieStore = await cookies();
+  const lastService = cookieStore.get(LAST_CLIENT_SERVICE_COOKIE)?.value;
 
   if (services.length === 1) {
     if (services[0] === 'construction') {
@@ -46,6 +50,10 @@ export default async function DashboardResolverPage({
 
   const params = (await searchParams) ?? {};
   const errorMessage = params.error;
+
+  if (isClientDashboardService(lastService) && dashboardServices.includes(lastService)) {
+    redirect(SERVICE_ROUTES[lastService]);
+  }
 
   return (
     <div className="min-h-screen bg-background px-4 sm:px-6 py-6 sm:py-8">

@@ -82,17 +82,17 @@ export function AgentAuthShell({
           >
             <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(9,18,19,0.04)_0%,rgba(8,18,17,0.10)_36%,rgba(6,16,15,0.78)_100%)]" />
             <div className="absolute inset-x-8 bottom-8">
-              <div className="max-w-[520px] space-y-5 text-white">
+              <div className="max-w-[640px] space-y-5 text-white">
                 <Image src={logoLockupColor} alt="Charis Consult" className="h-12 w-auto" priority />
                 <h2
                   className={cn(
-                    'text-[34px] font-semibold leading-[1.04] tracking-[-0.035em] xl:text-[40px]',
+                    'max-w-[620px] text-[32px] font-semibold leading-[1.04] tracking-[-0.035em] xl:text-[38px]',
                     visualTitleClassName,
                   )}
                 >
                   {visualTitle ?? shellVisuals.title}
                 </h2>
-                <p className="max-w-[500px] text-[19px] leading-9 text-white/92">
+                <p className="max-w-[620px] text-[19px] leading-8 text-white/92">
                   {visualCopy ?? shellVisuals.copy}
                 </p>
               </div>

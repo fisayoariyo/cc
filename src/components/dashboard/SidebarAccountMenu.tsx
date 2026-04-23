@@ -21,7 +21,13 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 
-export function SidebarAccountMenu({ fullName, fallbackLabel }: { fullName?: string | null; fallbackLabel: string }) {
+export function SidebarAccountMenu({
+  fullName,
+  fallbackLabel,
+}: {
+  fullName?: string | null;
+  fallbackLabel: string;
+}) {
   const router = useRouter();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [pending, setPending] = useState(false);
@@ -90,4 +96,3 @@ export function SidebarAccountMenu({ fullName, fallbackLabel }: { fullName?: str
     </>
   );
 }
-

@@ -21,7 +21,6 @@ export default async function RealEstateDashboardLayout({
       navItems={[
         { href: '/real-estate/dashboard', label: 'Dashboard' },
         { href: '/real-estate/properties', label: 'Browse properties' },
-        { href: '/dashboard', label: 'Switch service' },
         { href: '/contact', label: 'Help & support' },
       ]}
       primaryActionHref="/real-estate/properties"
@@ -31,4 +30,3 @@ export default async function RealEstateDashboardLayout({
     </DesktopServiceShell>
   );
 }
-

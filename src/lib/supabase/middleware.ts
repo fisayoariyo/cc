@@ -4,6 +4,10 @@ import {
   VIEWER_HEADER_NAMES,
   encodeViewerHeaderValue,
 } from '@/lib/supabase/viewer-headers';
+import {
+  LAST_CLIENT_SERVICE_COOKIE,
+  LAST_CLIENT_SERVICE_MAX_AGE,
+} from '@/lib/last-client-service';
 
 /**
  * Refreshes the Supabase session on each matched request and returns the response
@@ -126,6 +130,24 @@ export async function updateSession(request: NextRequest) {
     if (profile?.role === 'admin') return NextResponse.redirect(new URL('/admin', request.url));
     if (profile?.role === 'agent') return NextResponse.redirect(new URL('/agent', request.url));
     return NextResponse.redirect(new URL('/dashboard', request.url));
+  }
+
+  if (profile?.role === 'client') {
+    if (isTravelClientRoute) {
+      supabaseResponse.cookies.set(LAST_CLIENT_SERVICE_COOKIE, 'travel', {
+        path: '/',
+        maxAge: LAST_CLIENT_SERVICE_MAX_AGE,
+        sameSite: 'lax',
+      });
+    }
+
+    if (isRealEstateClientRoute) {
+      supabaseResponse.cookies.set(LAST_CLIENT_SERVICE_COOKIE, 'real_estate', {
+        path: '/',
+        maxAge: LAST_CLIENT_SERVICE_MAX_AGE,
+        sameSite: 'lax',
+      });
+    }
   }
 
   return supabaseResponse;

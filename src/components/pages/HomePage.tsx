@@ -111,7 +111,7 @@ export default function HomePage() {
                 onClick={() => router.push('/real-estate')}
                 className="group inline-flex cursor-pointer items-center rounded-full bg-[#f39a1d] px-8 py-3.5 text-sm font-semibold text-white shadow-[0_12px_28px_rgba(243,154,29,0.26)] transition-all"
               >
-                Browse Properties
+                Real Estate
                 <ArrowRight size={16} className="ml-2 transition-transform group-hover:translate-x-1.5" />
               </motion.button>
               <motion.button
@@ -121,22 +121,8 @@ export default function HomePage() {
                 onClick={() => router.push('/travels')}
                 className="inline-flex cursor-pointer items-center justify-center rounded-full border border-white/25 bg-white/14 px-8 py-3.5 text-sm font-semibold text-white backdrop-blur-sm"
               >
-                Plan Your Trip
+                Travel
               </motion.button>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.8, delay: 2.1 }}
-              className="mt-5 flex flex-wrap justify-center gap-2"
-            >
-              <Link href="/register?role=client&service=travel" className="rounded-full border border-white/20 px-3 py-1 text-xs text-white/90 hover:bg-white/10">
-                New Travel Client
-              </Link>
-              <Link href="/register?role=client&service=real_estate" className="rounded-full border border-white/20 px-3 py-1 text-xs text-white/90 hover:bg-white/10">
-                New Real Estate Client
-              </Link>
             </motion.div>
           </motion.div>
         </div>

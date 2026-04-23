@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { CircleHelp, LogOut, Repeat, ShieldCheck } from 'lucide-react';
+import { CircleHelp, LogOut, ShieldCheck } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 
 export function TravelProfileActions() {
@@ -19,7 +19,7 @@ export function TravelProfileActions() {
   }
 
   return (
-    <section className="rounded-2xl border border-border bg-card p-4 sm:p-6 shadow-sm">
+    <section className="rounded-2xl border border-border bg-card p-4 shadow-sm sm:p-6">
       <h2 className="text-base font-semibold text-foreground">More options</h2>
       <div className="mt-4 space-y-2">
         <Link
@@ -30,18 +30,7 @@ export function TravelProfileActions() {
             <CircleHelp size={16} />
             FAQs & Support
           </span>
-          <span aria-hidden>›</span>
-        </Link>
-
-        <Link
-          href="/dashboard"
-          className="flex items-center justify-between rounded-xl border border-border px-3 py-3 text-sm text-foreground hover:bg-muted/30"
-        >
-          <span className="inline-flex items-center gap-2">
-            <Repeat size={16} />
-            Switch Service
-          </span>
-          <span aria-hidden>›</span>
+          <span aria-hidden>&rsaquo;</span>
         </Link>
 
         <button
@@ -59,4 +48,3 @@ export function TravelProfileActions() {
     </section>
   );
 }
-

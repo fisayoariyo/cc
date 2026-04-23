@@ -1,3 +1,4 @@
+import { createClient as createPublicClient } from '@supabase/supabase-js';
 import { createClient } from '@/lib/supabase/server';
 import { unstable_cache } from 'next/cache';
 import type {
@@ -39,9 +40,30 @@ const CONSTRUCTION_STAGE_HISTORY_COLUMNS =
 const NOTIFICATION_COLUMNS =
   'id, user_id, title, body, type, link_url, metadata, is_read, created_at';
 
+function createPublicReadonlyClient() {
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+    return null;
+  }
+
+  return createPublicClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+    {
+      auth: {
+        persistSession: false,
+        autoRefreshToken: false,
+      },
+    },
+  );
+}
+
 const getCachedActiveProperties = unstable_cache(
   async (): Promise<PropertyRow[]> => {
-    const supabase = await createClient();
+    const supabase = createPublicReadonlyClient();
+    if (!supabase) {
+      return [];
+    }
+
     const { data, error } = await supabase
       .from('properties')
       .select(PROPERTY_COLUMNS)

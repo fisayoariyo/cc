@@ -67,9 +67,6 @@ export default async function ConstructionDashboardPage() {
           <Link href="/contact" className="rounded-full px-4 py-2 text-sm bg-primary text-primary-foreground">
             Start project inquiry
           </Link>
-          <Link href="/dashboard" className="rounded-full px-4 py-2 text-sm border border-border hover:bg-muted">
-            Switch service
-          </Link>
         </div>
     </div>
   );
