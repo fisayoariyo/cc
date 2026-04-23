@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from 'react';
 import { updateTravelStage } from './actions';
-import type { TravelStatus } from '@/lib/types/database';
+import type { TravelStageKey } from '@/lib/types/database';
 import { getStageOptions } from '@/lib/travel-stages';
 import { Button } from '@/components/ui/button';
 export function TravelStageSelect({
@@ -12,13 +12,13 @@ export function TravelStageSelect({
 }: {
   id: string;
   serviceType: string | null;
-  current: TravelStatus;
+  current: TravelStageKey;
 }) {
   const [pending, startTransition] = useTransition();
   const [notice, setNotice] = useState<string | null>(null);
-  const [stage, setStage] = useState<TravelStatus>(current);
+  const [stage, setStage] = useState<TravelStageKey>(current);
   const [note, setNote] = useState('');
-  const optionsBase = getStageOptions(serviceType).map((o) => ({ ...o, value: o.value as TravelStatus }));
+  const optionsBase = getStageOptions(serviceType).map((o) => ({ ...o, value: o.value }));
   const options = optionsBase.some((o) => o.value === current)
     ? optionsBase
     : [{ value: current, label: current.replace(/_/g, ' ') }, ...optionsBase];
@@ -28,7 +28,7 @@ export function TravelStageSelect({
       <select
         value={stage}
         disabled={pending}
-        onChange={(e) => setStage(e.target.value as TravelStatus)}
+        onChange={(e) => setStage(e.target.value)}
         className="h-9 w-full min-w-[140px] rounded-md border border-input bg-background px-2 text-sm"
         aria-label="Update stage"
       >

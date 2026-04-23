@@ -2,25 +2,23 @@
 
 import { revalidatePath } from 'next/cache';
 import { createClient } from '@/lib/supabase/server';
-import type { TravelStatus } from '@/lib/types/database';
+import { getViewerContext } from '@/lib/supabase/dashboard-access';
+import type { TravelStageKey } from '@/lib/types/database';
 import { getStageLabel, getStageOptions } from '@/lib/travel-stages';
 import { createNotification } from '@/lib/supabase/notifications';
 
-export async function updateTravelStage(id: string, serviceType: string, current_stage: TravelStatus, note?: string) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) {
+export async function updateTravelStage(id: string, serviceType: string, current_stage: TravelStageKey, note?: string) {
+  const viewer = await getViewerContext();
+  if (!viewer) {
     return { error: 'Not signed in.' };
   }
-
-  const { data: me } = await supabase.from('profiles').select('role').eq('id', user.id).maybeSingle();
-  if (me?.role !== 'admin') {
+  if (viewer.role !== 'admin') {
     return { error: 'Not allowed.' };
   }
 
-  const allowed = getStageOptions(serviceType).map((s) => s.value as TravelStatus);
+  const supabase = await createClient();
+
+  const allowed = getStageOptions(serviceType).map((s) => s.value);
   if (!allowed.includes(current_stage)) {
     return { error: 'Invalid stage.' };
   }
@@ -41,7 +39,7 @@ export async function updateTravelStage(id: string, serviceType: string, current
     stage_key: current_stage,
     stage_label: getStageLabel(serviceType, current_stage),
     note_to_client: note?.trim() || null,
-    changed_by: user.id,
+    changed_by: viewer.userId,
   });
 
   if (app?.client_id) {
@@ -66,14 +64,11 @@ export async function reviewApplicationDocument(
   status: 'accepted' | 'rejected' | 'resubmit_required',
   adminNote?: string,
 ) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { error: 'Not signed in.' };
+  const viewer = await getViewerContext();
+  if (!viewer) return { error: 'Not signed in.' };
+  if (viewer.role !== 'admin') return { error: 'Not allowed.' };
 
-  const { data: me } = await supabase.from('profiles').select('role').eq('id', user.id).maybeSingle();
-  if (me?.role !== 'admin') return { error: 'Not allowed.' };
+  const supabase = await createClient();
 
   if (status === 'resubmit_required' && !adminNote?.trim()) {
     return { error: 'Provide note for resubmission request.' };
@@ -90,7 +85,7 @@ export async function reviewApplicationDocument(
       status,
       admin_note: adminNote?.trim() || null,
       reviewed_at: new Date().toISOString(),
-      reviewed_by: user.id,
+      reviewed_by: viewer.userId,
     })
     .eq('id', id);
   if (error) return { error: error.message };

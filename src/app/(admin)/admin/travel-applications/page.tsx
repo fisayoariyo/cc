@@ -12,7 +12,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import type { TravelStatus } from '@/lib/types/database';
+import type { TravelStageKey } from '@/lib/types/database';
 import { TravelStageSelect } from './travel-stage-select';
 import { DocumentReviewControls } from './document-review-controls';
 import { getStageLabel } from '@/lib/travel-stages';
@@ -141,7 +141,7 @@ export default async function AdminTravelPage({
                         <TravelStageSelect
                           id={t.id}
                           serviceType={t.service_type}
-                          current={t.current_stage as TravelStatus}
+                          current={t.current_stage as TravelStageKey}
                         />
                       </div>
                     </TableCell>

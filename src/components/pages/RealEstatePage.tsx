@@ -6,6 +6,7 @@ import { motion } from 'motion/react';
 import PropertyCard from '@/components/PropertyCard';
 import { ArrowRight, Building2, Home, MapPin } from 'lucide-react';
 import type { PropertyRecord } from '@/data/properties';
+import { CONSTRUCTION_CONSULTATION_URL } from '@/lib/consultation';
 
 const CinematicHero = dynamic(() => import('@/components/CinematicHero'), {
   ssr: false,
@@ -106,12 +107,14 @@ export default function RealEstatePage({ featuredProperties }: { featuredPropert
             >
               Become Agent
             </Link>
-            <Link
-              href="/register?role=client&service=construction"
+            <a
+              href={CONSTRUCTION_CONSULTATION_URL}
+              target="_blank"
+              rel="noreferrer"
               className="inline-flex items-center px-8 py-4 bg-card text-foreground text-sm font-medium rounded-full border border-border hover:bg-muted transition-colors"
             >
-              Start a Build
-            </Link>
+              Book a Consultation
+            </a>
           </motion.div>
         </div>
       </section>

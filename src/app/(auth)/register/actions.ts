@@ -27,14 +27,11 @@ export async function signUp(prevState: SignUpState, formData: FormData): Promis
   const rawRole = String(formData.get('role') ?? 'client');
   const role = rawRole === 'agent' ? 'agent' : 'client';
   const rawService = String(formData.get('service_interest') ?? 'travel');
-  const serviceInterest =
-    rawService === 'real_estate' || rawService === 'construction' ? rawService : 'travel';
+  const serviceInterest = rawService === 'real_estate' ? 'real_estate' : 'travel';
   const phone = String(formData.get('phone') ?? '').trim();
   const passportNumber = String(formData.get('passport_number') ?? '').trim();
   const preferredLocation = String(formData.get('preferred_location') ?? '').trim();
   const budgetRange = String(formData.get('budget_range') ?? '').trim();
-  const projectType = String(formData.get('project_type') ?? '').trim();
-  const projectLocation = String(formData.get('project_location') ?? '').trim();
   const agencyName = String(formData.get('agency_name') ?? '').trim();
   const registrationNumber = String(formData.get('registration_number') ?? '').trim();
 
@@ -52,7 +49,6 @@ export async function signUp(prevState: SignUpState, formData: FormData): Promis
   }
   if (role === 'agent') {
     if (!phone) return { error: 'Phone is required for agent registration.' };
-    if (!registrationNumber) return { error: 'NIN or business registration number is required.' };
   } else {
     if (serviceInterest === 'travel') {
       if (!phone) return { error: 'Phone number is required for travel clients.' };
@@ -61,10 +57,6 @@ export async function signUp(prevState: SignUpState, formData: FormData): Promis
     if (serviceInterest === 'real_estate') {
       if (!preferredLocation) return { error: 'Preferred location is required for real estate clients.' };
       if (!budgetRange) return { error: 'Budget range is required for real estate clients.' };
-    }
-    if (serviceInterest === 'construction') {
-      if (!projectType) return { error: 'Project type is required for construction clients.' };
-      if (!projectLocation) return { error: 'Project location is required for construction clients.' };
     }
   }
 
@@ -75,8 +67,9 @@ export async function signUp(prevState: SignUpState, formData: FormData): Promis
   const supabase = await createClient();
 
   const origin = await getAppOrigin();
+  const callbackNext = role === 'agent' ? '/agent/under-review' : '/dashboard';
   /** After clicking the Supabase email link, user lands on /auth/callback (must be in Supabase Redirect URLs). */
-  const emailRedirectTo = origin ? `${origin}/auth/callback?next=/dashboard` : undefined;
+  const emailRedirectTo = origin ? `${origin}/auth/callback?next=${encodeURIComponent(callbackNext)}` : undefined;
 
   const { data, error } = await supabase.auth.signUp({
     email,
@@ -93,8 +86,6 @@ export async function signUp(prevState: SignUpState, formData: FormData): Promis
         service_interest: serviceInterest,
         preferred_location: preferredLocation,
         budget_range: budgetRange,
-        project_type: projectType,
-        project_location: projectLocation,
       },
     },
   });
@@ -110,7 +101,7 @@ export async function signUp(prevState: SignUpState, formData: FormData): Promis
   const needsEmailConfirmation = !data.session;
 
   if (!needsEmailConfirmation) {
-    redirect('/dashboard');
+    redirect(role === 'agent' ? '/agent/under-review' : '/dashboard');
   }
 
   return { success: true, needsEmailConfirmation, role };

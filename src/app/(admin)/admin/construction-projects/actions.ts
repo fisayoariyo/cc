@@ -2,18 +2,16 @@
 
 import { revalidatePath } from 'next/cache';
 import { createClient } from '@/lib/supabase/server';
+import { getViewerContext } from '@/lib/supabase/dashboard-access';
 import { CONSTRUCTION_STAGES, constructionStageLabel } from '@/lib/construction-stages';
 import { createNotification } from '@/lib/supabase/notifications';
 
 export async function createConstructionProject(formData: FormData) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { error: 'Not signed in.' };
+  const viewer = await getViewerContext();
+  if (!viewer) return { error: 'Not signed in.' };
+  if (viewer.role !== 'admin') return { error: 'Not allowed.' };
 
-  const { data: me } = await supabase.from('profiles').select('role').eq('id', user.id).maybeSingle();
-  if (me?.role !== 'admin') return { error: 'Not allowed.' };
+  const supabase = await createClient();
 
   const clientId = String(formData.get('client_id') ?? '').trim();
   const title = String(formData.get('title') ?? '').trim();
@@ -40,7 +38,7 @@ export async function createConstructionProject(formData: FormData) {
       description: description || null,
       current_stage: firstStage,
       status: 'in_progress',
-      created_by: user.id,
+      created_by: viewer.userId,
     })
     .select('id')
     .maybeSingle();
@@ -50,7 +48,7 @@ export async function createConstructionProject(formData: FormData) {
     project_id: data?.id,
     stage_key: firstStage,
     stage_label: constructionStageLabel(firstStage),
-    changed_by: user.id,
+    changed_by: viewer.userId,
   });
 
   await createNotification({
@@ -68,14 +66,11 @@ export async function createConstructionProject(formData: FormData) {
 }
 
 export async function updateConstructionProjectStage(projectId: string, stageKey: string, note?: string) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { error: 'Not signed in.' };
+  const viewer = await getViewerContext();
+  if (!viewer) return { error: 'Not signed in.' };
+  if (viewer.role !== 'admin') return { error: 'Not allowed.' };
 
-  const { data: me } = await supabase.from('profiles').select('role').eq('id', user.id).maybeSingle();
-  if (me?.role !== 'admin') return { error: 'Not allowed.' };
+  const supabase = await createClient();
 
   const allowed = CONSTRUCTION_STAGES.map((s) => s.value);
   if (!allowed.includes(stageKey as (typeof CONSTRUCTION_STAGES)[number]['value'])) {
@@ -97,7 +92,7 @@ export async function updateConstructionProjectStage(projectId: string, stageKey
     stage_key: stageKey,
     stage_label: constructionStageLabel(stageKey),
     note_to_client: note?.trim() || null,
-    changed_by: user.id,
+    changed_by: viewer.userId,
   });
 
   await createNotification({

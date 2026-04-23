@@ -1,4 +1,4 @@
-/** Aligns with SQL schema run in Supabase (user_role, property_status, travel_status). */
+/** Mirrors the live public schema export; travel stages are stored as text keys. */
 
 export type UserRole = 'admin' | 'agent' | 'client';
 export type ClientServiceType = 'travel' | 'real_estate' | 'construction';
@@ -14,45 +14,7 @@ export type PropertyStatus =
 
 export type PropertyCategory = 'Buy' | 'Rent' | 'Short-let';
 
-export type TravelStatus =
-  | 'application_received'
-  | 'document_review'
-  | 'documents_incomplete_action_required'
-  | 'documents_verified'
-  | 'visa_submission_prepared'
-  | 'submitted_to_embassy'
-  | 'decision_pending'
-  | 'approved'
-  | 'rejected_next_steps'
-  | 'school_selection_in_progress'
-  | 'applications_submitted'
-  | 'awaiting_admission_decision'
-  | 'admission_received_documents_needed'
-  | 'visa_application_in_progress'
-  | 'visa_approved_travel_planning'
-  | 'eligibility_assessment'
-  | 'action_required_profile_gaps'
-  | 'profile_complete'
-  | 'expression_of_interest_filed'
-  | 'awaiting_response'
-  | 'offer_or_nomination_received'
-  | 'visa_or_pr_in_progress'
-  | 'inquiry_received'
-  | 'itinerary_draft_in_progress'
-  | 'itinerary_shared_awaiting_approval'
-  | 'itinerary_confirmed'
-  | 'bookings_in_progress'
-  | 'bookings_confirmed'
-  | 'travel_documents_sent'
-  | 'request_received'
-  | 'fare_options_shared'
-  | 'payment_confirmed'
-  | 'ticket_issued'
-  | 'housing_and_logistics_planning'
-  | 'documents_and_profile_complete'
-  | 'application_in_progress'
-  | 'approved_travel_planning'
-  | 'completed';
+export type TravelStageKey = string;
 
 export type InquiryStatus = 'new' | 'actioned' | 'archived';
 
@@ -79,26 +41,12 @@ export type PropertyRow = {
   property_type: string | null;
   images: string[] | null;
   amenities: string[] | null;
-  labels: string[] | null;
   status: PropertyStatus;
   admin_notes: string | null;
   reviewed_at: string | null;
   reviewed_by: string | null;
   is_featured: boolean | null;
   agent_id: string | null;
-  created_at: string;
-  updated_at: string;
-};
-
-export type AgentProfileRow = {
-  id: string;
-  user_id: string;
-  agency_name: string | null;
-  registration_number: string | null;
-  verification_status: string;
-  payment_status: string;
-  onboarding_fee_amount: number;
-  rejection_reason: string | null;
   created_at: string;
   updated_at: string;
 };
@@ -115,7 +63,7 @@ export type SavedSearchRow = {
   user_id: string;
   service: ClientServiceType;
   title: string;
-  query: Record<string, string>;
+  query: Record<string, unknown>;
   created_at: string;
 };
 
@@ -138,7 +86,7 @@ export type TravelApplicationRow = {
   client_id: string | null;
   service_type: string | null;
   destination: string | null;
-  current_stage: TravelStatus;
+  current_stage: TravelStageKey;
   notes: string | null;
   created_at: string;
   updated_at: string;

@@ -33,7 +33,6 @@ export async function GET(request: Request) {
       .update({ status: 'success', raw_payload: verified })
       .eq('id', payment.id);
     await supabase.from('profiles').update({ onboarding_paid: true }).eq('id', payment.user_id);
-    await supabase.from('agent_profiles').update({ payment_status: 'paid' }).eq('user_id', payment.user_id);
     await createNotification({
       userId: payment.user_id,
       type: 'agent_payment',

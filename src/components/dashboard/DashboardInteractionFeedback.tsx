@@ -6,26 +6,26 @@ import { usePathname } from 'next/navigation';
 export function DashboardInteractionFeedback({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const [pending, setPending] = useState(false);
-  const resetTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const resetTimerRef = useRef<number | null>(null);
 
   useEffect(() => {
     setPending(false);
     if (resetTimerRef.current) {
-      clearTimeout(resetTimerRef.current);
+      window.clearTimeout(resetTimerRef.current);
       resetTimerRef.current = null;
     }
   }, [pathname]);
 
   useEffect(() => {
     return () => {
-      if (resetTimerRef.current) clearTimeout(resetTimerRef.current);
+      if (resetTimerRef.current) window.clearTimeout(resetTimerRef.current);
     };
   }, []);
 
   function beginPending() {
     setPending(true);
-    if (resetTimerRef.current) clearTimeout(resetTimerRef.current);
-    resetTimerRef.current = setTimeout(() => setPending(false), 8000);
+    if (resetTimerRef.current) window.clearTimeout(resetTimerRef.current);
+    resetTimerRef.current = window.setTimeout(() => setPending(false), 4000);
   }
 
   function handleClickCapture(event: React.MouseEvent<HTMLDivElement>) {
@@ -47,12 +47,8 @@ export function DashboardInteractionFeedback({ children }: { children: React.Rea
     }
   }
 
-  function handleSubmitCapture() {
-    beginPending();
-  }
-
   return (
-    <div onClickCapture={handleClickCapture} onSubmitCapture={handleSubmitCapture}>
+    <div onClickCapture={handleClickCapture}>
       {pending ? (
         <div className="pointer-events-none fixed inset-x-0 top-0 z-[70] h-1 overflow-hidden bg-[#03624D]/15">
           <div className="h-full w-full animate-pulse bg-[#03624D]" />
@@ -62,4 +58,3 @@ export function DashboardInteractionFeedback({ children }: { children: React.Rea
     </div>
   );
 }
-

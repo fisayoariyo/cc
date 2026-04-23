@@ -19,12 +19,22 @@ export async function requestPasswordReset(
   formData: FormData,
 ): Promise<ForgotState> {
   const email = String(formData.get('email') ?? '').trim().toLowerCase();
+  const role = String(formData.get('role') ?? '').trim();
+  const service = String(formData.get('service') ?? '').trim();
   if (!email) {
     return { error: 'Please enter your email address.' };
   }
   const supabase = await createClient();
   const origin = await getAppOrigin();
-  const redirectTo = origin ? `${origin}/reset-password` : undefined;
+  const redirectUrl = origin ? new URL('/reset-password', origin) : null;
+  if (redirectUrl && role === 'agent') {
+    redirectUrl.searchParams.set('role', 'agent');
+  }
+  if (redirectUrl && (service === 'travel' || service === 'real_estate')) {
+    redirectUrl.searchParams.set('role', 'client');
+    redirectUrl.searchParams.set('service', service);
+  }
+  const redirectTo = redirectUrl?.toString();
   const { error } = await supabase.auth.resetPasswordForEmail(email, {
     redirectTo,
   });

@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Building2, Plane, Hammer, ArrowRight, Users, Award, TrendingUp } from 'lucide-react';
+import { CONSTRUCTION_CONSULTATION_URL } from '@/lib/consultation';
 
 /** Deterministic layout/animation — avoids Math.random() hydration mismatch (SSR vs client). */
 const HERO_PARTICLES = Array.from({ length: 20 }, (_, i) => ({
@@ -249,7 +250,12 @@ export default function HomePage() {
               </motion.div>
             </Link>
 
-            <Link href="/register?role=client&service=construction" className="lg:col-span-2">
+            <a
+              href={CONSTRUCTION_CONSULTATION_URL}
+              target="_blank"
+              rel="noreferrer"
+              className="lg:col-span-2"
+            >
               <motion.div
                 initial={{ opacity: 0, y: 50 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -290,7 +296,7 @@ export default function HomePage() {
               </div>
               <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 rounded-full blur-3xl" />
               </motion.div>
-            </Link>
+            </a>
           </div>
         </div>
       </section>

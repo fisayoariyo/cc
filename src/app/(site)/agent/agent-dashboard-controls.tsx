@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useMemo, useState, useTransition } from 'react';
 import { LayoutGrid, List } from 'lucide-react';
 import { completeAgentOnboardingPayment, updateAgentListingMeta } from './actions';
@@ -29,6 +30,7 @@ export function AgentPendingReviewCard() {
 }
 
 export function AgentPaymentGate() {
+  const router = useRouter();
   const [pending, start] = useTransition();
   const [notice, setNotice] = useState<string | null>(null);
   return (
@@ -58,6 +60,7 @@ export function AgentPaymentGate() {
                   ? 'Payment marked as paid (development fallback mode).'
                   : 'Payment recorded. Refreshing...',
               );
+              router.refresh();
             })();
           })
         }
@@ -76,7 +79,6 @@ function AgentListingCard({ row }: { row: PropertyRow }) {
   const [pending, start] = useTransition();
   const [status, setStatus] = useState(row.status);
   const [featured, setFeatured] = useState(!!row.is_featured);
-  const [labels, setLabels] = useState((row.labels ?? []).join(', '));
   const [notice, setNotice] = useState<string | null>(null);
 
   return (
@@ -108,15 +110,6 @@ function AgentListingCard({ row }: { row: PropertyRow }) {
           <option value="archived">Archived</option>
         </select>
       </div>
-      <div className="space-y-2">
-        <label className="text-xs text-muted-foreground">Labels (comma separated)</label>
-        <input
-          className="h-9 w-full rounded-md border border-input bg-background px-2 text-sm"
-          value={labels}
-          onChange={(e) => setLabels(e.target.value)}
-          placeholder="hot_offer, open_house, rent"
-        />
-      </div>
       <label className="flex items-center gap-2 text-sm">
         <input type="checkbox" checked={featured} onChange={(e) => setFeatured(e.target.checked)} />
         Mark as featured
@@ -133,10 +126,6 @@ function AgentListingCard({ row }: { row: PropertyRow }) {
                   id: row.id,
                   status,
                   is_featured: featured,
-                  labels: labels
-                    .split(',')
-                    .map((s) => s.trim())
-                    .filter(Boolean),
                 });
                 setNotice(res && 'error' in res ? res.error ?? 'Failed.' : 'Saved');
               })();

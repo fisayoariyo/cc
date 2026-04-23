@@ -19,7 +19,7 @@ import type {
 const PROFILE_COLUMNS =
   'id, full_name, email, role, status, onboarding_paid, phone_number, passport_number, created_at, updated_at';
 const PROPERTY_COLUMNS =
-  'id, title, description, price, location, category, property_type, images, amenities, labels, status, admin_notes, reviewed_at, reviewed_by, is_featured, agent_id, created_at, updated_at';
+  'id, title, description, price, location, category, property_type, images, amenities, status, admin_notes, reviewed_at, reviewed_by, is_featured, agent_id, created_at, updated_at';
 const TRAVEL_APPLICATION_COLUMNS =
   'id, client_id, service_type, destination, current_stage, notes, created_at, updated_at';
 const INQUIRY_COLUMNS =

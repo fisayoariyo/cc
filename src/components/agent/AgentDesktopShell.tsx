@@ -44,7 +44,12 @@ export default function AgentDesktopShell({
     router.prefetch('/agent');
     router.prefetch('/agent/listings/new');
     router.prefetch('/agent/help');
+    router.prefetch('/agent/under-review');
   }, [router]);
+
+  if (pathname.startsWith('/agent/under-review') || pathname.startsWith('/agent/help')) {
+    return <>{children}</>;
+  }
 
   return (
     <DashboardInteractionFeedback>
@@ -152,4 +157,3 @@ export default function AgentDesktopShell({
     </DashboardInteractionFeedback>
   );
 }
-

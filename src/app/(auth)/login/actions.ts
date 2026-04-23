@@ -44,20 +44,24 @@ export async function signIn(prevState: SignInState, formData: FormData): Promis
 
   const { data: profile } = await supabase
     .from('profiles')
-    .select('role')
+    .select('role, status')
     .eq('id', data.user.id)
     .maybeSingle();
 
   const role = profile?.role ?? 'client';
+  const isVerifiedAgent = profile?.status === 'verified';
 
   if (next) {
+    if (role === 'agent' && !isVerifiedAgent) {
+      redirect('/agent/under-review');
+    }
     redirect(next);
   }
   if (role === 'admin') {
     redirect('/admin');
   }
   if (role === 'agent') {
-    redirect('/agent');
+    redirect(isVerifiedAgent ? '/agent' : '/agent/under-review');
   }
   redirect('/dashboard');
 }

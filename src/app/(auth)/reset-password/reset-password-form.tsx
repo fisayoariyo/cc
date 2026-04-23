@@ -2,16 +2,22 @@
 
 import { FormEvent, useEffect, useState } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
+import { ArrowLeft, Eye, EyeOff, LockKeyhole } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { humanizeAuthError } from '@/lib/supabase/auth-errors';
+import { AgentAuthShell, type AuthShellVariant } from '@/components/auth/AgentAuthShell';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import logoLockupColor from '@/assets/CC Logo Lockup (color).svg';
 import type { SupabaseClient } from '@supabase/supabase-js';
 
-export function ResetPasswordForm() {
+export function ResetPasswordForm({
+  agentMode = false,
+  service,
+}: {
+  agentMode?: boolean;
+  service?: 'travel' | 'real_estate';
+}) {
   const [supabase, setSupabase] = useState<SupabaseClient | null>(null);
   const [ready, setReady] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -19,9 +25,16 @@ export function ResetPasswordForm() {
   const [pending, setPending] = useState(false);
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const shellVariant: AuthShellVariant = agentMode ? 'agent' : service ?? 'generic';
+  const backHref = agentMode
+    ? '/login?role=agent'
+    : service
+      ? `/login?role=client&service=${service}`
+      : '/login';
 
   useEffect(() => {
-    // Prevent SSR/pre-render crashes if env is missing at build time.
     if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
       setError('Configuration missing. Please contact support.');
       setReady(true);
@@ -68,80 +81,102 @@ export function ResetPasswordForm() {
   }
 
   return (
-    <div className="grid w-full max-w-6xl overflow-hidden rounded-3xl border border-border bg-card shadow-sm lg:grid-cols-[1fr_1.03fr]">
-      <aside className="relative hidden min-h-[720px] lg:block">
-        <div
-          className="absolute inset-0 bg-cover bg-center"
-          style={{
-            backgroundImage:
-              "url('https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=1600&q=80')",
-          }}
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-foreground/85 via-foreground/45 to-foreground/20" />
-        <div className="relative flex h-full flex-col justify-between p-8">
-          <Image src={logoLockupColor} alt="DotCharis Consult" className="h-11 w-auto" />
-          <div className="space-y-3 text-primary-foreground">
-            <h2 className="text-3xl font-medium leading-tight">Secure your account again</h2>
-            <p className="max-w-md text-sm text-primary-foreground/90">
-              Create a new strong password to continue using your DotCharis dashboard.
-            </p>
-          </div>
-        </div>
-      </aside>
-
-      <section className="w-full p-5 sm:p-8 md:p-10">
-        <div className="mb-6 lg:hidden">
-          <Image src={logoLockupColor} alt="DotCharis Consult" className="h-10 w-auto" />
-        </div>
-        <div className="mb-6">
-          <h1 className="text-2xl font-semibold text-foreground">Reset password</h1>
-          <p className="mt-1 text-sm text-muted-foreground">Create your password and confirm it.</p>
-        </div>
-
+    <AgentAuthShell
+      title="Reset password"
+      variant={shellVariant}
+      description="Create your password and confirm it."
+      visualTitle={agentMode ? 'Set a fresh password and continue' : undefined}
+      visualCopy={
+        agentMode
+          ? 'Protect your Charis Consult account with a new password and return to your dashboard flow.'
+          : undefined
+      }
+      backHref={backHref}
+      backLabel="Go back"
+    >
+      <div className="space-y-5">
         {error ? (
-          <div className="rounded-xl border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive">
+          <div className="rounded-[18px] border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">
             {error}
           </div>
         ) : null}
         {success ? (
-          <div className="rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-800">
+          <div className="rounded-[18px] border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
             Password updated successfully. You can now sign in.
           </div>
         ) : null}
-        <form onSubmit={(e) => void onSubmit(e)} className="mt-4 space-y-5">
+
+        <form onSubmit={(e) => void onSubmit(e)} className="space-y-5">
           <div className="space-y-2">
             <Label htmlFor="password">Create your password</Label>
-            <Input
-              id="password"
-              type="password"
-              autoComplete="new-password"
-              required
-              minLength={6}
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
+            <div className="relative">
+              <LockKeyhole className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+              <Input
+                id="password"
+                type={showPassword ? 'text' : 'password'}
+                autoComplete="new-password"
+                required
+                minLength={6}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="h-12 rounded-[18px] border-slate-200 pl-11 pr-12"
+              />
+              <button
+                type="button"
+                aria-label={showPassword ? 'Hide password' : 'Show password'}
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 transition hover:text-slate-700"
+                onClick={() => setShowPassword((value) => !value)}
+              >
+                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              </button>
+            </div>
           </div>
+
           <div className="space-y-2">
             <Label htmlFor="confirm-password">Confirm password</Label>
-            <Input
-              id="confirm-password"
-              type="password"
-              autoComplete="new-password"
-              required
-              minLength={6}
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-            />
+            <div className="relative">
+              <LockKeyhole className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+              <Input
+                id="confirm-password"
+                type={showConfirmPassword ? 'text' : 'password'}
+                autoComplete="new-password"
+                required
+                minLength={6}
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                className="h-12 rounded-[18px] border-slate-200 pl-11 pr-12"
+              />
+              <button
+                type="button"
+                aria-label={showConfirmPassword ? 'Hide confirm password' : 'Show confirm password'}
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 transition hover:text-slate-700"
+                onClick={() => setShowConfirmPassword((value) => !value)}
+              >
+                {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              </button>
+            </div>
           </div>
-          <Button type="submit" className="w-full rounded-full py-5" disabled={!ready || pending}>
-            {pending ? 'Updating…' : 'Continue'}
+
+          <Button
+            type="submit"
+            className="h-12 w-full rounded-full bg-[#0B7155] text-base hover:bg-[#095743]"
+            disabled={!ready || pending}
+          >
+            {pending ? 'Updating...' : 'Continue'}
           </Button>
         </form>
 
-        <Button asChild variant="secondary" className="mt-3 w-full rounded-full">
-          <Link href="/login">Back</Link>
+        <Button
+          asChild
+          variant="secondary"
+          className="h-12 w-full rounded-full border border-slate-200 bg-[#F6F8F7] text-[#0B7155] hover:bg-[#edf3f0]"
+        >
+          <Link href={backHref}>
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Back
+          </Link>
         </Button>
-      </section>
-    </div>
+      </div>
+    </AgentAuthShell>
   );
 }

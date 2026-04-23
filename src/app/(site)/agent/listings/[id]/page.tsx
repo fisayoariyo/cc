@@ -1,20 +1,17 @@
 import { notFound } from 'next/navigation';
-import { createClient } from '@/lib/supabase/server';
 import { AdminPropertyForm } from '@/components/admin/AdminPropertyForm';
 import { getPropertyById } from '@/lib/supabase/data';
+import { getViewerContext } from '@/lib/supabase/dashboard-access';
 
 type Props = { params: Promise<{ id: string }> };
 
 export default async function AgentEditListingPage({ params }: Props) {
   const { id } = await params;
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return null;
+  const viewer = await getViewerContext();
+  if (!viewer) return null;
 
   const property = await getPropertyById(id);
-  if (!property || property.agent_id !== user.id) {
+  if (!property || property.agent_id !== viewer.userId) {
     notFound();
   }
 

@@ -78,7 +78,7 @@ export function AuthNav({
 
   useEffect(() => {
     router.prefetch('/login');
-    router.prefetch('/register');
+    router.prefetch('/contact');
     if (userId) {
       router.prefetch(dashboardHref(role));
     }
@@ -111,10 +111,10 @@ export function AuthNav({
         </Link>
         <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
           <Link
-            href="/register"
+            href="/contact"
             className="px-6 py-2.5 bg-primary text-primary-foreground text-sm font-medium rounded-full hover:bg-primary/90 transition-colors"
           >
-            Get Started
+            Contact Us
           </Link>
         </motion.div>
       </div>
@@ -189,7 +189,7 @@ export function AuthNavMobile({
 
   useEffect(() => {
     router.prefetch('/login');
-    router.prefetch('/register');
+    router.prefetch('/contact');
     if (userId) {
       router.prefetch(dashboardHref(role));
     }
@@ -215,11 +215,11 @@ export function AuthNavMobile({
           Login
         </Link>
         <Link
-          href="/register"
+          href="/contact"
           className="block w-full text-center px-6 py-2.5 bg-primary text-primary-foreground text-sm font-medium rounded-full"
           onClick={onNavigate}
         >
-          Get Started
+          Contact Us
         </Link>
       </>
     );

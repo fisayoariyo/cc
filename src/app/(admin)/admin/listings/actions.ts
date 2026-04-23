@@ -3,6 +3,7 @@
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
+import { getViewerContext } from '@/lib/supabase/dashboard-access';
 import type { PropertyCategory, PropertyStatus } from '@/lib/types/database';
 import { createNotification } from '@/lib/supabase/notifications';
 import { LISTING_STATUS_VALUES } from '@/lib/workflow-rules';
@@ -27,16 +28,13 @@ function parseAmenities(text: string): string[] {
 }
 
 export async function saveProperty(prevState: PropertySaveState, formData: FormData): Promise<PropertySaveState> {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) {
+  const viewer = await getViewerContext();
+  if (!viewer) {
     return { error: 'You must be signed in.' };
   }
 
-  const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).maybeSingle();
-  const role = profile?.role;
+  const supabase = await createClient();
+  const role = viewer.role;
   if (role !== 'admin' && role !== 'agent') {
     return { error: 'Not allowed.' };
   }
@@ -54,7 +52,6 @@ export async function saveProperty(prevState: PropertySaveState, formData: FormD
   const isFeatured = formData.get('is_featured') === 'on';
   const images = parseImages(String(formData.get('images') ?? ''));
   const amenities = parseAmenities(String(formData.get('amenities') ?? ''));
-  const labels = parseAmenities(String(formData.get('labels') ?? ''));
   const adminNotes = String(formData.get('admin_notes') ?? '').trim();
   const agentIdForm = String(formData.get('agent_id') ?? '').trim();
 
@@ -70,7 +67,7 @@ export async function saveProperty(prevState: PropertySaveState, formData: FormD
 
   let agent_id: string | null = null;
   if (role === 'agent') {
-    agent_id = user.id;
+    agent_id = viewer.userId;
   } else if (role === 'admin') {
     agent_id = agentIdForm || null;
   }
@@ -80,7 +77,12 @@ export async function saveProperty(prevState: PropertySaveState, formData: FormD
 
   if (role === 'agent') {
     const existing = id
-      ? await supabase.from('properties').select('id, status, agent_id').eq('id', id).eq('agent_id', user.id).maybeSingle()
+      ? await supabase
+          .from('properties')
+          .select('id, status, agent_id')
+          .eq('id', id)
+          .eq('agent_id', viewer.userId)
+          .maybeSingle()
       : null;
     if (id && !existing?.data?.id) {
       return { error: 'Listing not found or not owned by you.' };
@@ -109,7 +111,6 @@ export async function saveProperty(prevState: PropertySaveState, formData: FormD
     property_type: propertyType || null,
     images,
     amenities,
-    labels,
     status,
     is_featured: isFeatured,
     admin_notes,
@@ -144,14 +145,11 @@ export async function moderatePropertyListing(input: {
   decision: 'approve' | 'request_edits' | 'reject' | 'archive';
   note?: string;
 }) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { error: 'Not signed in.' };
+  const viewer = await getViewerContext();
+  if (!viewer) return { error: 'Not signed in.' };
+  if (viewer.role !== 'admin') return { error: 'Only admins can moderate listings.' };
 
-  const { data: me } = await supabase.from('profiles').select('role').eq('id', user.id).maybeSingle();
-  if (me?.role !== 'admin') return { error: 'Only admins can moderate listings.' };
+  const supabase = await createClient();
 
   const note = input.note?.trim() ?? '';
   if (input.decision === 'request_edits' && !note) {
@@ -172,7 +170,7 @@ export async function moderatePropertyListing(input: {
       status: statusByDecision[input.decision],
       admin_notes: note || null,
       reviewed_at: new Date().toISOString(),
-      reviewed_by: user.id,
+      reviewed_by: viewer.userId,
       is_featured: input.decision === 'approve',
     })
     .eq('id', input.listingId);

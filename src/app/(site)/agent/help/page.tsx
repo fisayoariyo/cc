@@ -1,61 +1,56 @@
 import type { Metadata } from 'next';
-import Link from 'next/link';
-import { ArrowLeft, CircleHelp, FileSearch, Headset } from 'lucide-react';
+import { redirect } from 'next/navigation';
+import { Mail, Phone } from 'lucide-react';
+import { AgentAuthShell } from '@/components/auth/AgentAuthShell';
+import { getViewerContext } from '@/lib/supabase/dashboard-access';
 
 export const metadata: Metadata = {
-  title: 'Agent help',
+  title: 'Agent support',
 };
 
-export default function AgentHelpPage() {
+export default async function AgentHelpPage() {
+  const viewer = await getViewerContext();
+
+  if (!viewer) {
+    redirect('/login?next=/agent/help');
+  }
+
+  if (viewer.role !== 'agent') {
+    redirect('/dashboard');
+  }
+
   return (
-    <div className="space-y-5">
-      <Link href="/agent" className="inline-flex items-center gap-1.5 text-sm text-foreground/90 hover:text-foreground lg:hidden">
-        <ArrowLeft size={16} />
-        Go back
-      </Link>
+    <main className="min-h-screen bg-white">
+      <AgentAuthShell
+        title="Need Help?"
+        description="We're here to support you. Reach out to us if you're having any issues with registration, verification, or syncing data."
+        visualTitle="Digitally onboard property agents"
+        visualCopy="Create verified agent profiles, complete onboarding, and activate listing access across Charis Consult."
+        backHref="/agent/under-review"
+        backLabel="Go back"
+      >
+        <div className="space-y-8">
+          <div className="space-y-1">
+            <h2 className="text-xl font-semibold text-[#101828]">Customer Support</h2>
+            <p className="text-sm text-slate-500">Get help from our support team</p>
+          </div>
 
-      <section className="rounded-2xl border border-border bg-card p-4 sm:p-6 shadow-sm">
-        <h1 className="text-2xl font-semibold text-foreground">Help & Support</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Quick support tools for listing issues, account questions, and onboarding guidance.
-        </p>
-      </section>
-
-      <section className="space-y-3">
-        <Link
-          href="/contact"
-          className="flex items-center justify-between rounded-2xl border border-border bg-card px-4 py-4 text-sm text-foreground shadow-sm hover:bg-muted/30"
-        >
-          <span className="inline-flex items-center gap-2">
-            <Headset size={16} />
-            Contact support
-          </span>
-          <span aria-hidden>›</span>
-        </Link>
-
-        <Link
-          href="/agent/listings/new"
-          className="flex items-center justify-between rounded-2xl border border-border bg-card px-4 py-4 text-sm text-foreground shadow-sm hover:bg-muted/30"
-        >
-          <span className="inline-flex items-center gap-2">
-            <FileSearch size={16} />
-            Submit listing again
-          </span>
-          <span aria-hidden>›</span>
-        </Link>
-
-        <Link
-          href="/agent"
-          className="flex items-center justify-between rounded-2xl border border-border bg-card px-4 py-4 text-sm text-foreground shadow-sm hover:bg-muted/30"
-        >
-          <span className="inline-flex items-center gap-2">
-            <CircleHelp size={16} />
-            Dashboard FAQs
-          </span>
-          <span aria-hidden>›</span>
-        </Link>
-      </section>
-    </div>
+          <div className="space-y-4">
+            <div className="flex items-center gap-3 text-[#101828]">
+              <span className="inline-flex h-9 w-9 items-center justify-center rounded-[10px] bg-[#0B7155] text-white">
+                <Phone className="h-4 w-4" />
+              </span>
+              <span className="text-[18px] font-medium">+234 XXX XXX XXXX</span>
+            </div>
+            <div className="flex items-center gap-3 text-[#101828]">
+              <span className="inline-flex h-9 w-9 items-center justify-center rounded-[10px] bg-[#0B7155] text-white">
+                <Mail className="h-4 w-4" />
+              </span>
+              <span className="text-[18px] font-medium">support@charisconsult.com</span>
+            </div>
+          </div>
+        </div>
+      </AgentAuthShell>
+    </main>
   );
 }
-

@@ -1,124 +1,144 @@
 'use client';
 
+import { useState } from 'react';
 import { useActionState } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
+import { Eye, EyeOff, LockKeyhole, Mail } from 'lucide-react';
 import { signIn, type SignInState } from './actions';
+import { AgentAuthShell, type AuthShellVariant } from '@/components/auth/AgentAuthShell';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import logoLockupColor from '@/assets/CC Logo Lockup (color).svg';
 
 export function LoginForm({
   nextPath,
   errorFromUrl,
   messageFromUrl,
+  agentMode,
+  service,
 }: {
   nextPath: string | undefined;
   errorFromUrl: string | undefined;
   messageFromUrl: string | undefined;
+  agentMode: boolean;
+  service?: 'travel' | 'real_estate';
 }) {
   const [state, formAction, isPending] = useActionState<SignInState, FormData>(signIn, null);
+  const [showPassword, setShowPassword] = useState(false);
 
   const displayError = state?.error ?? errorFromUrl;
+  const shellVariant: AuthShellVariant = agentMode ? 'agent' : service ?? 'generic';
+  const forgotPasswordHref = agentMode
+    ? '/forgot-password?role=agent'
+    : service
+      ? `/forgot-password?role=client&service=${service}`
+      : '/forgot-password';
+  const registerHref = agentMode
+    ? '/register?role=agent'
+    : service
+      ? `/register?role=client&service=${service}`
+      : '/register';
 
   return (
-    <div className="grid w-full max-w-6xl overflow-hidden rounded-3xl border border-border bg-card shadow-sm lg:grid-cols-[1fr_1.03fr]">
-      <aside className="relative hidden min-h-[720px] lg:block">
-        <div
-          className="absolute inset-0 bg-cover bg-center"
-          style={{
-            backgroundImage:
-              "url('https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=1600&q=80')",
-          }}
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-foreground/85 via-foreground/45 to-foreground/20" />
-        <div className="relative flex h-full flex-col justify-between p-8">
-          <Image src={logoLockupColor} alt="DotCharis Consult" className="h-11 w-auto" />
-          <div className="space-y-3 text-primary-foreground">
-            <h2 className="text-3xl font-medium leading-tight">Welcome back to DotCharis</h2>
-            <p className="max-w-md text-sm text-primary-foreground/90">
-              Access your dashboard to continue with your property, travel, or construction journey.
-            </p>
-          </div>
-        </div>
-      </aside>
-
-      <section className="w-full p-5 sm:p-8 md:p-10">
-        <div className="mb-6 lg:hidden">
-          <Image src={logoLockupColor} alt="DotCharis Consult" className="h-10 w-auto" />
-        </div>
-        <div className="mb-6">
-          <h1 className="text-2xl font-semibold text-foreground">Log in to your account</h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Sign in with your email and password to open your dashboard.
-          </p>
-        </div>
-
-        {displayError && (
+    <AgentAuthShell
+      title="Log in to your account"
+      variant={shellVariant}
+      description={
+        agentMode
+          ? 'Sign in to continue your agent onboarding or return to your dashboard.'
+          : 'Sign in with your email and password to open the right Charis Consult dashboard.'
+      }
+      visualTitle={agentMode ? 'Welcome back to Charis Consult agents' : undefined}
+      visualCopy={
+        agentMode
+          ? 'Return to your onboarding status, update your review progress, and continue into your agent workspace once approved.'
+          : undefined
+      }
+    >
+      <div className="space-y-5">
+        {displayError ? (
           <div
-            className="mb-4 rounded-xl border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive"
+            className="rounded-[18px] border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive"
             role="alert"
           >
             {displayError}
           </div>
-        )}
-        {messageFromUrl && (
-          <div className="mb-4 rounded-xl border border-border bg-muted/50 px-3 py-2 text-sm text-foreground">
+        ) : null}
+        {messageFromUrl ? (
+          <div className="rounded-[18px] border border-border bg-muted/50 px-4 py-3 text-sm text-foreground">
             {messageFromUrl}
           </div>
-        )}
+        ) : null}
 
         <form action={formAction} className="space-y-5">
           {nextPath ? <input type="hidden" name="next" value={nextPath} /> : null}
 
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
-            <Input
-              id="email"
-              name="email"
-              type="email"
-              autoComplete="email"
-              required
-              placeholder="you@example.com"
-            />
+            <div className="relative">
+              <Mail className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+              <Input
+                id="email"
+                name="email"
+                type="email"
+                autoComplete="email"
+                required
+                placeholder="Enter your email here"
+                className="h-12 rounded-[18px] border-slate-200 pl-11"
+              />
+            </div>
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="password">Password</Label>
-            <Input
-              id="password"
-              name="password"
-              type="password"
-              autoComplete="current-password"
-              required
-              placeholder="Your password"
-            />
+            <div className="relative">
+              <LockKeyhole className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+              <Input
+                id="password"
+                name="password"
+                type={showPassword ? 'text' : 'password'}
+                autoComplete="current-password"
+                required
+                placeholder="Write your password here"
+                className="h-12 rounded-[18px] border-slate-200 pl-11 pr-12"
+              />
+              <button
+                type="button"
+                aria-label={showPassword ? 'Hide password' : 'Show password'}
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 transition hover:text-slate-700"
+                onClick={() => setShowPassword((value) => !value)}
+              >
+                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              </button>
+            </div>
           </div>
 
           <div className="text-right">
-            <Link href="/forgot-password" className="text-sm text-primary font-medium underline-offset-4 hover:underline">
+            <Link
+              href={forgotPasswordHref}
+              className="text-sm font-medium text-[#0B7155] transition hover:text-[#075541]"
+            >
               Forgot password?
             </Link>
           </div>
 
-          <Button type="submit" className="w-full rounded-full py-5" disabled={isPending}>
-            {isPending ? 'Signing in…' : 'Continue'}
+          <Button
+            type="submit"
+            className="h-12 w-full rounded-full bg-[#0B7155] text-base hover:bg-[#095743]"
+            disabled={isPending}
+          >
+            {isPending ? 'Signing in...' : 'Continue'}
           </Button>
         </form>
 
-        <div className="mt-6 flex flex-col gap-3">
-          <Button asChild variant="secondary" className="w-full rounded-full">
-            <Link href="/register">I don&apos;t have an account</Link>
-          </Button>
-          <p className="text-center text-sm text-muted-foreground">
-            Back to{' '}
-            <Link href="/" className="font-medium text-primary underline-offset-4 hover:underline">
-              home
-            </Link>
-          </p>
-        </div>
-      </section>
-    </div>
+        <Button
+          asChild
+          variant="secondary"
+          className="h-12 w-full rounded-full border border-slate-200 bg-[#F6F8F7] text-[#0B7155] hover:bg-[#edf3f0]"
+        >
+          <Link href={registerHref}>I don&apos;t have an account</Link>
+        </Button>
+      </div>
+    </AgentAuthShell>
   );
 }

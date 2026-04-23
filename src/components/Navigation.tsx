@@ -112,6 +112,7 @@ export default function Navigation({ initialAuthState }: { initialAuthState: Aut
           {/* Mobile Menu Button */}
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            aria-label={isMobileMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
             className={`md:hidden ${navOnDarkImage ? 'text-white' : 'text-foreground'}`}
           >
             {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}

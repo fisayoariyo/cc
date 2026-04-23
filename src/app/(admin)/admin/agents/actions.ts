@@ -2,21 +2,19 @@
 
 import { revalidatePath } from 'next/cache';
 import { createClient } from '@/lib/supabase/server';
+import { getViewerContext } from '@/lib/supabase/dashboard-access';
 import { createNotification } from '@/lib/supabase/notifications';
 
 export async function setAgentVerification(profileId: string, status: 'verified' | 'rejected') {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) {
+  const viewer = await getViewerContext();
+  if (!viewer) {
     return { error: 'Not signed in.' };
   }
-
-  const { data: me } = await supabase.from('profiles').select('role').eq('id', user.id).maybeSingle();
-  if (me?.role !== 'admin') {
+  if (viewer.role !== 'admin') {
     return { error: 'Not allowed.' };
   }
+
+  const supabase = await createClient();
 
   const { error } = await supabase
     .from('profiles')
@@ -27,14 +25,6 @@ export async function setAgentVerification(profileId: string, status: 'verified'
   if (error) {
     return { error: error.message };
   }
-
-  await supabase
-    .from('agent_profiles')
-    .update({
-      verification_status: status,
-      ...(status === 'rejected' ? { payment_status: 'unpaid' } : {}),
-    })
-    .eq('user_id', profileId);
 
   await createNotification({
     userId: profileId,

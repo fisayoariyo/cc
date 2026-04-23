@@ -3,20 +3,18 @@
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
+import { getViewerContext } from '@/lib/supabase/dashboard-access';
 import type { ClientServiceType } from '@/lib/types/database';
 import { firstStageForService, getStageLabel, normalizeTravelServiceType } from '@/lib/travel-stages';
+import { CONSTRUCTION_CONSULTATION_URL } from '@/lib/consultation';
 
 export async function addClientService(service: ClientServiceType) {
+  const viewer = await getViewerContext();
+  if (!viewer) return { error: 'Please sign in again.' };
+  if (viewer.role !== 'client') return { error: 'Only clients can add services.' };
+
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { error: 'Please sign in again.' };
-
-  const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).maybeSingle();
-  if (profile?.role !== 'client') return { error: 'Only clients can add services.' };
-
-  const { error } = await supabase.from('client_services').insert({ user_id: user.id, service });
+  const { error } = await supabase.from('client_services').insert({ user_id: viewer.userId, service });
   if (error && !error.message.toLowerCase().includes('duplicate')) {
     return { error: error.message };
   }
@@ -38,7 +36,7 @@ export async function addClientServiceAndContinue(service: ClientServiceType): P
   if (service === 'real_estate') {
     redirect('/real-estate/dashboard');
   }
-  redirect('/construction/dashboard');
+  redirect(CONSTRUCTION_CONSULTATION_URL);
 }
 
 export type TravelFormState = { error: string } | { success: true } | null;
@@ -48,13 +46,12 @@ export async function createTravelApplication(
   prevState: TravelFormState,
   formData: FormData,
 ): Promise<TravelFormState> {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) {
+  const viewer = await getViewerContext();
+  if (!viewer) {
     return { error: 'You must be signed in.' };
   }
+
+  const supabase = await createClient();
 
   const service_type = normalizeTravelServiceType(String(formData.get('service_type') ?? '').trim());
   const destination = String(formData.get('destination') ?? '').trim();
@@ -67,7 +64,7 @@ export async function createTravelApplication(
   const { data, error } = await supabase
     .from('travel_applications')
     .insert({
-      client_id: user.id,
+      client_id: viewer.userId,
       service_type,
       destination,
       notes: notes || null,
@@ -100,11 +97,10 @@ export async function uploadApplicationDocument(
   prevState: UploadDocState,
   formData: FormData,
 ): Promise<UploadDocState> {
+  const viewer = await getViewerContext();
+  if (!viewer) return { error: 'You must be signed in.' };
+
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { error: 'You must be signed in.' };
 
   const applicationId = String(formData.get('application_id') ?? '').trim();
   const documentType = String(formData.get('document_type') ?? '').trim() || 'General';
@@ -115,7 +111,7 @@ export async function uploadApplicationDocument(
   if (file.size > 10 * 1024 * 1024) return { error: 'File must be 10MB or smaller.' };
 
   const ext = file.name.includes('.') ? file.name.split('.').pop() : 'bin';
-  const filePath = `${user.id}/${applicationId}/${Date.now()}_${cleanFileName(file.name || `document.${ext}`)}`;
+  const filePath = `${viewer.userId}/${applicationId}/${Date.now()}_${cleanFileName(file.name || `document.${ext}`)}`;
 
   const { error: uploadError } = await supabase.storage
     .from('application-documents')
@@ -124,7 +120,7 @@ export async function uploadApplicationDocument(
 
   const { error: rowError } = await supabase.from('application_documents').insert({
     application_id: applicationId,
-    client_id: user.id,
+    client_id: viewer.userId,
     file_path: filePath,
     document_type: documentType,
     status: 'under_review',

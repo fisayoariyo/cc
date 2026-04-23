@@ -12,7 +12,32 @@ type Props = { property: PropertyRecord };
 
 export default function PropertyDetailView({ property }: Props) {
   const [active, setActive] = useState(0);
+  const [shareLabel, setShareLabel] = useState('Share');
   const imgs = property.images.length ? property.images : [property.image];
+
+  async function handleShare() {
+    if (typeof window === 'undefined') return;
+
+    const shareUrl = window.location.href;
+
+    try {
+      if (navigator.share) {
+        await navigator.share({
+          title: property.title,
+          text: `Take a look at ${property.title} on Charis Consult.`,
+          url: shareUrl,
+        });
+        return;
+      }
+
+      await navigator.clipboard.writeText(shareUrl);
+      setShareLabel('Copied');
+      window.setTimeout(() => setShareLabel('Share'), 1800);
+    } catch {
+      setShareLabel('Copy failed');
+      window.setTimeout(() => setShareLabel('Share'), 1800);
+    }
+  }
 
   return (
     <div className="min-h-screen bg-background pt-20">
@@ -63,8 +88,10 @@ export default function PropertyDetailView({ property }: Props) {
                 <span className="text-xs font-medium uppercase tracking-wide text-primary">{property.type}</span>
                 <button
                   type="button"
+                  onClick={() => void handleShare()}
                   className="p-2 rounded-full border border-border hover:bg-muted transition-colors"
-                  aria-label="Share"
+                  aria-label={shareLabel}
+                  title={shareLabel}
                 >
                   <Share2 className="w-4 h-4" />
                 </button>

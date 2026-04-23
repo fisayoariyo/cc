@@ -26,7 +26,6 @@ export function AdminPropertyForm({
 
   const imagesText = (initial?.images ?? []).join('\n');
   const amenitiesText = (initial?.amenities ?? []).join('\n');
-  const labelsText = (initial?.labels ?? []).join('\n');
   const isAgent = actor === 'agent';
 
   return (
@@ -137,10 +136,6 @@ export function AdminPropertyForm({
         <div className="space-y-2 md:col-span-2">
           <Label htmlFor="amenities">Amenities (one per line)</Label>
           <Textarea id="amenities" name="amenities" rows={3} defaultValue={amenitiesText} />
-        </div>
-        <div className="space-y-2 md:col-span-2">
-          <Label htmlFor="labels">Labels (one per line)</Label>
-          <Textarea id="labels" name="labels" rows={2} defaultValue={labelsText} />
         </div>
         {!isAgent ? (
           <div className="space-y-2 md:col-span-2">

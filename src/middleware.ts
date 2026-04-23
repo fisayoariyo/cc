@@ -13,6 +13,5 @@ export const config = {
     '/travels/dashboard/:path*',
     '/real-estate/dashboard/:path*',
     '/construction/dashboard/:path*',
-    '/api/:path*',
   ],
 };

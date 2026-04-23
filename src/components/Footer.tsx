@@ -5,72 +5,98 @@ import Image from 'next/image';
 import { motion } from 'motion/react';
 import { Building2, Plane, Hammer, MapPin, Phone, Mail } from 'lucide-react';
 import logoLockupBlack from '@/assets/CC Logo Lockup (black).svg';
+import { CONSTRUCTION_CONSULTATION_URL } from '@/lib/consultation';
 
 export default function Footer() {
   return (
     <footer className="border-t border-border bg-card text-foreground">
       <div className="max-w-7xl mx-auto px-6 lg:px-8 py-16">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
-          {/* Brand */}
           <div>
             <Image src={logoLockupBlack} alt="DotCharis Consult" className="h-12 w-auto mb-4" />
-            <p className="text-muted-foreground mb-4">
-              Your Property. Your Journey. One Consultant.
-            </p>
+            <p className="text-muted-foreground mb-4">Your Property. Your Journey. One Consultant.</p>
             <div className="flex space-x-3">
               {['F', 'I', 'Y', 'L'].map((letter) => (
-                <motion.button
+                <motion.div
                   key={letter}
                   whileHover={{ scale: 1.1 }}
                   className="w-10 h-10 bg-muted rounded-full flex items-center justify-center text-sm transition-colors hover:bg-primary/15 text-foreground"
                 >
                   {letter}
-                </motion.button>
+                </motion.div>
               ))}
             </div>
           </div>
 
-          {/* Services */}
           <div>
             <h4 className="text-lg font-medium mb-4">Services</h4>
             <ul className="space-y-3">
-              {[
-                { name: 'Real Estate', path: '/real-estate', icon: Building2 },
-                { name: 'Travel & Mobility', path: '/travels', icon: Plane },
-                { name: 'Construction', path: '/real-estate', icon: Hammer },
-              ].map((service) => (
-                <li key={service.name}>
-                  <Link
-                    href={service.path}
-                    className="text-muted-foreground hover:text-primary transition-colors flex items-center"
-                  >
-                    <service.icon size={16} className="mr-2" />
-                    {service.name}
-                  </Link>
-                </li>
-              ))}
+              <li>
+                <Link
+                  href="/real-estate"
+                  className="text-muted-foreground hover:text-primary transition-colors flex items-center"
+                >
+                  <Building2 size={16} className="mr-2" />
+                  Real Estate
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/travels"
+                  className="text-muted-foreground hover:text-primary transition-colors flex items-center"
+                >
+                  <Plane size={16} className="mr-2" />
+                  Travel & Mobility
+                </Link>
+              </li>
+              <li>
+                <a
+                  href={CONSTRUCTION_CONSULTATION_URL}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-muted-foreground hover:text-primary transition-colors flex items-center"
+                >
+                  <Hammer size={16} className="mr-2" />
+                  Construction Consultation
+                </a>
+              </li>
             </ul>
           </div>
 
-          {/* Quick Links */}
           <div>
             <h4 className="text-lg font-medium mb-4">Quick Links</h4>
             <ul className="space-y-3">
-              {[
-                { label: 'About', href: '/about' },
-                { label: 'Properties', href: '/real-estate/properties' },
-                { label: 'Contact', href: '/contact' },
-              ].map((link) => (
-                <li key={link.label}>
-                  <Link href={link.href} className="text-muted-foreground hover:text-primary transition-colors">
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
+              <li>
+                <Link href="/about" className="text-muted-foreground hover:text-primary transition-colors">
+                  About
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/real-estate/properties"
+                  className="text-muted-foreground hover:text-primary transition-colors"
+                >
+                  Properties
+                </Link>
+              </li>
+              <li>
+                <Link href="/contact" className="text-muted-foreground hover:text-primary transition-colors">
+                  Contact
+                </Link>
+              </li>
+              <li>
+                <a
+                  href={CONSTRUCTION_CONSULTATION_URL}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-muted-foreground hover:text-primary transition-colors"
+                >
+                  Book Consultation
+                </a>
+              </li>
             </ul>
           </div>
 
-          {/* Contact */}
           <div>
             <h4 className="text-lg font-medium mb-4">Contact</h4>
             <ul className="space-y-3 text-muted-foreground">
@@ -80,11 +106,18 @@ export default function Footer() {
               </li>
               <li className="flex items-center">
                 <Phone size={16} className="mr-2 flex-shrink-0 text-primary" />
-                <span className="text-sm">+234 XXX XXX XXXX</span>
+                <a href="tel:+2340000000000" className="text-sm transition-colors hover:text-primary">
+                  +234 XXX XXX XXXX
+                </a>
               </li>
               <li className="flex items-center">
                 <Mail size={16} className="mr-2 flex-shrink-0 text-primary" />
-                <span className="text-sm">info@dotcharisconsult.com</span>
+                <a
+                  href="mailto:info@dotcharisconsult.com"
+                  className="text-sm transition-colors hover:text-primary"
+                >
+                  info@dotcharisconsult.com
+                </a>
               </li>
             </ul>
           </div>

@@ -2,6 +2,7 @@
 
 import { revalidatePath } from 'next/cache';
 import { createClient } from '@/lib/supabase/server';
+import { getViewerContext } from '@/lib/supabase/dashboard-access';
 import type { PropertyStatus } from '@/lib/types/database';
 import { initializePaystackTransaction } from '@/lib/payments/paystack';
 import { LISTING_AGENT_TRANSITIONS, LISTING_STATUS_VALUES } from '@/lib/workflow-rules';
@@ -9,21 +10,18 @@ import { LISTING_AGENT_TRANSITIONS, LISTING_STATUS_VALUES } from '@/lib/workflow
 const AGENT_ALLOWED: PropertyStatus[] = LISTING_STATUS_VALUES;
 
 export async function completeAgentOnboardingPayment() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { error: 'Not signed in.' };
+  const viewer = await getViewerContext();
+  if (!viewer) return { error: 'Not signed in.' };
 
-  const { data: profile } = await supabase.from('profiles').select('status').eq('id', user.id).maybeSingle();
-  if (profile?.status !== 'verified') {
+  const supabase = await createClient();
+  if (viewer.status !== 'verified') {
     return { error: 'Your account must be verified before onboarding payment.' };
   }
 
   const { data: fullProfile } = await supabase
     .from('profiles')
     .select('email, onboarding_paid')
-    .eq('id', user.id)
+    .eq('id', viewer.userId)
     .maybeSingle();
   if (fullProfile?.onboarding_paid) {
     return { ok: true };
@@ -34,20 +32,19 @@ export async function completeAgentOnboardingPayment() {
     const { error: pErr } = await supabase
       .from('profiles')
       .update({ onboarding_paid: true })
-      .eq('id', user.id);
+      .eq('id', viewer.userId);
     if (pErr) return { error: pErr.message };
-    await supabase.from('agent_profiles').update({ payment_status: 'paid' }).eq('user_id', user.id);
     revalidatePath('/agent');
     return { ok: true, mode: 'fallback' as const };
   }
 
   const origin = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
-  const reference = `agent_onboard_${user.id.replace(/-/g, '')}_${Date.now()}`;
+  const reference = `agent_onboard_${viewer.userId.replace(/-/g, '')}_${Date.now()}`;
   const amount = 5000;
   const callbackUrl = `${origin}/api/payments/agent-onboarding/callback`;
 
   const { error: insertErr } = await supabase.from('agent_onboarding_payments').insert({
-    user_id: user.id,
+    user_id: viewer.userId,
     provider: 'paystack',
     reference,
     amount,
@@ -57,11 +54,11 @@ export async function completeAgentOnboardingPayment() {
 
   try {
     const payment = await initializePaystackTransaction({
-      email: fullProfile?.email || user.email || 'agent@example.com',
+      email: fullProfile?.email || viewer.email || 'agent@example.com',
       amountKobo: amount * 100,
       reference,
       callbackUrl,
-      metadata: { user_id: user.id, type: 'agent_onboarding' },
+      metadata: { user_id: viewer.userId, type: 'agent_onboarding' },
     });
     return { ok: true, authorizationUrl: payment.authorization_url };
   } catch (error) {
@@ -77,20 +74,12 @@ export async function updateAgentListingMeta(input: {
   id: string;
   status: PropertyStatus;
   is_featured: boolean;
-  labels: string[];
 }) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { error: 'Not signed in.' };
+  const viewer = await getViewerContext();
+  if (!viewer) return { error: 'Not signed in.' };
 
-  const { data: me } = await supabase
-    .from('profiles')
-    .select('status, onboarding_paid')
-    .eq('id', user.id)
-    .maybeSingle();
-  if (me?.status !== 'verified' || !me?.onboarding_paid) {
+  const supabase = await createClient();
+  if (viewer.status !== 'verified' || !viewer.onboardingPaid) {
     return { error: 'Only verified and paid agents can manage listings.' };
   }
   if (!AGENT_ALLOWED.includes(input.status)) {
@@ -101,7 +90,7 @@ export async function updateAgentListingMeta(input: {
     .from('properties')
     .select('status')
     .eq('id', input.id)
-    .eq('agent_id', user.id)
+    .eq('agent_id', viewer.userId)
     .maybeSingle();
   if (!listing) return { error: 'Listing not found.' };
 
@@ -112,16 +101,14 @@ export async function updateAgentListingMeta(input: {
     return { error: `Cannot change status from ${current} to ${next}.` };
   }
 
-  const labels = input.labels.map((s) => s.trim()).filter(Boolean);
   const { error } = await supabase
     .from('properties')
     .update({
       status: input.status,
       is_featured: input.is_featured,
-      labels,
     })
     .eq('id', input.id)
-    .eq('agent_id', user.id);
+    .eq('agent_id', viewer.userId);
 
   if (error) return { error: error.message };
   revalidatePath('/agent');

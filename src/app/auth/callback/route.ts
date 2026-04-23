@@ -26,6 +26,26 @@ export async function GET(request: Request) {
     const supabase = await createClient();
     const { error } = await supabase.auth.exchangeCodeForSession(code);
     if (!error) {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      if (user) {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('role, status')
+          .eq('id', user.id)
+          .maybeSingle();
+
+        if (profile?.role === 'admin') {
+          return NextResponse.redirect(new URL('/admin', origin));
+        }
+
+        if (profile?.role === 'agent') {
+          return NextResponse.redirect(new URL(profile.status === 'verified' ? '/agent' : '/agent/under-review', origin));
+        }
+      }
+
       return NextResponse.redirect(new URL(next, origin));
     }
     const login = new URL('/login', origin);

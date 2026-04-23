@@ -1,7 +1,12 @@
 import 'server-only';
 
 import { cache } from 'react';
+import { headers } from 'next/headers';
 import { createClient } from '@/lib/supabase/server';
+import {
+  VIEWER_HEADER_NAMES,
+  decodeViewerHeaderValue,
+} from '@/lib/supabase/viewer-headers';
 
 export type ViewerContext = {
   userId: string;
@@ -13,6 +18,20 @@ export type ViewerContext = {
 };
 
 export const getViewerContext = cache(async (): Promise<ViewerContext | null> => {
+  const requestHeaders = await headers();
+  const headerUserId = requestHeaders.get(VIEWER_HEADER_NAMES.userId);
+
+  if (headerUserId) {
+    return {
+      userId: headerUserId,
+      email: decodeViewerHeaderValue(requestHeaders.get(VIEWER_HEADER_NAMES.email)),
+      fullName: decodeViewerHeaderValue(requestHeaders.get(VIEWER_HEADER_NAMES.fullName)),
+      role: decodeViewerHeaderValue(requestHeaders.get(VIEWER_HEADER_NAMES.role)),
+      status: decodeViewerHeaderValue(requestHeaders.get(VIEWER_HEADER_NAMES.status)),
+      onboardingPaid: requestHeaders.get(VIEWER_HEADER_NAMES.onboardingPaid) === '1',
+    };
+  }
+
   const supabase = await createClient();
   const {
     data: { user },
@@ -47,4 +66,3 @@ export const hasClientService = cache(async (userId: string, service: 'travel' |
 
   return Boolean(data);
 });
-

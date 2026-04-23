@@ -1,8 +1,9 @@
 import type { Metadata } from 'next';
+import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { getNotificationsForUser, getPropertiesForAgent } from '@/lib/supabase/data';
-import { AgentListingsManager, AgentPaymentGate, AgentPendingReviewCard } from './agent-dashboard-controls';
+import { AgentListingsManager, AgentPaymentGate } from './agent-dashboard-controls';
 import { getViewerContext } from '@/lib/supabase/dashboard-access';
 
 export const metadata: Metadata = {
@@ -17,6 +18,7 @@ export default async function AgentDashboardPage({
   const { payment } = await searchParams;
   const viewer = await getViewerContext();
   if (!viewer) return null;
+  if (viewer.status !== 'verified') redirect('/agent/under-review');
 
   const [rows, notices] = await Promise.all([
     getPropertiesForAgent(viewer.userId),
@@ -58,7 +60,6 @@ export default async function AgentDashboardPage({
           </p>
         ) : null}
 
-        {viewer.status !== 'verified' ? <AgentPendingReviewCard /> : null}
         {viewer.status === 'verified' && !viewer.onboardingPaid ? <AgentPaymentGate /> : null}
         <div className="rounded-2xl border border-border bg-card p-4 shadow-sm">
           <h2 className="text-base font-medium text-foreground mb-2">Recent updates</h2>
