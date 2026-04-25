@@ -10,7 +10,7 @@ export default function TravelHelpPage() {
   return (
     <div className="space-y-6">
       <Link
-        href="/travels/dashboard/profile"
+        href="/travel/dashboard/profile"
         className="inline-flex items-center gap-1.5 text-sm text-foreground/90 hover:text-foreground sm:hidden"
       >
         <ArrowLeft size={16} />
@@ -43,7 +43,7 @@ export default function TravelHelpPage() {
             If document upload fails, include application id and file type in your message.
           </p>
           <Link
-            href="/travels/dashboard/applications"
+        href="/travel/dashboard/applications"
             className="mt-3 inline-flex rounded-full border border-border px-4 py-2 text-sm text-foreground hover:bg-muted"
           >
             Go to applications
@@ -53,4 +53,3 @@ export default function TravelHelpPage() {
     </div>
   );
 }
-

@@ -8,7 +8,7 @@ import { CONSTRUCTION_CONSULTATION_URL } from '@/lib/consultation';
 import { isClientDashboardService, LAST_CLIENT_SERVICE_COOKIE } from '@/lib/last-client-service';
 
 const SERVICE_ROUTES = {
-  travel: '/travels/dashboard',
+  travel: '/travel/dashboard',
   real_estate: '/real-estate/dashboard',
 } as const;
 

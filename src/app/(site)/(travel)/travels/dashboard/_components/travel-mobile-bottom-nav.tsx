@@ -5,10 +5,10 @@ import { usePathname } from 'next/navigation';
 import { Bell, FileText, LayoutDashboard, UserCircle } from 'lucide-react';
 
 const ITEMS = [
-  { href: '/travels/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { href: '/travels/dashboard/applications', label: 'Applications', icon: FileText },
-  { href: '/travels/dashboard/updates', label: 'Updates', icon: Bell },
-  { href: '/travels/dashboard/profile', label: 'Profile', icon: UserCircle },
+  { href: '/travel/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+  { href: '/travel/dashboard/applications', label: 'Applications', icon: FileText },
+  { href: '/travel/dashboard/updates', label: 'Updates', icon: Bell },
+  { href: '/travel/dashboard/profile', label: 'Profile', icon: UserCircle },
 ] as const;
 
 export function TravelMobileBottomNav() {
@@ -19,8 +19,8 @@ export function TravelMobileBottomNav() {
       <div className="mx-auto flex max-w-md items-center justify-between rounded-2xl border border-border bg-card/95 px-2 py-2 shadow-lg backdrop-blur">
         {ITEMS.map((item) => {
           const active =
-            item.href === '/travels/dashboard/profile'
-              ? pathname.startsWith('/travels/dashboard/profile') || pathname.startsWith('/travels/dashboard/help')
+      item.href === '/travel/dashboard/profile'
+        ? pathname.startsWith('/travel/dashboard/profile') || pathname.startsWith('/travel/dashboard/help')
               : pathname === item.href;
           return (
             <Link
@@ -39,4 +39,3 @@ export function TravelMobileBottomNav() {
     </nav>
   );
 }
-

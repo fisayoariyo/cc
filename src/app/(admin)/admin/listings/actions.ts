@@ -131,7 +131,7 @@ export async function saveProperty(prevState: PropertySaveState, formData: FormD
 
   revalidatePath('/admin/listings');
   revalidatePath('/admin');
-  revalidatePath('/real-estate/properties');
+  revalidatePath('/properties');
   revalidatePath('/agent');
 
   const redirectTo = String(formData.get('redirect_to') ?? '/admin/listings');
@@ -190,6 +190,6 @@ export async function moderatePropertyListing(input: {
   revalidatePath('/admin/listings');
   revalidatePath('/admin');
   revalidatePath('/agent');
-  revalidatePath('/real-estate/properties');
+  revalidatePath('/properties');
   return { ok: true };
 }

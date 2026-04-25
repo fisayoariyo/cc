@@ -25,7 +25,7 @@ export async function toggleFavoriteProperty(propertyId: string) {
     if (error) return { error: error.message };
   }
 
-  revalidatePath('/real-estate/properties');
+  revalidatePath('/properties');
   revalidatePath('/real-estate/dashboard');
   return { ok: true };
 }
@@ -56,7 +56,7 @@ export async function toggleCompareProperty(propertyId: string) {
     if (error) return { error: error.message };
   }
 
-  revalidatePath('/real-estate/properties');
+  revalidatePath('/properties');
   revalidatePath('/real-estate/dashboard');
   return { ok: true };
 }
@@ -77,7 +77,7 @@ export async function saveRealEstateSearch(input: { title: string; query: Record
   });
   if (error) return { error: error.message };
 
-  revalidatePath('/real-estate/properties');
+  revalidatePath('/properties');
   revalidatePath('/real-estate/dashboard');
   return { ok: true };
 }

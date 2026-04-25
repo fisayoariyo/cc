@@ -17,14 +17,14 @@ export default function TravelPage() {
       title: 'Your Journey Starts Here',
       subtitle: 'Expert guidance for education, work, and travel abroad',
       cta: 'Explore Services',
-      ctaHref: '/travels#services',
+    ctaHref: '/travel#services',
     },
     {
       image: 'https://images.unsplash.com/photo-1773829126358-1e5f4e5aa532?w=1920&q=80',
       title: 'Global Opportunities Await',
       subtitle: 'Visa advisory, relocation, and mobility solutions',
       cta: 'How It Works',
-      ctaHref: '/travels#how-it-works',
+    ctaHref: '/travel#how-it-works',
     },
   ];
 

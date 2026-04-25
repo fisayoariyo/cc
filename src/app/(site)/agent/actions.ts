@@ -112,6 +112,6 @@ export async function updateAgentListingMeta(input: {
 
   if (error) return { error: error.message };
   revalidatePath('/agent');
-  revalidatePath('/real-estate/properties');
+  revalidatePath('/properties');
   return { ok: true };
 }

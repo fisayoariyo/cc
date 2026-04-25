@@ -48,13 +48,13 @@ export async function updateTravelStage(id: string, serviceType: string, current
       type: 'travel',
       title: 'Travel stage updated',
       body: `${getStageLabel(serviceType, current_stage)}${note?.trim() ? ` - ${note.trim()}` : ''}`,
-      linkUrl: '/travels/dashboard',
+      linkUrl: '/travel/dashboard',
       metadata: { application_id: id, service_type: app.service_type },
     });
   }
 
   revalidatePath('/admin/travel-applications');
-  revalidatePath('/travels/dashboard');
+  revalidatePath('/travel/dashboard');
   revalidatePath('/admin');
   return { ok: true };
 }
@@ -96,12 +96,12 @@ export async function reviewApplicationDocument(
       type: 'travel_document',
       title: `Document ${status.replace(/_/g, ' ')}`,
       body: `${doc.document_type ?? 'Document'}: ${adminNote?.trim() || 'Review updated by admin.'}`,
-      linkUrl: '/travels/dashboard',
+      linkUrl: '/travel/dashboard',
       metadata: { application_id: doc.application_id, document_id: id },
     });
   }
 
   revalidatePath('/admin/travel-applications');
-  revalidatePath('/travels/dashboard');
+  revalidatePath('/travel/dashboard');
   return { ok: true };
 }

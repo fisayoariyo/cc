@@ -23,7 +23,7 @@ export function TravelProfileActions() {
       <h2 className="text-base font-semibold text-foreground">More options</h2>
       <div className="mt-4 space-y-2">
         <Link
-          href="/travels/dashboard/help"
+          href="/travel/dashboard/help"
           className="flex items-center justify-between rounded-xl border border-border px-3 py-3 text-sm text-foreground hover:bg-muted/30"
         >
           <span className="inline-flex items-center gap-2">

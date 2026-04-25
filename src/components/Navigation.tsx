@@ -26,7 +26,7 @@ export default function Navigation({ initialAuthState }: { initialAuthState: Aut
   }, []);
 
   useEffect(() => {
-    const routesToPrefetch = ['/', '/real-estate', '/travels', '/about', '/contact', '/login', '/register'];
+const routesToPrefetch = ['/', '/real-estate', '/travel', '/about', '/contact', '/login', '/register'];
 
     const warmRoutes = () => {
       routesToPrefetch.forEach((route) => router.prefetch(route));
@@ -44,13 +44,13 @@ export default function Navigation({ initialAuthState }: { initialAuthState: Aut
   const navItems = [
     { name: 'Home', path: '/' },
     { name: 'Real Estate', path: '/real-estate' },
-    { name: 'Travels', path: '/travels' },
+  { name: 'Travel', path: '/travel' },
     { name: 'About', path: '/about' },
     { name: 'Contact', path: '/contact' },
   ];
 
   /** Full-bleed dark heroes need light nav text. */
-  const navOnDarkImage = !isScrolled && ['/', '/real-estate', '/travels'].includes(pathname);
+const navOnDarkImage = !isScrolled && ['/', '/real-estate', '/travel'].includes(pathname);
 
   return (
     <motion.nav

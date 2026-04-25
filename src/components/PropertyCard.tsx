@@ -79,7 +79,7 @@ export default function PropertyCard({
 
   if (slug) {
     return (
-      <Link href={`/real-estate/properties/${slug}`} className="block h-full">
+      <Link href={`/properties/${slug}`} className="block h-full">
         {inner}
       </Link>
     );

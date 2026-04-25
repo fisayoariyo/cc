@@ -29,7 +29,7 @@ const SIGN_IN_OPTIONS = [
     icon: UserRound,
   },
   {
-    href: '/login?role=client&service=travel&next=/travels/dashboard',
+    href: '/login?role=client&service=travel&next=/travel/dashboard',
     label: 'Travel Client',
     description: 'Travel applications and updates',
     icon: Plane,

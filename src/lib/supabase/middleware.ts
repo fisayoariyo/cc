@@ -17,7 +17,7 @@ export async function updateSession(request: NextRequest) {
   const path = request.nextUrl.pathname;
   const isAdminRoute = path.startsWith('/admin');
   const isDashboardRoute = path.startsWith('/dashboard');
-  const isTravelClientRoute = path.startsWith('/travels/dashboard');
+  const isTravelClientRoute = path.startsWith('/travel/dashboard');
   const isRealEstateClientRoute = path.startsWith('/real-estate/dashboard');
   const isConstructionClientRoute = path.startsWith('/construction/dashboard');
   const isAgentRoute = path.startsWith('/agent');

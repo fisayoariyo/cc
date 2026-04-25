@@ -137,7 +137,7 @@ export default function ListingForm({
               required
               className="bg-card font-mono text-sm"
             />
-            <p className="text-xs text-muted-foreground">Shown as /real-estate/properties/[slug]</p>
+            <p className="text-xs text-muted-foreground">Shown as /properties/[slug]</p>
           </div>
           <div className="space-y-2">
             <Label>Status</Label>

@@ -10,7 +10,7 @@ export const config = {
     '/dashboard/:path*',
     '/admin/:path*',
     '/agent/:path*',
-    '/travels/dashboard/:path*',
+    '/travel/dashboard/:path*',
     '/real-estate/dashboard/:path*',
     '/construction/dashboard/:path*',
   ],

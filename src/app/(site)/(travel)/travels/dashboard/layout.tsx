@@ -14,7 +14,7 @@ export default async function TravelDashboardLayout({
 }) {
   const viewer = await getViewerContext();
   if (!viewer) {
-    redirect('/login?next=/travels/dashboard');
+    redirect('/login?next=/travel/dashboard');
   }
 
   const service = await hasClientService(viewer.userId, 'travel');
@@ -35,7 +35,7 @@ export default async function TravelDashboardLayout({
               <div className="flex items-center gap-2">
                 <Badge className="rounded-full bg-emerald-600/10 text-emerald-700 hover:bg-emerald-600/10">Online</Badge>
                 <Link
-                  href="/travels/dashboard/applications"
+        href="/travel/dashboard/applications"
                   className="inline-flex items-center gap-2 rounded-[12px] bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground hover:bg-primary/90"
                 >
                   <PlusCircle size={14} />
@@ -72,7 +72,7 @@ export default async function TravelDashboardLayout({
                       Online
                     </Badge>
                     <Link
-                      href="/travels/dashboard/applications"
+        href="/travel/dashboard/applications"
                       className="inline-flex items-center gap-2 rounded-[14px] bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
                     >
                       <PlusCircle size={16} />
@@ -92,4 +92,3 @@ export default async function TravelDashboardLayout({
     </DashboardInteractionFeedback>
   );
 }
-

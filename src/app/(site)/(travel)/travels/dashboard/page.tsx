@@ -50,19 +50,19 @@ export default async function TravelClientDashboardPage() {
         <h2 className="text-lg font-semibold text-foreground">Quick links</h2>
         <div className="mt-3 flex flex-wrap gap-2">
           <Link
-            href="/travels/dashboard/applications"
+          href="/travel/dashboard/applications"
             className="rounded-full bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
           >
             Manage applications
           </Link>
           <Link
-            href="/travels/dashboard/updates"
+          href="/travel/dashboard/updates"
             className="rounded-full border border-border px-4 py-2 text-sm text-foreground hover:bg-muted"
           >
             View updates ({noticesCount})
           </Link>
           <Link
-            href="/travels/dashboard/profile"
+          href="/travel/dashboard/profile"
             className="rounded-full border border-border px-4 py-2 text-sm text-foreground hover:bg-muted"
           >
             Open profile

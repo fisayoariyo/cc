@@ -44,7 +44,7 @@ export default async function RealEstateDashboardPage() {
         <div className="rounded-2xl border border-border bg-card p-5 shadow-sm space-y-3">
           <h2 className="text-lg font-medium text-foreground">Quick actions</h2>
           <div className="flex flex-wrap gap-2">
-            <Link href="/real-estate/properties" className="rounded-full px-4 py-2 text-sm bg-primary text-primary-foreground">
+            <Link href="/properties" className="rounded-full px-4 py-2 text-sm bg-primary text-primary-foreground">
               Browse properties
             </Link>
           </div>

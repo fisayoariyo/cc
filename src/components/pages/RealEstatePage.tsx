@@ -20,21 +20,21 @@ export default function RealEstatePage({ featuredProperties }: { featuredPropert
       title: 'Luxury on an Endless Horizon',
       subtitle: 'Discover exceptional waterfront properties across Nigeria',
       cta: 'Explore Properties',
-      ctaHref: '/real-estate/properties',
+    ctaHref: '/properties',
     },
     {
       image: 'https://images.unsplash.com/photo-1775466989637-a142f04aa2ad?w=1920&q=80',
       title: 'Modern Living Redefined',
       subtitle: "Premium estates nestled in nature's embrace",
       cta: 'View Collection',
-      ctaHref: '/real-estate/properties',
+    ctaHref: '/properties',
     },
     {
       image: 'https://images.unsplash.com/photo-1775466989717-6ca5a1943c6a?w=1920&q=80',
       title: 'Your Dream Home Awaits',
       subtitle: 'Curated selection of luxury real estate',
       cta: 'Start Your Journey',
-      ctaHref: '/real-estate/properties',
+    ctaHref: '/properties',
     },
   ];
 
@@ -95,7 +95,7 @@ export default function RealEstatePage({ featuredProperties }: { featuredPropert
             className="text-center mt-12 flex flex-col sm:flex-row items-center justify-center gap-3"
           >
             <Link
-              href="/real-estate/properties"
+                  href="/properties"
               className="inline-flex items-center px-8 py-4 bg-primary text-primary-foreground text-sm font-medium rounded-full hover:bg-primary/90 transition-colors shadow-md shadow-primary/15"
             >
               View All Properties
@@ -258,7 +258,7 @@ export default function RealEstatePage({ featuredProperties }: { featuredPropert
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
-                href="/real-estate/properties"
+                  href="/properties"
                 className="inline-flex px-8 py-4 bg-primary text-primary-foreground text-sm font-medium rounded-full hover:bg-primary/90 transition-colors shadow-md shadow-primary/15"
               >
                 Browse Properties

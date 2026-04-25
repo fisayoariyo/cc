@@ -8,7 +8,7 @@ import type { AuthNavInitialState } from '@/components/auth-nav';
 function isAppShellRoute(pathname: string): boolean {
   return (
     pathname === '/dashboard' ||
-    pathname.startsWith('/travels/dashboard') ||
+    pathname.startsWith('/travel/dashboard') ||
     pathname.startsWith('/real-estate/dashboard') ||
     pathname.startsWith('/construction/dashboard') ||
     pathname.startsWith('/agent')
@@ -37,4 +37,3 @@ export function SiteShellClient({
     </div>
   );
 }
-

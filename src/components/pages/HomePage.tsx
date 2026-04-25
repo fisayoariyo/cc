@@ -118,7 +118,7 @@ export default function HomePage() {
                 type="button"
                 whileHover={{ scale: 1.03 }}
                 whileTap={{ scale: 0.95 }}
-                onClick={() => router.push('/travels')}
+              onClick={() => router.push('/travel')}
                 className="inline-flex cursor-pointer items-center justify-center rounded-full border border-white/25 bg-white/14 px-8 py-3.5 text-sm font-semibold text-white backdrop-blur-sm"
               >
                 Travel
@@ -197,7 +197,7 @@ export default function HomePage() {
               </motion.div>
             </Link>
 
-            <Link href="/travels">
+              <Link href="/travel">
               <motion.div
                 initial={{ opacity: 0, x: 50 }}
                 whileInView={{ opacity: 1, x: 0 }}

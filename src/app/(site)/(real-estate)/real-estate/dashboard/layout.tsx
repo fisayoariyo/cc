@@ -20,10 +20,10 @@ export default async function RealEstateDashboardLayout({
       fullName={viewer.fullName ?? viewer.email}
       navItems={[
         { href: '/real-estate/dashboard', label: 'Dashboard' },
-        { href: '/real-estate/properties', label: 'Browse properties' },
+  { href: '/properties', label: 'Browse properties' },
         { href: '/contact', label: 'Help & support' },
       ]}
-      primaryActionHref="/real-estate/properties"
+      primaryActionHref="/properties"
       primaryActionLabel="Browse Properties"
     >
       {children}

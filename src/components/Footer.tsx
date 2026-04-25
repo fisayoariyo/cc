@@ -64,7 +64,7 @@ export default function Footer() {
               </li>
               <li>
                 <Link
-                  href="/travels"
+                  href="/travel"
                   className="flex items-center text-muted-foreground transition-colors hover:text-primary"
                 >
                   <Plane size={16} className="mr-2" />
@@ -95,7 +95,7 @@ export default function Footer() {
               </li>
               <li>
                 <Link
-                  href="/real-estate/properties"
+                  href="/properties"
                   className="text-muted-foreground transition-colors hover:text-primary"
                 >
                   Properties

@@ -43,7 +43,7 @@ export default function PropertyDetailView({ property }: Props) {
     <div className="min-h-screen bg-background pt-20">
       <div className="max-w-7xl mx-auto px-6 lg:px-8 py-8">
         <Link
-          href="/real-estate/properties"
+          href="/properties"
           className="inline-flex items-center text-sm text-muted-foreground hover:text-primary transition-colors mb-8"
         >
           <ChevronLeft className="w-4 h-4 mr-1" />

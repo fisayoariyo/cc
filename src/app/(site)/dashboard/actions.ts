@@ -31,7 +31,7 @@ export async function addClientServiceAndContinue(service: ClientServiceType): P
   }
 
   if (service === 'travel') {
-    redirect('/travels/dashboard');
+    redirect('/travel/dashboard');
   }
   if (service === 'real_estate') {
     redirect('/real-estate/dashboard');
@@ -85,7 +85,7 @@ export async function createTravelApplication(
     changed_by: null,
   });
 
-  revalidatePath('/travels/dashboard');
+  revalidatePath('/travel/dashboard');
   return { success: true };
 }
 
@@ -127,7 +127,7 @@ export async function uploadApplicationDocument(
   });
   if (rowError) return { error: rowError.message };
 
-  revalidatePath('/travels/dashboard');
+  revalidatePath('/travel/dashboard');
   revalidatePath('/admin/travel-applications');
   return { success: true };
 }

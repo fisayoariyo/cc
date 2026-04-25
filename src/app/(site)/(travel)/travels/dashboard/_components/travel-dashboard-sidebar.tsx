@@ -9,15 +9,15 @@ import logoLockupColor from '@/assets/CC Logo Lockup (color).svg';
 import { SidebarAccountMenu } from '@/components/dashboard/SidebarAccountMenu';
 
 const ITEMS = [
-  { href: '/travels/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { href: '/travels/dashboard/applications', label: 'Applications', icon: FileText },
-  { href: '/travels/dashboard/updates', label: 'Updates', icon: Bell },
-  { href: '/travels/dashboard/profile', label: 'Profile', icon: UserCircle },
-  { href: '/travels/dashboard/help', label: 'Help & support', icon: CircleHelp },
+  { href: '/travel/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+  { href: '/travel/dashboard/applications', label: 'Applications', icon: FileText },
+  { href: '/travel/dashboard/updates', label: 'Updates', icon: Bell },
+  { href: '/travel/dashboard/profile', label: 'Profile', icon: UserCircle },
+  { href: '/travel/dashboard/help', label: 'Help & support', icon: CircleHelp },
 ] as const;
 
 function isActive(pathname: string, href: string): boolean {
-  if (href === '/travels/dashboard') {
+  if (href === '/travel/dashboard') {
     return pathname === href;
   }
   return pathname.startsWith(href);
@@ -62,4 +62,3 @@ export function TravelDashboardSidebar({ fullName }: { fullName?: string | null 
     </aside>
   );
 }
-
