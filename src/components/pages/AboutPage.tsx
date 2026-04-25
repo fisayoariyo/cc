@@ -6,19 +6,34 @@ import { Target, Eye, Award, Users } from 'lucide-react';
 export default function AboutPage() {
   const team = [
     {
-      name: 'Adebayo Johnson',
+      name: 'Idowu Dotun',
       role: 'CEO & Founder',
       image: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=400&q=80',
     },
     {
-      name: 'Chioma Okafor',
-      role: 'Head of Real Estate',
+      name: 'Adefunke Popoola',
+      role: 'Operations Manager',
       image: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&q=80',
     },
     {
-      name: 'Ibrahim Ahmed',
-      role: 'Travel Services Director',
+      name: 'Fatunmbi Oluwasegun',
+      role: 'Customer Relations Manager',
       image: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&q=80',
+    },
+    {
+      name: 'Bello Olayinka',
+      role: 'Secretary',
+      image: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=400&q=80',
+    },
+    {
+      name: 'Oshinowo Kofoworola',
+      role: 'Construction Manager',
+      image: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=400&q=80',
+    },
+    {
+      name: 'Ayodeji Ogundele',
+      role: 'International Consultant',
+      image: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=400&q=80',
     },
     {
       name: 'Ngozi Eze',

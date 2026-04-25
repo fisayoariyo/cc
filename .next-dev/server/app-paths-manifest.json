@@ -1,10 +1,6 @@
 {
-  "/(site)/about/page": "app/(site)/about/page.js",
-  "/(auth)/login/page": "app/(auth)/login/page.js",
-  "/(site)/contact/page": "app/(site)/contact/page.js",
-  "/(auth)/register/page": "app/(auth)/register/page.js",
+  "/(site)/page": "app/(site)/page.js",
   "/(site)/(travel)/travels/page": "app/(site)/(travel)/travels/page.js",
-  "/(site)/dashboard/page": "app/(site)/dashboard/page.js",
-  "/(site)/(real-estate)/real-estate/dashboard/page": "app/(site)/(real-estate)/real-estate/dashboard/page.js",
-  "/(site)/(travel)/travels/dashboard/page": "app/(site)/(travel)/travels/dashboard/page.js"
+  "/(site)/contact/page": "app/(site)/contact/page.js",
+  "/(site)/about/page": "app/(site)/about/page.js"
 }

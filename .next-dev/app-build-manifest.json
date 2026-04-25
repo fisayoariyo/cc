@@ -11,90 +11,25 @@
       "static/chunks/main-app.js",
       "static/chunks/app/(site)/layout.js"
     ],
-    "/(site)/(real-estate)/real-estate/properties/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/(site)/(real-estate)/real-estate/properties/page.js"
-    ],
     "/(site)/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/chunks/app/(site)/page.js"
-    ],
-    "/(site)/(real-estate)/real-estate/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/(site)/(real-estate)/real-estate/page.js"
     ],
     "/(site)/(travel)/travels/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/chunks/app/(site)/(travel)/travels/page.js"
     ],
-    "/(site)/about/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/(site)/about/page.js"
-    ],
     "/(site)/contact/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/chunks/app/(site)/contact/page.js"
     ],
-    "/(auth)/layout": [
+    "/(site)/about/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/(auth)/layout.js"
-    ],
-    "/(auth)/login/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/(auth)/login/page.js"
-    ],
-    "/(auth)/register/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/(auth)/register/page.js"
-    ],
-    "/(auth)/forgot-password/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/(auth)/forgot-password/page.js"
-    ],
-    "/(site)/dashboard/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/(site)/dashboard/page.js"
-    ],
-    "/(site)/(real-estate)/real-estate/dashboard/layout": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/(site)/(real-estate)/real-estate/dashboard/layout.js"
-    ],
-    "/(site)/(real-estate)/real-estate/dashboard/loading": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/(site)/(real-estate)/real-estate/dashboard/loading.js"
-    ],
-    "/(site)/(real-estate)/real-estate/dashboard/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/(site)/(real-estate)/real-estate/dashboard/page.js"
-    ],
-    "/(site)/(travel)/travels/dashboard/layout": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/(site)/(travel)/travels/dashboard/layout.js"
-    ],
-    "/(site)/(travel)/travels/dashboard/loading": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/(site)/(travel)/travels/dashboard/loading.js"
-    ],
-    "/(site)/(travel)/travels/dashboard/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/(site)/(travel)/travels/dashboard/page.js"
+      "static/chunks/app/(site)/about/page.js"
     ]
   }
 }

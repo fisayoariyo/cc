@@ -130,7 +130,9 @@ export default function ContactPage() {
                     <div>
                       <h3 className="font-medium text-foreground mb-1">Our Office</h3>
                       <p className="text-muted-foreground">
-                        Jofat Shopping Plaza
+                        Suite 5, Jofat Shopping Plaza, Joyce B Junction
+                        <br /> 
+                        Opposite Mobil Filling Station
                         <br />
                         Ring Road, Ibadan
                         <br />
@@ -144,7 +146,7 @@ export default function ContactPage() {
                     <div>
                       <h3 className="font-medium text-foreground mb-1">Phone</h3>
                       <a href="tel:+2340000000000" className="text-muted-foreground transition-colors hover:text-primary">
-                        +234 XXX XXX XXXX
+                        +234 810 584 4946
                       </a>
                     </div>
                   </div>
@@ -182,21 +184,6 @@ export default function ContactPage() {
                 <div className="text-center text-muted-foreground">
                   <MapPin size={48} className="mx-auto mb-2 text-primary" />
                   <p>Map Integration</p>
-                </div>
-              </div>
-
-              <div>
-                <h3 className="font-medium text-foreground mb-4">Follow Us</h3>
-                <div className="flex space-x-4">
-                  {['Facebook', 'Instagram', 'YouTube', 'LinkedIn'].map((platform) => (
-                    <motion.div
-                      key={platform}
-                      whileHover={{ scale: 1.1 }}
-                      className="w-12 h-12 bg-muted rounded-full flex items-center justify-center hover:bg-primary/15 transition-colors border border-border"
-                    >
-                      <span className="text-xs text-muted-foreground">{platform[0]}</span>
-                    </motion.div>
-                  ))}
                 </div>
               </div>
             </motion.div>
