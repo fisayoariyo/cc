@@ -71,12 +71,12 @@ const navOnDarkImage = !isScrolled && ['/', '/real-estate', '/travel'].includes(
               {navOnDarkImage ? (
                 <Image
                   src={logoLockupColor}
-                  alt="DotCharis Consult"
+              alt="Charis Consult"
                   className="h-11 w-auto drop-shadow-[0_2px_8px_rgba(0,0,0,0.35)]"
                   priority
                 />
               ) : (
-                <Image src={logoLockupBlack} alt="DotCharis Consult" className="h-11 w-auto" priority />
+              <Image src={logoLockupBlack} alt="Charis Consult" className="h-11 w-auto" priority />
               )}
             </motion.div>
           </Link>

@@ -34,7 +34,7 @@ export function TravelDashboardSidebar({ fullName }: { fullName?: string | null 
   return (
     <aside className="h-full rounded-2xl bg-white px-4 py-5">
       <div className="mb-8 px-2">
-        <Image src={logoLockupColor} alt="DotCharis Consult" className="h-11 w-auto object-contain" priority />
+          <Image src={logoLockupColor} alt="Charis Consult" className="h-11 w-auto object-contain" priority />
       </div>
 
       <nav className="space-y-2">

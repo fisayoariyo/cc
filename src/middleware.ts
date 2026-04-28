@@ -12,6 +12,5 @@ export const config = {
     '/agent/:path*',
     '/travel/dashboard/:path*',
     '/real-estate/dashboard/:path*',
-    '/construction/dashboard/:path*',
   ],
 };

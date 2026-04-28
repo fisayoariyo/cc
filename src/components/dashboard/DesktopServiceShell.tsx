@@ -45,7 +45,7 @@ export function DesktopServiceShell({
           <div className="grid h-full gap-[10px] lg:grid-cols-[295px_minmax(0,1fr)]">
             <aside className="rounded-[20px] bg-white px-[20px] py-[24px] lg:px-[24px] lg:py-[28px]">
             <div className="mb-[44px]">
-              <Image src={logoLockupColor} alt="DotCharis Consult" className="h-11 w-auto object-contain" priority />
+            <Image src={logoLockupColor} alt="Charis Consult" className="h-11 w-auto object-contain" priority />
             </div>
             <nav className="space-y-2">
               {navItems.map((item) => {
@@ -100,4 +100,3 @@ export function DesktopServiceShell({
     </DashboardInteractionFeedback>
   );
 }
-

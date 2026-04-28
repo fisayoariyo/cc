@@ -19,7 +19,6 @@ export async function updateSession(request: NextRequest) {
   const isDashboardRoute = path.startsWith('/dashboard');
   const isTravelClientRoute = path.startsWith('/travel/dashboard');
   const isRealEstateClientRoute = path.startsWith('/real-estate/dashboard');
-  const isConstructionClientRoute = path.startsWith('/construction/dashboard');
   const isAgentRoute = path.startsWith('/agent');
   const isAgentUnderReviewRoute = path === '/agent/under-review';
   const isProtectedRoute =
@@ -27,7 +26,6 @@ export async function updateSession(request: NextRequest) {
     isDashboardRoute ||
     isTravelClientRoute ||
     isRealEstateClientRoute ||
-    isConstructionClientRoute ||
     isAgentRoute;
 
   if (!isProtectedRoute) {
@@ -126,7 +124,7 @@ export async function updateSession(request: NextRequest) {
     }
   }
 
-  if ((isTravelClientRoute || isRealEstateClientRoute || isConstructionClientRoute) && profile?.role !== 'client') {
+  if ((isTravelClientRoute || isRealEstateClientRoute) && profile?.role !== 'client') {
     if (profile?.role === 'admin') return NextResponse.redirect(new URL('/admin', request.url));
     if (profile?.role === 'agent') return NextResponse.redirect(new URL('/agent', request.url));
     return NextResponse.redirect(new URL('/dashboard', request.url));

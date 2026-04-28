@@ -49,7 +49,7 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
       >
             <div className="mb-[44px]">
               <Link href="/admin" className="flex items-center gap-3 text-lg font-semibold text-foreground">
-                <Image src={logoLockupColor} alt="DotCharis Consult" className="h-[34px] w-auto object-contain" />
+          <Image src={logoLockupColor} alt="Charis Consult" className="h-[34px] w-auto object-contain" />
               </Link>
             </div>
             <nav className="space-y-2">

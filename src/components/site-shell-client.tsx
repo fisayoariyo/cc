@@ -10,7 +10,6 @@ function isAppShellRoute(pathname: string): boolean {
     pathname === '/dashboard' ||
     pathname.startsWith('/travel/dashboard') ||
     pathname.startsWith('/real-estate/dashboard') ||
-    pathname.startsWith('/construction/dashboard') ||
     pathname.startsWith('/agent')
   );
 }

@@ -56,11 +56,11 @@ export async function createConstructionProject(formData: FormData) {
     type: 'construction',
     title: 'Construction project created',
     body: `${title} has been created and is now at stage: ${constructionStageLabel(firstStage)}.`,
-    linkUrl: '/construction/dashboard',
+    linkUrl: '/dashboard',
   });
 
   revalidatePath('/admin/construction-projects');
-  revalidatePath('/construction/dashboard');
+  revalidatePath('/dashboard');
   revalidatePath('/admin');
   return { ok: true };
 }
@@ -100,11 +100,11 @@ export async function updateConstructionProjectStage(projectId: string, stageKey
     type: 'construction',
     title: 'Construction stage updated',
     body: `${project.title}: ${constructionStageLabel(stageKey)}${note?.trim() ? ` - ${note.trim()}` : ''}`,
-    linkUrl: '/construction/dashboard',
+    linkUrl: '/dashboard',
   });
 
   revalidatePath('/admin/construction-projects');
-  revalidatePath('/construction/dashboard');
+  revalidatePath('/dashboard');
   revalidatePath('/admin');
   return { ok: true };
 }

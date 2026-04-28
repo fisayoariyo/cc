@@ -87,7 +87,7 @@ export default function AgentDesktopShell({
         <div className="min-h-[calc(100vh-1.5rem)] rounded-[20px] bg-white p-3 sm:p-4 shadow-[0_8px_24px_rgba(15,23,42,0.06)]">
           <div className="grid h-full gap-[10px] lg:grid-cols-[295px_minmax(0,1fr)]">
             <aside className="rounded-[20px] bg-white px-[20px] py-[24px] lg:px-[24px] lg:py-[28px]">
-              <Image src={logoLockupColor} alt="DotCharis Consult" className="mb-[44px] h-[34px] w-auto object-contain" />
+            <Image src={logoLockupColor} alt="Charis Consult" className="mb-[44px] h-[34px] w-auto object-contain" />
 
               <nav className="space-y-2">
                 {NAV_LINKS.map((item) => {
