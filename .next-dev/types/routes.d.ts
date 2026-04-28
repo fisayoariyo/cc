@@ -5,8 +5,8 @@ type AppRoutes = "/" | "/about" | "/admin" | "/admin/agents" | "/admin/construct
 type AppRouteHandlerRoutes = "/api/payments/agent-onboarding/callback" | "/auth/callback"
 type PageRoutes = never
 type LayoutRoutes = "/" | "/admin" | "/agent" | "/construction/dashboard" | "/real-estate/dashboard" | "/travels/dashboard"
-type RedirectRoutes = never
-type RewriteRoutes = never
+type RedirectRoutes = "/real-estate/properties" | "/real-estate/properties/[[...path]]" | "/travels" | "/travels/[[...path]]"
+type RewriteRoutes = "/properties" | "/properties/[[...path]]" | "/travel" | "/travel/[[...path]]"
 type Routes = AppRoutes | PageRoutes | LayoutRoutes | RedirectRoutes | RewriteRoutes | AppRouteHandlerRoutes
 
 
@@ -34,14 +34,20 @@ interface ParamMap {
   "/forgot-password": {}
   "/login": {}
   "/privacy": {}
+  "/properties": {}
+  "/properties/[[...path]]": { "path"?: string[]; }
   "/real-estate": {}
   "/real-estate/dashboard": {}
   "/real-estate/properties": {}
+  "/real-estate/properties/[[...path]]": { "path"?: string[]; }
   "/real-estate/properties/[propertyId]": { "propertyId": string; }
   "/register": {}
   "/reset-password": {}
   "/terms": {}
+  "/travel": {}
+  "/travel/[[...path]]": { "path"?: string[]; }
   "/travels": {}
+  "/travels/[[...path]]": { "path"?: string[]; }
   "/travels/dashboard": {}
   "/travels/dashboard/applications": {}
   "/travels/dashboard/help": {}

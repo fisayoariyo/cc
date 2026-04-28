@@ -38,7 +38,7 @@ export default function AboutPage() {
     {
       name: 'Ngozi Eze',
       role: 'Construction Manager',
-      image: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=400&q=80',
+      image: 'https://images.unsplash.com/photo-1580gi489944761-15a19d654956?w=400&q=80',
     },
   ];
 
