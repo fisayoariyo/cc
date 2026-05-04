@@ -1,0 +1,6 @@
+---
+alwaysApply: true
+---
+# PRD Reference
+Always follow prd.pdf (full platform with Real Estate, Construction, Travel portals + Admin/Agent/Client dashboards).
+Focus on missing pieces: individual property pages, full Admin Dashboard (add/edit listings), Agent Dashboard, Travel Client Dashboard, protected routes, mobile responsiveness.
