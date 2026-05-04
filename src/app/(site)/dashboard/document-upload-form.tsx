@@ -2,7 +2,6 @@
 
 import { type FormEvent, useRef, useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
-import { Paperclip } from 'lucide-react';
 import { uploadApplicationDocument, type UploadDocState } from './actions';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -82,34 +81,22 @@ export function DocumentUploadForm({
         <Label htmlFor={`file-${applicationId}`} className="text-sm">
           Select file
         </Label>
-        <label
-          htmlFor={`file-${applicationId}`}
-          className="flex cursor-pointer items-center gap-3 rounded-2xl border border-dashed border-border bg-background px-3 py-3 transition-colors hover:bg-muted/40"
-        >
-          <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-2xl bg-[#efe8f7] text-[#4b2e6f]">
-            <Paperclip className="h-4 w-4" />
-          </span>
-          <span className="min-w-0 flex-1">
-            <span className="block truncate text-sm font-medium text-foreground">
-              {fileName || 'Choose a file'}
-            </span>
-            <span className="block text-xs text-muted-foreground">
-              {`Max ${TRAVEL_DOCUMENT_MAX_UPLOAD_MB}MB per upload`}
-            </span>
-          </span>
-        </label>
         <input
           id={`file-${applicationId}`}
+          ref={fileInputRef}
           name="file"
           type="file"
           required
-          className="sr-only"
+          className="h-12 rounded-2xl border-border/70 bg-card file:mr-4 file:rounded-full file:bg-[#efe8f7] file:px-3 file:text-[#4b2e6f]"
           onChange={(event) => {
             const nextFileName = event.currentTarget.files?.[0]?.name ?? '';
             setFileName(nextFileName);
             setState(null);
           }}
         />
+        <p className="text-xs text-muted-foreground">
+          {fileName || `Max ${TRAVEL_DOCUMENT_MAX_UPLOAD_MB}MB per upload`}
+        </p>
       </div>
 
       {state && 'error' in state ? <p className="text-sm text-destructive">{state.error}</p> : null}
