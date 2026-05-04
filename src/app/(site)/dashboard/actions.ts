@@ -149,6 +149,13 @@ function cleanFileName(name: string): string {
   return name.replace(/[^\w.\-]+/g, '_').toLowerCase();
 }
 
+function inferDocumentTypeFromFileName(name: string): string {
+  return name
+    .replace(/\.[^.]+$/, '')
+    .replace(/[_-]+/g, ' ')
+    .trim();
+}
+
 export async function uploadApplicationDocument(
   prevState: UploadDocState,
   formData: FormData,
@@ -159,7 +166,6 @@ export async function uploadApplicationDocument(
   const supabase = await createClient();
 
   const applicationId = String(formData.get('application_id') ?? '').trim();
-  const documentType = String(formData.get('document_type') ?? '').trim() || 'General';
   const file = formData.get('file');
   if (!applicationId) return { error: 'Application id is missing.' };
   if (!(file instanceof File)) return { error: 'Please select a file.' };
@@ -167,6 +173,10 @@ export async function uploadApplicationDocument(
   if (file.size > TRAVEL_DOCUMENT_MAX_UPLOAD_BYTES) {
     return { error: `File must be ${TRAVEL_DOCUMENT_MAX_UPLOAD_MB}MB or smaller.` };
   }
+
+  const documentType =
+    String(formData.get('document_type') ?? '').trim() || inferDocumentTypeFromFileName(file.name);
+  if (!documentType) return { error: 'Please enter a document name.' };
 
   const ext = file.name.includes('.') ? file.name.split('.').pop() : 'bin';
   const filePath = `${viewer.userId}/${applicationId}/${Date.now()}_${cleanFileName(file.name || `document.${ext}`)}`;

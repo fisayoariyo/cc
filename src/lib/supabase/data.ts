@@ -400,3 +400,19 @@ export async function getNotificationsForUser(userId: string, limit = 8): Promis
   }
   return (data ?? []) as NotificationRow[];
 }
+
+export async function getUnreadNotificationsCount(userId: string): Promise<number> {
+  const supabase = await createClient();
+  const { count, error } = await supabase
+    .from('notifications')
+    .select('id', { count: 'exact', head: true })
+    .eq('user_id', userId)
+    .eq('is_read', false);
+
+  if (error) {
+    console.error('getUnreadNotificationsCount', error.message);
+    return 0;
+  }
+
+  return count ?? 0;
+}

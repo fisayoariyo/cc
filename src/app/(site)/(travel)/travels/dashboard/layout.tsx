@@ -6,6 +6,7 @@ import { PlusCircle } from 'lucide-react';
 import { TravelMobileBottomNav } from './_components/travel-mobile-bottom-nav';
 import { DashboardInteractionFeedback } from '@/components/dashboard/DashboardInteractionFeedback';
 import { getViewerContext, hasClientService } from '@/lib/supabase/dashboard-access';
+import { getUnreadNotificationsCount } from '@/lib/supabase/data';
 
 export default async function TravelDashboardLayout({
   children,
@@ -21,6 +22,7 @@ export default async function TravelDashboardLayout({
   if (viewer.role === 'admin') redirect('/admin');
   if (viewer.role === 'agent') redirect('/agent');
   if (!service) redirect('/dashboard');
+  const unreadUpdatesCount = await getUnreadNotificationsCount(viewer.userId);
 
   return (
     <DashboardInteractionFeedback>
@@ -46,12 +48,15 @@ export default async function TravelDashboardLayout({
         <main className="min-h-[calc(100vh-84px)] bg-[#fbfafc] p-4 pb-24">{children}</main>
       </div>
 
-      <TravelMobileBottomNav />
+      <TravelMobileBottomNav unreadUpdatesCount={unreadUpdatesCount} />
 
       <div className="hidden min-h-screen bg-white lg:block">
         <div className="grid min-h-screen lg:grid-cols-[295px_minmax(0,1fr)]">
           <div className="border-r border-border/60 bg-white px-4 py-5">
-            <TravelDashboardSidebar fullName={viewer.fullName ?? viewer.email} />
+            <TravelDashboardSidebar
+              fullName={viewer.fullName ?? viewer.email}
+              unreadUpdatesCount={unreadUpdatesCount}
+            />
           </div>
           <div className="min-w-0 min-h-0 flex flex-col">
             <header className="border-b border-border/60 bg-white px-6 py-5">

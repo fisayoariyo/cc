@@ -4,6 +4,7 @@ import { BookOpen, BriefcaseBusiness, Luggage, ArrowRight } from 'lucide-react';
 import { createClient } from '@/lib/supabase/server';
 import { getViewerContext } from '@/lib/supabase/dashboard-access';
 import { isTravelApplicationFinished } from '@/lib/travel-stages';
+import { getUnreadNotificationsCount } from '@/lib/supabase/data';
 
 const START_OPTIONS = [
   {
@@ -36,7 +37,7 @@ export default async function TravelClientDashboardPage() {
 
   const supabase = await createClient();
 
-  const [appsCountRes, docsCountRes, completedCountRes, noticesCountRes, applicationsRes] = await Promise.all([
+  const [appsCountRes, docsCountRes, completedCountRes, unreadNoticesCount, applicationsRes] = await Promise.all([
     supabase.from('travel_applications').select('id', { count: 'exact', head: true }).eq('client_id', viewer.userId),
     supabase.from('application_documents').select('id', { count: 'exact', head: true }).eq('client_id', viewer.userId),
     supabase
@@ -44,7 +45,7 @@ export default async function TravelClientDashboardPage() {
       .select('id', { count: 'exact', head: true })
       .eq('client_id', viewer.userId)
       .in('current_stage', ['completed', 'approved']),
-    supabase.from('notifications').select('id', { count: 'exact', head: true }).eq('user_id', viewer.userId),
+    getUnreadNotificationsCount(viewer.userId),
     supabase
       .from('travel_applications')
       .select('id, service_type, current_stage, deletion_request_status')
@@ -53,7 +54,6 @@ export default async function TravelClientDashboardPage() {
   const applicationsCount = appsCountRes.count ?? 0;
   const docsCount = docsCountRes.count ?? 0;
   const completedCount = completedCountRes.count ?? 0;
-  const noticesCount = noticesCountRes.count ?? 0;
   const pendingApplications = Math.max(0, applicationsCount - completedCount);
   const activeServiceTypes = new Set(
     (applicationsRes.data ?? [])
@@ -153,7 +153,7 @@ export default async function TravelClientDashboardPage() {
           href="/travel/dashboard/updates"
             className="rounded-full border border-[#d8d1df] bg-white px-4 py-2.5 text-[15px] text-foreground hover:bg-[#f6f1ea]"
           >
-            View updates ({noticesCount})
+            View updates {unreadNoticesCount > 0 ? `(${unreadNoticesCount})` : ''}
           </Link>
           <Link
           href="/travel/dashboard/profile"

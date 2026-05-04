@@ -22,7 +22,13 @@ function isActive(pathname: string, href: string): boolean {
   return pathname.startsWith(href);
 }
 
-export function TravelDashboardSidebar({ fullName }: { fullName?: string | null }) {
+export function TravelDashboardSidebar({
+  fullName,
+  unreadUpdatesCount = 0,
+}: {
+  fullName?: string | null;
+  unreadUpdatesCount?: number;
+}) {
   const pathname = usePathname();
 
   return (
@@ -45,7 +51,16 @@ export function TravelDashboardSidebar({ fullName }: { fullName?: string | null 
               }`}
             >
               <item.icon size={16} />
-              {item.label}
+              <span>{item.label}</span>
+              {item.href === '/travel/dashboard/updates' && unreadUpdatesCount > 0 ? (
+                <span
+                  className={`ml-auto inline-flex min-w-5 items-center justify-center rounded-full px-1.5 py-0.5 text-xs font-semibold ${
+                    active ? 'bg-white/20 text-white' : 'bg-[#efe8f7] text-[#4b2e6f]'
+                  }`}
+                >
+                  {unreadUpdatesCount}
+                </span>
+              ) : null}
             </Link>
           );
         })}

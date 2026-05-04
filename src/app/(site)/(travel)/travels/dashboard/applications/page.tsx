@@ -23,6 +23,7 @@ import {
 import { getViewerContext } from '@/lib/supabase/dashboard-access';
 import { postTravelClientMessage } from '@/app/actions/case-messages';
 import { DeleteTravelApplicationButton } from './delete-travel-application-button';
+import { getDocumentDisplayName } from '@/lib/format';
 
 export const metadata: Metadata = {
   title: 'Travel applications',
@@ -137,6 +138,12 @@ export default async function TravelApplicationsPage({
               const allStageOptions = getStageOptions(a.service_type);
               const serviceChoice = getTravelServiceChoice(a.service_type);
               const currentStageIndex = allStageOptions.findIndex((step) => step.value === a.current_stage);
+              const documentsReceivedStageIndex = allStageOptions.findIndex((step) => step.value === 'documents_received');
+              const documentsReceivedByTeam =
+                docsUploaded ||
+                (documentsReceivedStageIndex !== -1 && currentStageIndex >= documentsReceivedStageIndex);
+              const reviewProgressedBeyondIntake =
+                documentsReceivedStageIndex !== -1 && currentStageIndex > documentsReceivedStageIndex;
               const latestUpdate = historyMap[a.id]?.[0];
               const caseMessages = messageMap[a.id] ?? [];
               const isCreated = params.created === a.id;
@@ -204,27 +211,31 @@ export default async function TravelApplicationsPage({
                           <p className="text-[15px] font-medium text-foreground">Application started</p>
                         </div>
                         <p className="mt-2 text-sm leading-6 text-muted-foreground">
-                          Your travel case is live and visible to the team.
+                          {currentStageIndex > 0
+                            ? 'Your case has moved beyond the starting point and is now active with the team.'
+                            : 'Your travel case is live and visible to the team.'}
                         </p>
                       </div>
                       <div className="rounded-2xl border border-border/70 bg-card p-4 shadow-sm">
                         <div className="flex items-center gap-2">
-                          {docsUploaded ? (
+                          {documentsReceivedByTeam ? (
                             <CheckCircle2 className="h-4 w-4 text-primary" />
                           ) : (
                             <CircleDashed className="h-4 w-4 text-muted-foreground" />
                           )}
-                          <p className="text-[15px] font-medium text-foreground">Documents uploaded</p>
+                          <p className="text-[15px] font-medium text-foreground">Documents received</p>
                         </div>
                         <p className="mt-2 text-sm leading-6 text-muted-foreground">
-                          {docsUploaded
-                            ? `${applicationDocs.length} document${applicationDocs.length === 1 ? '' : 's'} received.`
+                          {documentsReceivedByTeam
+                            ? 'The team has confirmed receipt of your documents and is reviewing them now.'
+                            : docsUploaded
+                              ? `${applicationDocs.length} document${applicationDocs.length === 1 ? '' : 's'} uploaded. Waiting for the team to confirm receipt.`
                             : 'Upload your first document to unlock review.'}
                         </p>
                       </div>
                       <div className="rounded-2xl border border-border/70 bg-card p-4 shadow-sm">
                         <div className="flex items-center gap-2">
-                          {docsApproved ? (
+                          {docsApproved || reviewProgressedBeyondIntake ? (
                             <CheckCircle2 className="h-4 w-4 text-primary" />
                           ) : (
                             <CircleDashed className="h-4 w-4 text-muted-foreground" />
@@ -234,6 +245,8 @@ export default async function TravelApplicationsPage({
                         <p className="mt-2 text-sm leading-6 text-muted-foreground">
                           {docsApproved
                             ? 'Your uploaded documents are approved for the current stage.'
+                            : reviewProgressedBeyondIntake
+                              ? 'Your case has moved past document intake into the next review step.'
                             : 'We will tick this as soon as the team clears your uploaded documents.'}
                         </p>
                       </div>
@@ -315,7 +328,9 @@ export default async function TravelApplicationsPage({
                                 className="rounded-2xl border border-border bg-card px-3 py-3 text-sm"
                               >
                                 <div className="flex flex-wrap items-center justify-between gap-2">
-                                  <p className="font-medium text-foreground">{doc.document_type ?? 'Document'}</p>
+                                  <p className="font-medium text-foreground">
+                                    {getDocumentDisplayName(doc.document_type, doc.file_path)}
+                                  </p>
                                   <div className="flex flex-wrap items-center gap-2">
                                     <Badge variant="secondary">{getDocumentStatusLabel(doc.status)}</Badge>
                                     <Link

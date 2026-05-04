@@ -16,6 +16,7 @@ export function DocumentUploadForm({
   const router = useRouter();
   const formRef = useRef<HTMLFormElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const documentTypeRef = useRef<HTMLInputElement>(null);
   const [fileName, setFileName] = useState('');
   const [state, setState] = useState<UploadDocState>(null);
   const [isPending, startTransition] = useTransition();
@@ -71,8 +72,10 @@ export function DocumentUploadForm({
         </Label>
         <Input
           id={`doc-type-${applicationId}`}
+          ref={documentTypeRef}
           name="document_type"
           placeholder="Passport, statement, transcript, CV..."
+          required
           className="h-10 rounded-xl"
         />
       </div>
@@ -89,13 +92,21 @@ export function DocumentUploadForm({
           required
           className="h-12 rounded-2xl border-border/70 bg-card file:mr-4 file:rounded-full file:bg-[#efe8f7] file:px-3 file:text-[#4b2e6f]"
           onChange={(event) => {
-            const nextFileName = event.currentTarget.files?.[0]?.name ?? '';
+            const nextFile = event.currentTarget.files?.[0] ?? null;
+            const nextFileName = nextFile?.name ?? '';
             setFileName(nextFileName);
             setState(null);
+
+            if (nextFile && documentTypeRef.current && !documentTypeRef.current.value.trim()) {
+              documentTypeRef.current.value = nextFile.name
+                .replace(/\.[^.]+$/, '')
+                .replace(/[_-]+/g, ' ')
+                .trim();
+            }
           }}
         />
         <p className="text-xs text-muted-foreground">
-          {fileName || `Max ${TRAVEL_DOCUMENT_MAX_UPLOAD_MB}MB per upload`}
+          {fileName || `Enter a document name and upload a file up to ${TRAVEL_DOCUMENT_MAX_UPLOAD_MB}MB.`}
         </p>
       </div>
 

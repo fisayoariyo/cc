@@ -11,7 +11,7 @@ const ITEMS = [
   { href: '/travel/dashboard/profile', label: 'Profile', icon: UserCircle },
 ] as const;
 
-export function TravelMobileBottomNav() {
+export function TravelMobileBottomNav({ unreadUpdatesCount = 0 }: { unreadUpdatesCount?: number }) {
   const pathname = usePathname();
 
   return (
@@ -26,12 +26,21 @@ export function TravelMobileBottomNav() {
             <Link
               key={item.href}
               href={item.href}
-              className={`flex min-w-[72px] flex-col items-center gap-1 rounded-xl px-3 py-2 text-xs ${
+              className={`relative flex min-w-[72px] flex-col items-center gap-1 rounded-xl px-3 py-2 text-xs ${
                 active ? 'bg-[#4b2e6f] text-white' : 'text-muted-foreground'
               }`}
             >
               <item.icon size={16} />
               <span className="truncate">{item.label}</span>
+              {item.href === '/travel/dashboard/updates' && unreadUpdatesCount > 0 ? (
+                <span
+                  className={`absolute right-2 top-1 inline-flex min-w-5 items-center justify-center rounded-full px-1.5 py-0.5 text-[10px] font-semibold ${
+                    active ? 'bg-white/20 text-white' : 'bg-[#efe8f7] text-[#4b2e6f]'
+                  }`}
+                >
+                  {unreadUpdatesCount}
+                </span>
+              ) : null}
             </Link>
           );
         })}

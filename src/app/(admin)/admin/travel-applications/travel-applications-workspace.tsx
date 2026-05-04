@@ -12,6 +12,7 @@ import { DocumentReviewControls } from './document-review-controls';
 import { DeletionRequestControls } from './deletion-request-controls';
 import { TravelStageSelect } from './travel-stage-select';
 import { getDocumentStatusLabel } from '@/lib/travel-stages';
+import { getDocumentDisplayName } from '@/lib/format';
 import type {
   ApplicationDocumentRow,
   ApplicationStageHistoryRow,
@@ -207,7 +208,9 @@ export function TravelApplicationsWorkspace({
                     <div key={doc.id} className="rounded-2xl border border-border/70 bg-[#fbfafc] p-4">
                       <div className="flex flex-wrap items-center justify-between gap-3">
                         <div>
-                          <p className="text-sm font-medium text-foreground">{doc.document_type ?? 'Document'}</p>
+                          <p className="text-sm font-medium text-foreground">
+                            {getDocumentDisplayName(doc.document_type, doc.file_path)}
+                          </p>
                           <p className="mt-1 text-xs text-muted-foreground">
                             Current: {getDocumentStatusLabel(doc.status)}
                           </p>
