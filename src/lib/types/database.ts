@@ -2,6 +2,7 @@
 
 export type UserRole = 'admin' | 'agent' | 'client';
 export type ClientServiceType = 'travel' | 'real_estate' | 'construction';
+export type SuccessStoryServiceType = ClientServiceType;
 
 export type PropertyStatus =
   | 'draft'
@@ -170,6 +171,33 @@ export type NotificationRow = {
   metadata: Record<string, unknown>;
   is_read: boolean;
   created_at: string;
+};
+
+export type SuccessStoryRow = {
+  id: string;
+  slug: string;
+  title: string;
+  summary: string;
+  story_body: string;
+  service: SuccessStoryServiceType;
+  client_label: string | null;
+  location: string | null;
+  outcome: string | null;
+  cover_image_url: string;
+  cover_image_alt: string | null;
+  highlight_video_url: string | null;
+  highlight_video_poster_url: string | null;
+  gallery_image_urls: string[];
+  gallery_video_urls: string[];
+  published: boolean;
+  featured: boolean;
+  sort_order: number;
+  seo_title: string | null;
+  seo_description: string | null;
+  created_by: string | null;
+  updated_by: string | null;
+  created_at: string;
+  updated_at: string;
 };
 
 export type CaseMessageVisibility = 'client' | 'internal';

@@ -26,7 +26,7 @@ export default function Navigation({ initialAuthState }: { initialAuthState: Aut
   }, []);
 
   useEffect(() => {
-const routesToPrefetch = ['/', '/real-estate', '/travel', '/about', '/contact', '/login', '/register'];
+const routesToPrefetch = ['/', '/real-estate', '/travel', '/about', '/contact', '/login', '/register', '/success-stories'];
 
     const warmRoutes = () => {
       routesToPrefetch.forEach((route) => router.prefetch(route));

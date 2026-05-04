@@ -14,6 +14,7 @@ import type {
   ProfileRow,
   PropertyRow,
   SavedSearchRow,
+  SuccessStoryRow,
   TravelApplicationRow,
 } from '@/lib/types/database';
 
@@ -39,6 +40,8 @@ const CONSTRUCTION_STAGE_HISTORY_COLUMNS =
   'id, project_id, stage_key, stage_label, note_to_client, changed_by, changed_at';
 const NOTIFICATION_COLUMNS =
   'id, user_id, title, body, type, link_url, metadata, is_read, created_at';
+const SUCCESS_STORY_COLUMNS =
+  'id, slug, title, summary, story_body, service, client_label, location, outcome, cover_image_url, cover_image_alt, highlight_video_url, highlight_video_poster_url, gallery_image_urls, gallery_video_urls, published, featured, sort_order, seo_title, seo_description, created_by, updated_by, created_at, updated_at';
 
 function createPublicReadonlyClient() {
   if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
@@ -415,4 +418,106 @@ export async function getUnreadNotificationsCount(userId: string): Promise<numbe
   }
 
   return count ?? 0;
+}
+
+export async function getFeaturedSuccessStories(limit = 6): Promise<SuccessStoryRow[]> {
+  const supabase = createPublicReadonlyClient();
+  if (!supabase) return [];
+
+  const { data, error } = await supabase
+    .from('success_stories')
+    .select(SUCCESS_STORY_COLUMNS)
+    .eq('published', true)
+    .eq('featured', true)
+    .order('sort_order', { ascending: true })
+    .order('created_at', { ascending: false })
+    .limit(limit);
+
+  if (error) {
+    console.error('getFeaturedSuccessStories', error.message);
+    return [];
+  }
+
+  return (data ?? []) as SuccessStoryRow[];
+}
+
+export async function getPublishedSuccessStories(
+  limit = 24,
+  service?: string | null,
+): Promise<SuccessStoryRow[]> {
+  const supabase = createPublicReadonlyClient();
+  if (!supabase) return [];
+
+  let query = supabase
+    .from('success_stories')
+    .select(SUCCESS_STORY_COLUMNS)
+    .eq('published', true)
+    .order('featured', { ascending: false })
+    .order('sort_order', { ascending: true })
+    .order('created_at', { ascending: false })
+    .limit(limit);
+
+  if (service && ['travel', 'real_estate', 'construction'].includes(service)) {
+    query = query.eq('service', service);
+  }
+
+  const { data, error } = await query;
+  if (error) {
+    console.error('getPublishedSuccessStories', error.message);
+    return [];
+  }
+
+  return (data ?? []) as SuccessStoryRow[];
+}
+
+export async function getSuccessStoryBySlug(slug: string): Promise<SuccessStoryRow | null> {
+  const supabase = createPublicReadonlyClient();
+  if (!supabase) return null;
+
+  const { data, error } = await supabase
+    .from('success_stories')
+    .select(SUCCESS_STORY_COLUMNS)
+    .eq('published', true)
+    .eq('slug', slug)
+    .maybeSingle();
+
+  if (error) {
+    console.error('getSuccessStoryBySlug', error.message);
+    return null;
+  }
+
+  return (data as SuccessStoryRow | null) ?? null;
+}
+
+export async function getAllSuccessStoriesForAdmin(): Promise<SuccessStoryRow[]> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from('success_stories')
+    .select(SUCCESS_STORY_COLUMNS)
+    .order('featured', { ascending: false })
+    .order('sort_order', { ascending: true })
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    console.error('getAllSuccessStoriesForAdmin', error.message);
+    return [];
+  }
+
+  return (data ?? []) as SuccessStoryRow[];
+}
+
+export async function getSuccessStoryByIdForAdmin(id: string): Promise<SuccessStoryRow | null> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from('success_stories')
+    .select(SUCCESS_STORY_COLUMNS)
+    .eq('id', id)
+    .maybeSingle();
+
+  if (error) {
+    console.error('getSuccessStoryByIdForAdmin', error.message);
+    return null;
+  }
+
+  return (data as SuccessStoryRow | null) ?? null;
 }

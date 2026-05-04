@@ -1,6 +1,7 @@
 'use client';
 
 import { motion } from 'motion/react';
+import Link from 'next/link';
 import { Target, Eye, Award, Users } from 'lucide-react';
 
 export default function AboutPage() {
@@ -223,6 +224,31 @@ export default function AboutPage() {
               ))}
             </div>
           </motion.div>
+        </div>
+      </section>
+
+      <section className="border-t border-border bg-white px-6 py-24 lg:px-8">
+        <div className="mx-auto max-w-5xl rounded-[32px] border border-border/70 bg-[#fbfafc] p-8 shadow-sm md:p-10">
+          <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
+            <div className="max-w-3xl space-y-3">
+              <p className="inline-flex rounded-full bg-[#efe8f7] px-3 py-1 text-sm font-medium text-[#4b2e6f]">
+                Success Stories
+              </p>
+              <h2 className="text-3xl font-semibold tracking-[-0.03em] text-foreground md:text-4xl">
+                See the projects and client journeys behind our reputation.
+              </h2>
+              <p className="text-[16px] leading-7 text-muted-foreground">
+                Explore selected travel, property, and construction outcomes through photos, videos, and story-led highlights from our recent work.
+              </p>
+            </div>
+
+            <Link
+              href="/success-stories"
+              className="inline-flex items-center justify-center rounded-full bg-[#c88a2d] px-5 py-3 text-sm font-medium text-white hover:bg-[#b67b25]"
+            >
+              Browse stories
+            </Link>
+          </div>
         </div>
       </section>
     </div>

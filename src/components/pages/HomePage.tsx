@@ -6,6 +6,8 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Building2, Plane, Hammer, ArrowRight, Users, Award, TrendingUp } from 'lucide-react';
 import { CONSTRUCTION_CONSULTATION_URL } from '@/lib/consultation';
+import { SuccessStoriesHomeSection } from '@/components/success-stories/success-stories-home-section';
+import type { SuccessStoryRow } from '@/lib/types/database';
 
 /** Deterministic layout/animation — avoids Math.random() hydration mismatch (SSR vs client). */
 const HERO_PARTICLES = Array.from({ length: 20 }, (_, i) => ({
@@ -16,7 +18,11 @@ const HERO_PARTICLES = Array.from({ length: 20 }, (_, i) => ({
   duration: 5 + (i % 5) * 0.9,
 }));
 
-export default function HomePage() {
+export default function HomePage({
+  featuredStories = [],
+}: {
+  featuredStories?: SuccessStoryRow[];
+}) {
   const router = useRouter();
   const [heroParticlesMounted, setHeroParticlesMounted] = useState(false);
   useEffect(() => {
@@ -320,6 +326,8 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      <SuccessStoriesHomeSection stories={featuredStories} />
 
       {/* Final CTA */}
       <section className="py-32 px-6 lg:px-8 bg-background">

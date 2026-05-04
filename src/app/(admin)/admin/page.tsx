@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { ArrowRight, Building2, Hammer, Inbox, Plane, Users } from 'lucide-react';
+import { ArrowRight, Building2, Hammer, Images, Inbox, Plane, Users } from 'lucide-react';
 import { createClient } from '@/lib/supabase/server';
 
 export default async function AdminDashboardPage() {
@@ -45,6 +45,7 @@ export default async function AdminDashboardPage() {
     { label: 'Review inquiries', href: '/admin/inquiries', copy: 'Check new messages and assign follow-up.' },
     { label: 'Open travel queue', href: '/admin/travel-applications', copy: 'Review documents, stages, and client updates.' },
     { label: 'Manage listings', href: '/admin/listings', copy: 'Approve properties and keep the catalog clean.' },
+    { label: 'Curate success stories', href: '/admin/success-stories', copy: 'Publish stories, media, and featured homepage proof.' },
   ] as const;
 
   return (

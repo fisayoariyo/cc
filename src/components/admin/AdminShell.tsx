@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation';
 import {
   Building2,
   Hammer,
+  Images,
   Inbox,
   LayoutDashboard,
   Menu,
@@ -26,6 +27,7 @@ const NAV_ITEMS = [
   { href: '/admin/travel-applications', label: 'Travel', icon: Plane },
   { href: '/admin/construction-projects', label: 'Construction', icon: Hammer },
   { href: '/admin/inquiries', label: 'Inquiries', icon: Inbox },
+  { href: '/admin/success-stories', label: 'Success Stories', icon: Images },
 ] as const;
 
 function NavContent({
