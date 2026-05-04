@@ -1,6 +1,6 @@
 'use client';
 
-import { useActionState, useEffect, useRef, useState } from 'react';
+import { type FormEvent, useRef, useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { Paperclip } from 'lucide-react';
 import { uploadApplicationDocument, type UploadDocState } from './actions';
@@ -16,26 +16,44 @@ export function DocumentUploadForm({
 }) {
   const router = useRouter();
   const formRef = useRef<HTMLFormElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [fileName, setFileName] = useState('');
-  const [state, formAction, isPending] = useActionState<UploadDocState, FormData>(
-    uploadApplicationDocument,
-    null,
-  );
+  const [state, setState] = useState<UploadDocState>(null);
+  const [isPending, startTransition] = useTransition();
 
-  useEffect(() => {
-    if (!state || !('success' in state)) {
+  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
+    const form = formRef.current;
+    const input = fileInputRef.current;
+    const file = input?.files?.[0] ?? null;
+
+    if (!form || !file) {
+      setState({ error: 'Please select a file.' });
       return;
     }
 
-    setFileName('');
-    formRef.current?.reset();
-    router.refresh();
-  }, [router, state]);
+    const formData = new FormData(form);
+    formData.set('file', file);
+
+    startTransition(() => {
+      void (async () => {
+        const result = await uploadApplicationDocument(null, formData);
+        setState(result);
+
+        if (result && 'success' in result) {
+          setFileName('');
+          form.reset();
+          router.refresh();
+        }
+      })();
+    });
+  }
 
   return (
     <form
       ref={formRef}
-      action={formAction}
+      onSubmit={handleSubmit}
       encType="multipart/form-data"
       className="rounded-[20px] border border-border bg-card p-4 space-y-3"
     >
@@ -89,10 +107,7 @@ export function DocumentUploadForm({
           onChange={(event) => {
             const nextFileName = event.currentTarget.files?.[0]?.name ?? '';
             setFileName(nextFileName);
-
-            if (nextFileName) {
-              formRef.current?.requestSubmit();
-            }
+            setState(null);
           }}
         />
       </div>
