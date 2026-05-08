@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { motion } from 'motion/react';
@@ -58,6 +58,7 @@ export function AuthNav({
   const [role, setRole] = useState<ProfileRole | null>(initialState?.role ?? null);
   const [loading, setLoading] = useState(initialState?.resolved ? false : true);
   const [signInOpen, setSignInOpen] = useState(false);
+  const signInMenuRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     if (!hasSupabaseConfig) {
@@ -110,6 +111,30 @@ export function AuthNav({
     }
   }, [router, userId, role]);
 
+  useEffect(() => {
+    if (!signInOpen) return;
+
+    const handlePointerDown = (event: PointerEvent) => {
+      const target = event.target as Node | null;
+      if (signInMenuRef.current && target && !signInMenuRef.current.contains(target)) {
+        setSignInOpen(false);
+      }
+    };
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setSignInOpen(false);
+      }
+    };
+
+    document.addEventListener('pointerdown', handlePointerDown);
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('pointerdown', handlePointerDown);
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [signInOpen]);
+
   const signOut = async () => {
     if (!supabase) return;
     await supabase.auth.signOut();
@@ -135,7 +160,7 @@ export function AuthNav({
   if (!userId) {
     return (
       <div className="hidden md:flex items-center gap-3 relative">
-        <div className="relative">
+        <div ref={signInMenuRef} className="relative">
           <button
             type="button"
             onClick={() => setSignInOpen((value) => !value)}
