@@ -3,6 +3,8 @@ import Link from 'next/link';
 import { BookOpen, BriefcaseBusiness, Luggage, ArrowRight, Home, HeartPulse } from 'lucide-react';
 import { isTravelApplicationFinished, type TravelServiceType } from '@/lib/travel-stages';
 import { getUnreadNotificationsCount } from '@/lib/supabase/data';
+import { getViewerContext } from '@/lib/supabase/dashboard-access';
+import { createClient } from '@/lib/supabase/server';
 const START_OPTIONS: {
   flowParam: string;
   serviceType: TravelServiceType;
