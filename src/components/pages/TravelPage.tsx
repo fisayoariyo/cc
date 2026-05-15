@@ -10,6 +10,9 @@ const CinematicHero = dynamic(() => import('@/components/CinematicHero'), {
   loading: () => <div className="h-screen w-full bg-muted/40 animate-pulse" />,
 });
 
+const TRAVEL_CLIENT_REGISTER = '/register?role=client&service=travel';
+const TRAVEL_CLIENT_LOGIN = '/login?role=client&service=travel&next=/travel/dashboard';
+
 export default function TravelPage() {
   const heroSlides = [
     {
@@ -142,6 +145,20 @@ export default function TravelPage() {
                     </li>
                   ))}
                 </ul>
+                <div className="mt-8 flex flex-col gap-2 border-t border-border/70 pt-6 sm:flex-row sm:flex-wrap sm:items-center">
+                  <Link
+                    href={TRAVEL_CLIENT_REGISTER}
+                    className="inline-flex w-full items-center justify-center rounded-full bg-primary px-5 py-3 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 sm:w-auto sm:min-w-[140px]"
+                  >
+                    Apply Now
+                  </Link>
+                  <Link
+                    href={TRAVEL_CLIENT_LOGIN}
+                    className="inline-flex w-full items-center justify-center rounded-full border border-border bg-background px-5 py-3 text-sm font-medium text-foreground transition-colors hover:bg-muted sm:w-auto sm:min-w-[140px]"
+                  >
+                    Sign in
+                  </Link>
+                </div>
               </motion.div>
             ))}
           </div>
@@ -240,7 +257,7 @@ export default function TravelPage() {
             <p className="text-xl text-muted-foreground mb-10">
               Book a free consultation today and take the first step toward your goals
             </p>
-            <Link href="/register?role=client&service=travel">
+            <Link href={TRAVEL_CLIENT_REGISTER}>
               <motion.span
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}

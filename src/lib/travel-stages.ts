@@ -9,7 +9,7 @@ export type TravelServiceType =
 export type TravelStageOption = { value: string; label: string };
 
 export type TravelServiceChoice = {
-  value: 'education' | 'immigration' | 'tourism';
+  value: TravelServiceType;
   label: string;
   shortLabel: string;
   prompt: string;
@@ -80,7 +80,64 @@ export const TRAVEL_SERVICE_OPTIONS: TravelServiceChoice[] = [
       'Medical report',
     ],
   },
+  {
+    value: 'relocation',
+    label: 'Permanent Relocation',
+    shortLabel: 'Move',
+    prompt: 'Relocation',
+    description:
+      'End-to-end support for permanent moves: eligibility checks, documentation, and coordinated next steps with our team.',
+    destinationLabel: 'Destination country or region',
+    notesPlaceholder:
+      'Tell us your timeline, family size, current status, and any destination preferences or constraints.',
+    documents: [
+      'International passport',
+      'Birth certificate',
+      'Marriage certificate (if applicable)',
+      'Police character report',
+      'Medical report',
+      'Proof of funds or sponsorship',
+    ],
+  },
+  {
+    value: 'visa',
+    label: 'Visa & Embassy Support',
+    shortLabel: 'Visa',
+    prompt: 'Visa',
+    description:
+      'Focused embassy and consulate visa support when you already know your route and need document and submission guidance.',
+    destinationLabel: 'Destination or embassy location',
+    notesPlaceholder: 'Tell us visa category, intended travel dates, and any prior refusals or deadlines.',
+    documents: [
+      'Passport data page',
+      'Completed visa application forms',
+      'Invitation or sponsor letters (if applicable)',
+      'Bank statements',
+      'Travel itinerary or appointment confirmation',
+    ],
+  },
 ];
+
+/** Dashboard “Health” flow — stored as `visa` in `travel_applications.service_type`. */
+export const HEALTH_TRAVEL_SERVICE_CHOICE: TravelServiceChoice = {
+  value: 'visa',
+  label: 'Health & Medical Travel',
+  shortLabel: 'Health',
+  prompt: 'Health',
+  description:
+    'Medical treatment abroad, companion travel, and visa documentation aligned with hospitals or treatment timelines.',
+  destinationLabel: 'Treatment country or facility (if known)',
+  notesPlaceholder:
+    'Share treatment type, tentative dates, referral or appointment letters, and who is traveling with you.',
+  documents: [
+    'Passport data page',
+    'Medical referral or hospital correspondence',
+    'Proof of funds for treatment and stay',
+    'Travel medical insurance (if applicable)',
+    'Police character report',
+    'Supporting identity documents',
+  ],
+};
 
 const EDUCATION_STAGES: TravelStageOption[] = [
   { value: 'application_started', label: 'Application Started' },
@@ -159,6 +216,8 @@ export function normalizeTravelServiceType(raw: string | null | undefined): Trav
   if (value === 'study' || value === 'edu' || value === 'school') return 'education';
   if (value === 'work' || value === 'job') return 'immigration';
   if (value === 'leisure' || value === 'vacation' || value === 'holiday') return 'tourism';
+  if (value === 'health' || value === 'medical' || value === 'medical_travel') return 'visa';
+  if (value === 'permanent_relocation' || value === 'pr') return 'relocation';
 
   if (value in TRAVEL_STAGE_MAP) return value as TravelServiceType;
   return 'education';
@@ -183,6 +242,10 @@ export function getTravelServiceLabel(serviceType: string | null | undefined): s
 }
 
 export function getTravelServiceChoice(serviceType: string | null | undefined): TravelServiceChoice {
+  const raw = (serviceType ?? '').trim().toLowerCase();
+  if (raw === 'health' || raw === 'medical' || raw === 'medical_travel') {
+    return HEALTH_TRAVEL_SERVICE_CHOICE;
+  }
   const normalized = normalizeTravelServiceType(serviceType);
   return (
     TRAVEL_SERVICE_OPTIONS.find((option) => option.value === normalized) ??

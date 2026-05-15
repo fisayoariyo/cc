@@ -2,6 +2,8 @@ import type { ReactNode } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import logoLockupColor from '@/assets/CC Logo Lockup (color).svg';
+import agentAuthHero from '@/assets/agent.png';
+import travelAuthHero from '@/assets/travel.png';
 import { cn } from '@/components/ui/utils';
 
 const DEFAULT_IMAGE =
@@ -16,12 +18,12 @@ const SHELL_VISUALS: Record<
   agent: {
     title: 'Digitally onboard property agents',
     copy: 'Create verified agent profiles, complete onboarding, and activate listing access across Charis Consult.',
-    imageUrl: DEFAULT_IMAGE,
+    imageUrl: agentAuthHero.src,
   },
   travel: {
     title: 'Travel smarter with Charis Consult',
     copy: 'Manage visa applications, destination planning, and every milestone of your travel journey from one place.',
-    imageUrl: 'https://images.unsplash.com/photo-1502920917128-1aa500764cbd?w=1600&q=80',
+    imageUrl: travelAuthHero.src,
   },
   real_estate: {
     title: 'Find property with confidence',

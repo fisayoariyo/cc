@@ -52,7 +52,6 @@ export async function signUp(prevState: SignUpState, formData: FormData): Promis
   } else {
     if (serviceInterest === 'travel') {
       if (!phone) return { error: 'Phone number is required for travel clients.' };
-      if (!passportNumber) return { error: 'Passport number is required for travel clients.' };
     }
     if (serviceInterest === 'real_estate') {
       if (!preferredLocation) return { error: 'Preferred location is required for real estate clients.' };
@@ -80,7 +79,7 @@ export async function signUp(prevState: SignUpState, formData: FormData): Promis
         full_name: fullName,
         role,
         phone,
-        passport_number: passportNumber,
+        ...(passportNumber ? { passport_number: passportNumber } : {}),
         agency_name: agencyName,
         registration_number: registrationNumber,
         service_interest: serviceInterest,

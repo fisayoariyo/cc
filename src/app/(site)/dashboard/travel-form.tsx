@@ -8,7 +8,19 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { getTravelServiceChoice, normalizeTravelServiceType } from '@/lib/travel-stages';
+import {
+  getTravelServiceChoice,
+  normalizeTravelServiceType,
+  type TravelServiceType,
+} from '@/lib/travel-stages';
+
+const SUPPORTED_TRAVEL_FLOWS: TravelServiceType[] = [
+  'education',
+  'immigration',
+  'tourism',
+  'relocation',
+  'visa',
+];
 
 export function TravelApplicationForm({
   initialServiceType,
@@ -18,15 +30,14 @@ export function TravelApplicationForm({
   createdApplicationId?: string;
 }) {
   const defaultService = normalizeTravelServiceType(initialServiceType);
-  const selectedService =
-    defaultService === 'education' || defaultService === 'immigration' || defaultService === 'tourism'
-      ? defaultService
-      : null;
+  const selectedService = SUPPORTED_TRAVEL_FLOWS.includes(defaultService) ? defaultService : null;
   const [state, formAction, isPending] = useActionState<TravelFormState, FormData>(
     createTravelApplication,
     null,
   );
-  const selectedFlow = selectedService ? getTravelServiceChoice(selectedService) : null;
+  const selectedFlow = selectedService
+    ? getTravelServiceChoice(initialServiceType ?? selectedService)
+    : null;
 
   if (!selectedFlow) {
     return null;

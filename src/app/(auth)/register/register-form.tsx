@@ -176,17 +176,6 @@ export function RegisterForm({
                       className="h-12 rounded-[18px] border-slate-200"
                     />
                   </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="passport_number">Passport number</Label>
-                    <Input
-                      id="passport_number"
-                      name="passport_number"
-                      type="text"
-                      required
-                      placeholder="A12345678"
-                      className="h-12 rounded-[18px] border-slate-200"
-                    />
-                  </div>
                 </>
               ) : (
                 <>

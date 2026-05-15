@@ -1,31 +1,51 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { BookOpen, BriefcaseBusiness, Luggage, ArrowRight } from 'lucide-react';
-import { createClient } from '@/lib/supabase/server';
-import { getViewerContext } from '@/lib/supabase/dashboard-access';
-import { isTravelApplicationFinished } from '@/lib/travel-stages';
+import { BookOpen, BriefcaseBusiness, Luggage, ArrowRight, Home, HeartPulse } from 'lucide-react';
+import { isTravelApplicationFinished, type TravelServiceType } from '@/lib/travel-stages';
 import { getUnreadNotificationsCount } from '@/lib/supabase/data';
-
-const START_OPTIONS = [
+const START_OPTIONS: {
+  flowParam: string;
+  serviceType: TravelServiceType;
+  title: string;
+  copy: string;
+  icon: typeof BookOpen;
+}[] = [
   {
-    value: 'education',
+    flowParam: 'education',
+    serviceType: 'education',
     title: 'Study',
     copy: 'Apply for admission, scholarship support, and then move into visa processing.',
     icon: BookOpen,
   },
   {
-    value: 'immigration',
+    flowParam: 'immigration',
+    serviceType: 'immigration',
     title: 'Work',
     copy: 'Share your CV and profile so the team can start work-abroad processing.',
     icon: BriefcaseBusiness,
   },
   {
-    value: 'tourism',
+    flowParam: 'tourism',
+    serviceType: 'tourism',
     title: 'Leisure',
     copy: 'Plan your itinerary first, then prepare the visa documents for your trip.',
     icon: Luggage,
   },
-] as const;
+  {
+    flowParam: 'relocation',
+    serviceType: 'relocation',
+    title: 'Permanent Relocation',
+    copy: 'End-to-end support for permanent moves, housing logistics, and settlement planning.',
+    icon: Home,
+  },
+  {
+    flowParam: 'health',
+    serviceType: 'visa',
+    title: 'Health',
+    copy: 'Medical travel, treatment abroad, and visa documentation aligned with care timelines.',
+    icon: HeartPulse,
+  },
+];
 
 export const metadata: Metadata = {
   title: 'Travel dashboard',
@@ -79,50 +99,49 @@ export default async function TravelClientDashboardPage() {
           </div>
         </div>
 
-        <div className="mt-5 grid gap-3 md:grid-cols-3">
+        <div className="mx-auto mt-5 max-w-6xl grid grid-cols-2 gap-2.5 sm:gap-3 lg:grid-cols-5">
           {START_OPTIONS.map((option) => (
             (() => {
               const matchingApplications = (applicationsRes.data ?? []).filter(
-                (application) => application.service_type === option.value,
+                (application) => application.service_type === option.serviceType,
               );
               const hasPendingDeletion = matchingApplications.some(
                 (application) => application.deletion_request_status === 'pending',
               );
-              const hasActiveApplication = activeServiceTypes.has(option.value);
+              const hasActiveApplication = activeServiceTypes.has(option.serviceType);
               const href = hasActiveApplication
                 ? '/travel/dashboard/applications'
-                : `/travel/dashboard/applications?flow=${option.value}`;
+                : `/travel/dashboard/applications?flow=${option.flowParam}`;
 
               return (
             <Link
-              key={option.value}
+              key={option.flowParam}
               href={href}
-              className="group rounded-[24px] border border-border bg-white p-4 transition-colors hover:border-[#6b4a95] hover:bg-[#faf7fd]"
+              className="group flex flex-col rounded-2xl border border-border bg-white p-3 transition-colors hover:border-[#6b4a95] hover:bg-[#faf7fd] sm:p-3.5"
             >
-              <div className="flex items-start justify-between gap-3">
-                <div className="space-y-1">
-                  <p className="text-[1.1rem] font-semibold tracking-[-0.02em] text-foreground">{option.title}</p>
-                  <p className="text-[15px] leading-7 text-muted-foreground">{option.copy}</p>
+              <div className="flex items-start justify-between gap-2">
+                <div className="min-w-0 space-y-1">
+                  <p className="text-sm font-semibold tracking-[-0.02em] text-foreground sm:text-[0.95rem]">{option.title}</p>
+                  <p className="line-clamp-3 text-xs leading-relaxed text-muted-foreground sm:text-[13px] sm:leading-6">{option.copy}</p>
                   {hasPendingDeletion ? (
-                    <p className="text-sm font-medium text-[#4b2e6f]">Deletion request pending approval</p>
+                    <p className="text-xs font-medium text-[#4b2e6f]">Deletion request pending approval</p>
                   ) : hasActiveApplication ? (
-                    <p className="text-sm font-medium text-[#4b2e6f]">Active application already started</p>
+                    <p className="text-xs font-medium text-[#4b2e6f]">Active application already started</p>
                   ) : null}
                 </div>
-                <div className="rounded-2xl bg-[#4b2e6f] p-2 text-white">
-                  <option.icon className="h-4 w-4" />
+                <div className="shrink-0 rounded-xl bg-[#4b2e6f] p-1.5 text-white sm:p-2">
+                  <option.icon className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                 </div>
               </div>
-              <div className="mt-4 inline-flex items-center gap-2 text-[15px] font-medium text-[#4b2e6f]">
+              <div className="mt-3 inline-flex items-center gap-1.5 text-xs font-medium text-[#4b2e6f] sm:text-[13px]">
                 {hasPendingDeletion ? 'View status' : hasActiveApplication ? 'View application' : 'Continue'}
-                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+                <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5 sm:h-4 sm:w-4" />
               </div>
             </Link>
               );
             })()
           ))}
-        </div>
-      </section>
+        </div>      </section>
 
       <section className="grid grid-cols-1 gap-3 sm:grid-cols-3">
         <div className="rounded-2xl bg-gradient-to-br from-[#2f1b49] to-[#4b2e6f] p-4 text-white shadow-sm">
