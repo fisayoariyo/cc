@@ -1,6 +1,16 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { BookOpen, BriefcaseBusiness, Luggage, ArrowRight, Home, HeartPulse } from 'lucide-react';
+import {
+  BookOpen,
+  BriefcaseBusiness,
+  Luggage,
+  ArrowRight,
+  Home,
+  HeartPulse,
+  FolderOpen,
+  Files,
+  Clock3,
+} from 'lucide-react';
 import { isTravelApplicationFinished, type TravelServiceType } from '@/lib/travel-stages';
 import { getUnreadNotificationsCount } from '@/lib/supabase/data';
 import { getViewerContext } from '@/lib/supabase/dashboard-access';
@@ -83,16 +93,36 @@ export default async function TravelClientDashboardPage() {
       .map((application) => application.service_type)
       .filter(Boolean),
   );
+  const metrics = [
+    {
+      label: 'Applications',
+      value: applicationsCount,
+      icon: FolderOpen,
+      accent: 'bg-[#efe8f7] text-[#4b2e6f]',
+    },
+    {
+      label: 'Uploaded docs',
+      value: docsCount,
+      icon: Files,
+      accent: 'bg-[#f7ead8] text-[#9a6420]',
+    },
+    {
+      label: 'Pending stages',
+      value: pendingApplications,
+      icon: Clock3,
+      accent: 'bg-[#e9f3ef] text-[#24604a]',
+    },
+  ] as const;
 
   return (
     <div className="space-y-8">
-      <section className="rounded-[28px] border border-border bg-card p-5 shadow-sm sm:p-6">
+      <section className="rounded-[28px] border border-border bg-card p-5 shadow-sm sm:p-6 lg:rounded-[32px] lg:border-[#ece4d8] lg:bg-[#fcfaf7] lg:p-7 lg:shadow-none">
         <div className="space-y-2">
           <p className="inline-flex rounded-full bg-[#efe8f7] px-3 py-1 text-sm font-medium text-[#4b2e6f]">
             Start my application
           </p>
           <div>
-            <h2 className="text-[2.35rem] font-semibold leading-none tracking-[-0.04em] text-foreground sm:text-[3rem]">
+            <h2 className="text-[2.35rem] font-semibold leading-none text-foreground sm:text-[3rem]">
               Choose the travel flow that fits your goal
             </h2>
             <p className="mt-3 max-w-3xl text-[15px] leading-7 text-muted-foreground sm:text-[17px]">
@@ -101,7 +131,7 @@ export default async function TravelClientDashboardPage() {
           </div>
         </div>
 
-        <div className="mx-auto mt-5 max-w-6xl grid grid-cols-2 gap-2.5 sm:gap-3 lg:grid-cols-5">
+        <div className="mx-auto mt-5 grid max-w-6xl grid-cols-2 gap-2.5 sm:gap-3 lg:grid-cols-3 lg:gap-4">
           {START_OPTIONS.map((option) => (
             (() => {
               const matchingApplications = (applicationsRes.data ?? []).filter(
@@ -119,45 +149,62 @@ export default async function TravelClientDashboardPage() {
             <Link
               key={option.flowParam}
               href={href}
-              className="group flex flex-col rounded-2xl border border-border bg-white p-3 transition-colors hover:border-[#6b4a95] hover:bg-[#faf7fd] sm:p-3.5"
+              className="group flex h-full flex-col rounded-2xl border border-border bg-white p-3 transition-[border-color,background-color,transform,box-shadow] hover:border-[#6b4a95] hover:bg-[#faf7fd] sm:p-3.5 lg:min-h-[220px] lg:rounded-3xl lg:border-[#e9dfd2] lg:p-5 lg:shadow-[0_1px_2px_rgba(17,24,39,0.04)] lg:hover:-translate-y-0.5 lg:hover:shadow-[0_14px_30px_rgba(75,46,111,0.08)]"
             >
-              <div className="flex items-start justify-between gap-2">
-                <div className="min-w-0 space-y-1">
-                  <p className="text-sm font-semibold tracking-[-0.02em] text-foreground sm:text-[0.95rem]">{option.title}</p>
-                  <p className="line-clamp-3 text-xs leading-relaxed text-muted-foreground sm:text-[13px] sm:leading-6">{option.copy}</p>
+              <div className="flex h-full flex-col">
+                <div className="flex items-start justify-between gap-2 lg:gap-3">
+                  <div className="min-w-0 space-y-1.5 lg:space-y-2">
+                    <p className="text-sm font-semibold text-foreground sm:text-[0.95rem] lg:text-[1.05rem]">{option.title}</p>
+                    <p className="line-clamp-4 text-xs leading-relaxed text-muted-foreground sm:text-[13px] sm:leading-6 lg:max-w-[24ch]">
+                      {option.copy}
+                    </p>
+                  </div>
+                  <div className="shrink-0 rounded-xl bg-[#4b2e6f] p-1.5 text-white sm:p-2 lg:rounded-2xl lg:p-2.5">
+                    <option.icon className="h-3.5 w-3.5 sm:h-4 sm:w-4 lg:h-[18px] lg:w-[18px]" />
+                  </div>
+                </div>
+
+                <div className="mt-3 space-y-2 lg:mt-auto lg:space-y-3">
                   {hasPendingDeletion ? (
                     <p className="text-xs font-medium text-[#4b2e6f]">Deletion request pending approval</p>
                   ) : hasActiveApplication ? (
                     <p className="text-xs font-medium text-[#4b2e6f]">Active application already started</p>
-                  ) : null}
+                  ) : (
+                    <div className="hidden lg:block lg:h-[18px]" aria-hidden="true" />
+                  )}
+
+                  <div className="inline-flex items-center gap-1.5 text-xs font-medium text-[#4b2e6f] sm:text-[13px]">
+                    {hasPendingDeletion ? 'View status' : hasActiveApplication ? 'View application' : 'Continue'}
+                    <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5 sm:h-4 sm:w-4" />
+                  </div>
                 </div>
-                <div className="shrink-0 rounded-xl bg-[#4b2e6f] p-1.5 text-white sm:p-2">
-                  <option.icon className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-                </div>
-              </div>
-              <div className="mt-3 inline-flex items-center gap-1.5 text-xs font-medium text-[#4b2e6f] sm:text-[13px]">
-                {hasPendingDeletion ? 'View status' : hasActiveApplication ? 'View application' : 'Continue'}
-                <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5 sm:h-4 sm:w-4" />
               </div>
             </Link>
               );
             })()
           ))}
-        </div>      </section>
+        </div>
+      </section>
 
-      <section className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-        <div className="rounded-2xl bg-gradient-to-br from-[#2f1b49] to-[#4b2e6f] p-4 text-white shadow-sm">
-          <p className="text-sm text-white/85">Applications</p>
-          <p className="mt-2 text-3xl font-semibold">{applicationsCount}</p>
-        </div>
-        <div className="rounded-2xl bg-gradient-to-br from-[#3a2358] to-[#593881] p-4 text-white shadow-sm">
-          <p className="text-sm text-white/85">Uploaded docs</p>
-          <p className="mt-2 text-3xl font-semibold">{docsCount}</p>
-        </div>
-        <div className="rounded-2xl bg-gradient-to-br from-[#442963] to-[#6a4698] p-4 text-white shadow-sm">
-          <p className="text-sm text-white/85">Pending stages</p>
-          <p className="mt-2 text-3xl font-semibold">{pendingApplications}</p>
-        </div>
+      <section className="grid grid-cols-1 gap-3 sm:grid-cols-3 lg:gap-4">
+        {metrics.map((metric) => (
+          <div
+            key={metric.label}
+            className="rounded-2xl bg-gradient-to-br from-[#2f1b49] to-[#4b2e6f] p-4 text-white shadow-sm lg:rounded-3xl lg:border lg:border-[#e9dfd2] lg:bg-none lg:bg-white lg:p-5 lg:text-foreground lg:shadow-none"
+          >
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <p className="text-sm text-white/85 lg:text-[13px] lg:font-medium lg:uppercase lg:tracking-[0.08em] lg:text-muted-foreground">
+                  {metric.label}
+                </p>
+                <p className="mt-2 text-3xl font-semibold lg:mt-4 lg:text-[2.25rem]">{metric.value}</p>
+              </div>
+              <div className={`hidden rounded-2xl p-3 lg:flex ${metric.accent}`}>
+                <metric.icon className="h-5 w-5" />
+              </div>
+            </div>
+          </div>
+        ))}
       </section>
 
       <section className="rounded-2xl border border-border bg-white p-5 sm:p-6 shadow-sm">
