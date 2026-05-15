@@ -116,7 +116,7 @@ export default async function TravelClientDashboardPage() {
 
   return (
     <div className="space-y-8">
-      <section className="rounded-[28px] border border-border bg-card p-5 shadow-sm sm:p-6 lg:rounded-[32px] lg:border-[#ece4d8] lg:bg-[#fcfaf7] lg:p-7 lg:shadow-none">
+      <section className="p-5 sm:p-6 lg:px-0 lg:py-2">
         <div className="space-y-2">
           <p className="inline-flex rounded-full bg-[#efe8f7] px-3 py-1 text-sm font-medium text-[#4b2e6f]">
             Start my application
@@ -131,7 +131,7 @@ export default async function TravelClientDashboardPage() {
           </div>
         </div>
 
-        <div className="mx-auto mt-5 grid max-w-6xl grid-cols-2 gap-2.5 sm:gap-3 lg:grid-cols-3 lg:gap-4">
+        <div className="mt-5 grid grid-cols-2 gap-2.5 sm:gap-3 lg:grid-cols-3 lg:gap-4 xl:grid-cols-4">
           {START_OPTIONS.map((option) => (
             (() => {
               const matchingApplications = (applicationsRes.data ?? []).filter(
@@ -149,7 +149,7 @@ export default async function TravelClientDashboardPage() {
             <Link
               key={option.flowParam}
               href={href}
-              className="group flex h-full flex-col rounded-2xl border border-border bg-white p-3 transition-[border-color,background-color,transform,box-shadow] hover:border-[#6b4a95] hover:bg-[#faf7fd] sm:p-3.5 lg:min-h-[220px] lg:rounded-3xl lg:border-[#e9dfd2] lg:p-5 lg:shadow-[0_1px_2px_rgba(17,24,39,0.04)] lg:hover:-translate-y-0.5 lg:hover:shadow-[0_14px_30px_rgba(75,46,111,0.08)]"
+              className="group flex h-full flex-col rounded-2xl border border-border bg-white p-3 transition-[border-color,background-color,transform,box-shadow] hover:border-[#6b4a95] hover:bg-[#faf7fd] sm:p-3.5 lg:min-h-[220px] lg:rounded-3xl lg:border-[#e6ddd1] lg:bg-white lg:p-5 lg:shadow-[0_1px_2px_rgba(17,24,39,0.03)] lg:hover:-translate-y-0.5 lg:hover:shadow-[0_12px_24px_rgba(75,46,111,0.06)]"
             >
               <div className="flex h-full flex-col">
                 <div className="flex items-start justify-between gap-2 lg:gap-3">
@@ -190,7 +190,7 @@ export default async function TravelClientDashboardPage() {
         {metrics.map((metric) => (
           <div
             key={metric.label}
-            className="rounded-2xl bg-gradient-to-br from-[#2f1b49] to-[#4b2e6f] p-4 text-white shadow-sm lg:rounded-3xl lg:border lg:border-[#e9dfd2] lg:bg-none lg:bg-white lg:p-5 lg:text-foreground lg:shadow-none"
+            className="rounded-2xl bg-gradient-to-br from-[#2f1b49] to-[#4b2e6f] p-4 text-white shadow-sm lg:rounded-3xl lg:border lg:border-[#e6ddd1] lg:bg-none lg:bg-[#f7f4ef] lg:p-5 lg:text-foreground lg:shadow-none"
           >
             <div className="flex items-start justify-between gap-3">
               <div>
