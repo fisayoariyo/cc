@@ -1,0 +1,22 @@
+---
+alwaysApply: true
+---
+# Design & Vibe Rules — UPDATED (Much Lighter & Brighter)
+
+Overall theme must feel extremely light, airy, bright and sunlit.
+- Very high lightness / brightness level (even lighter than current Figma)
+- Warm, welcoming Nigerian hospitality feel — premium but fresh and open
+- Never dark or heavy
+
+Exact Color Palette (use these exact hex codes):
+- Background / Main surface: #FEFAF4 (very light warm cream, almost white)
+- Secondary surface / Cards: #FFFDF9
+- Primary Accent (buttons, CTAs, highlights): #E88A5F (bright, warm terracotta-orange)
+- Secondary Accent / Trust color:rgb(80, 0, 133) (bright, fresh forest green)
+- Text Primary: #1F2A24 (deep but not black)
+- Text Secondary: #3F4A44
+- Borders / Subtle dividers: #F0EDE6
+
+Real Estate hero must feel bright, cinematic and premium (like rangedevelopmentsgroup.com but even lighter and more open).
+
+All components, dashboards, property cards, navigation, etc. must use this brighter palette consistently.

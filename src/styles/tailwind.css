@@ -1,0 +1,5 @@
+/* Default Tailwind v4 content detection (do not use source(none) here): a manual @source glob
+   can miss Next.js route groups like app/(auth), so /register and similar routes lose utilities. */
+@import 'tailwindcss';
+
+@import 'tw-animate-css';

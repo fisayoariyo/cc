@@ -1,0 +1,684 @@
+import { createClient as createPublicClient } from '@supabase/supabase-js';
+import { createClient } from '@/lib/supabase/server';
+import { unstable_cache } from 'next/cache';
+import type {
+  ApplicationDocumentRow,
+  ApplicationStageHistoryRow,
+  ClientServiceRow,
+  ComparePropertyRow,
+  ConstructionProjectRow,
+  ConstructionStageHistoryRow,
+  FavoritePropertyRow,
+  InquiryRow,
+  AgentSupportTicketRow,
+  AgentSupportTicketWithAgent,
+  NotificationRow,
+  ProfileRow,
+  PropertyRow,
+  SavedSearchRow,
+  SuccessStoryRow,
+  TravelApplicationRow,
+} from '@/lib/types/database';
+
+const PROFILE_COLUMNS =
+  'id, full_name, email, role, status, onboarding_paid, phone_number, passport_number, gender, agent_state, agent_lga, agent_address, nin, photo_url, next_of_kin_name, next_of_kin_phone, next_of_kin_relationship, onboarding_step, created_at, updated_at';
+const PROPERTY_COLUMNS =
+  'id, title, description, price, location, category, property_type, images, amenities, status, admin_notes, reviewed_at, reviewed_by, is_featured, agent_id, created_at, updated_at';
+const TRAVEL_APPLICATION_COLUMNS =
+  'id, client_id, service_type, destination, current_stage, notes, deletion_request_status, deletion_requested_at, deletion_requested_by, deletion_reviewed_at, deletion_reviewed_by, created_at, updated_at';
+const INQUIRY_COLUMNS =
+  'id, full_name, email, phone, inquiry_type, message, channel, status, created_at, updated_at';
+const SUPPORT_TICKET_COLUMNS =
+  'id, ticket_code, agent_id, issue_type, listing_reference, description, status, resolved_at, resolved_by, created_at, updated_at';
+const APPLICATION_DOCUMENT_COLUMNS =
+  'id, application_id, client_id, file_path, document_type, status, admin_note, reviewed_at, reviewed_by, created_at, updated_at';
+const APPLICATION_STAGE_HISTORY_COLUMNS =
+  'id, application_id, stage_key, stage_label, note_to_client, changed_by, changed_at';
+const CLIENT_SERVICE_COLUMNS = 'id, user_id, service, created_at';
+const FAVORITE_COLUMNS = 'id, user_id, property_id, created_at';
+const COMPARE_COLUMNS = 'id, user_id, property_id, created_at';
+const SAVED_SEARCH_COLUMNS = 'id, user_id, service, title, query, created_at';
+const CONSTRUCTION_PROJECT_COLUMNS =
+  'id, client_id, title, project_type, location, budget_range, timeline, description, current_stage, status, created_by, created_at, updated_at';
+const CONSTRUCTION_STAGE_HISTORY_COLUMNS =
+  'id, project_id, stage_key, stage_label, note_to_client, changed_by, changed_at';
+const NOTIFICATION_COLUMNS =
+  'id, user_id, title, body, type, link_url, metadata, is_read, created_at';
+const SUCCESS_STORY_COLUMNS =
+  'id, slug, title, summary, story_body, service, client_label, location, outcome, cover_image_url, cover_image_alt, highlight_video_url, highlight_video_poster_url, gallery_image_urls, gallery_video_urls, published, featured, sort_order, seo_title, seo_description, created_by, updated_by, created_at, updated_at';
+
+function createPublicReadonlyClient() {
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+    return null;
+  }
+
+  return createPublicClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+    {
+      auth: {
+        persistSession: false,
+        autoRefreshToken: false,
+      },
+    },
+  );
+}
+
+const getCachedActiveProperties = unstable_cache(
+  async (): Promise<PropertyRow[]> => {
+    const supabase = createPublicReadonlyClient();
+    if (!supabase) {
+      return [];
+    }
+
+    const { data, error } = await supabase
+      .from('properties')
+      .select(PROPERTY_COLUMNS)
+      .eq('status', 'active')
+      .order('created_at', { ascending: false });
+    if (error) {
+      console.error('getActiveProperties', error.message);
+      return [];
+    }
+    return (data ?? []) as PropertyRow[];
+  },
+  ['active-properties'],
+  { revalidate: 120, tags: ['active-properties'] },
+);
+
+export async function getProfile(userId: string): Promise<ProfileRow | null> {
+  const supabase = await createClient();
+  if (!supabase) return null;
+  const { data, error } = await supabase
+    .from('profiles')
+    .select(PROFILE_COLUMNS)
+    .eq('id', userId)
+    .maybeSingle();
+  if (error) {
+    console.error('getProfile', error.message);
+    return null;
+  }
+  return data as ProfileRow | null;
+}
+
+export async function getActiveProperties(): Promise<PropertyRow[]> {
+  return getCachedActiveProperties();
+}
+
+export async function getPropertyById(id: string): Promise<PropertyRow | null> {
+  const supabase = await createClient();
+  if (!supabase) return null;
+  const { data, error } = await supabase
+    .from('properties')
+    .select(PROPERTY_COLUMNS)
+    .eq('id', id)
+    .maybeSingle();
+  if (error) {
+    console.error('getPropertyById', error.message);
+    return null;
+  }
+  return data as PropertyRow | null;
+}
+
+/**
+ * Public, cached read for the property detail page. Uses the cookie-less anon
+ * client so it can be served from Next's Data Cache / global edge (fast for a
+ * worldwide audience), and only returns active listings. Self-heals every 120s
+ * and shares the 'active-properties' tag so listing mutations invalidate it.
+ */
+const getCachedActivePropertyById = unstable_cache(
+  async (id: string): Promise<PropertyRow | null> => {
+    const supabase = createPublicReadonlyClient();
+    if (!supabase) return null;
+    const { data, error } = await supabase
+      .from('properties')
+      .select(PROPERTY_COLUMNS)
+      .eq('id', id)
+      .eq('status', 'active')
+      .maybeSingle();
+    if (error) {
+      console.error('getActivePropertyById', error.message);
+      return null;
+    }
+    return data as PropertyRow | null;
+  },
+  ['active-property'],
+  { revalidate: 120, tags: ['active-properties'] },
+);
+
+export async function getActivePropertyById(id: string): Promise<PropertyRow | null> {
+  return getCachedActivePropertyById(id);
+}
+
+export async function getAllPropertiesForAdmin(): Promise<PropertyRow[]> {
+  const supabase = await createClient();
+  if (!supabase) return [];
+  const { data, error } = await supabase
+    .from('properties')
+    .select(PROPERTY_COLUMNS)
+    .order('created_at', { ascending: false });
+  if (error) {
+    console.error('getAllPropertiesForAdmin', error.message);
+    return [];
+  }
+  return (data ?? []) as PropertyRow[];
+}
+
+export async function getPropertiesForAgent(agentId: string): Promise<PropertyRow[]> {
+  const supabase = await createClient();
+  if (!supabase) return [];
+  const { data, error } = await supabase
+    .from('properties')
+    .select(PROPERTY_COLUMNS)
+    .eq('agent_id', agentId)
+    .order('created_at', { ascending: false });
+  if (error) {
+    console.error('getPropertiesForAgent', error.message);
+    return [];
+  }
+  return (data ?? []) as PropertyRow[];
+}
+
+export async function getTravelApplicationsForClient(clientId: string): Promise<TravelApplicationRow[]> {
+  const supabase = await createClient();
+  if (!supabase) return [];
+  const { data, error } = await supabase
+    .from('travel_applications')
+    .select(TRAVEL_APPLICATION_COLUMNS)
+    .eq('client_id', clientId)
+    .order('created_at', { ascending: false });
+  if (error) {
+    console.error('getTravelApplicationsForClient', error.message);
+    return [];
+  }
+  return (data ?? []) as TravelApplicationRow[];
+}
+
+export async function getAllTravelApplicationsForAdmin(): Promise<TravelApplicationRow[]> {
+  const supabase = await createClient();
+  if (!supabase) return [];
+  const { data, error } = await supabase
+    .from('travel_applications')
+    .select(TRAVEL_APPLICATION_COLUMNS)
+    .order('created_at', { ascending: false });
+  if (error) {
+    console.error('getAllTravelApplicationsForAdmin', error.message);
+    return [];
+  }
+  return (data ?? []) as TravelApplicationRow[];
+}
+
+export async function getTravelApplicationById(id: string): Promise<TravelApplicationRow | null> {
+  const supabase = await createClient();
+  if (!supabase) return null;
+  const { data, error } = await supabase
+    .from('travel_applications')
+    .select(TRAVEL_APPLICATION_COLUMNS)
+    .eq('id', id)
+    .maybeSingle();
+  if (error) {
+    console.error('getTravelApplicationById', error.message);
+    return null;
+  }
+  return (data ?? null) as TravelApplicationRow | null;
+}
+
+/** Agents pending verification: role agent + status pending (your schema uses status text). */
+export async function getAllAgentsForAdmin(): Promise<ProfileRow[]> {
+  const supabase = await createClient();
+  if (!supabase) return [];
+  const { data, error } = await supabase
+    .from('profiles')
+    .select(PROFILE_COLUMNS)
+    .eq('role', 'agent')
+    .order('created_at', { ascending: false });
+  if (error) {
+    console.error('getAllAgentsForAdmin', error.message);
+    return [];
+  }
+  return (data ?? []) as ProfileRow[];
+}
+
+export async function getAgentForAdminById(agentId: string): Promise<ProfileRow | null> {
+  const supabase = await createClient();
+  if (!supabase) return null;
+  const { data, error } = await supabase
+    .from('profiles')
+    .select(PROFILE_COLUMNS)
+    .eq('id', agentId)
+    .eq('role', 'agent')
+    .maybeSingle();
+  if (error) {
+    console.error('getAgentForAdminById', error.message);
+    return null;
+  }
+  return (data as ProfileRow | null) ?? null;
+}
+
+export async function getPendingAgents(): Promise<ProfileRow[]> {
+  const supabase = await createClient();
+  if (!supabase) return [];
+  const { data, error } = await supabase
+    .from('profiles')
+    .select(PROFILE_COLUMNS)
+    .eq('role', 'agent')
+    .eq('status', 'pending')
+    .order('created_at', { ascending: true });
+  if (error) {
+    console.error('getPendingAgents', error.message);
+    return [];
+  }
+  return (data ?? []) as ProfileRow[];
+}
+
+export async function countPropertiesByStatus(): Promise<Record<string, number>> {
+  const rows = await getAllPropertiesForAdmin();
+  const counts: Record<string, number> = {
+    draft: 0,
+    pending: 0,
+    edits_requested: 0,
+    active: 0,
+    rejected: 0,
+    sold: 0,
+    archived: 0,
+  };
+  for (const r of rows) {
+    counts[r.status] = (counts[r.status] ?? 0) + 1;
+  }
+  return counts;
+}
+
+export async function getAllInquiriesForAdmin(): Promise<InquiryRow[]> {
+  const supabase = await createClient();
+  if (!supabase) return [];
+  const { data, error } = await supabase
+    .from('inquiries')
+    .select(INQUIRY_COLUMNS)
+    .order('created_at', { ascending: false });
+  if (error) {
+    console.error('getAllInquiriesForAdmin', error.message);
+    return [];
+  }
+  return (data ?? []) as InquiryRow[];
+}
+
+export async function getSupportTicketsForAdmin(): Promise<AgentSupportTicketWithAgent[]> {
+  const supabase = await createClient();
+  if (!supabase) return [];
+  const { data, error } = await supabase
+    .from('agent_support_tickets')
+    .select(
+      `${SUPPORT_TICKET_COLUMNS}, agent:profiles!agent_support_tickets_agent_id_fkey(id, full_name, email, phone_number, photo_url, agent_state)`,
+    )
+    .order('created_at', { ascending: false });
+  if (error) {
+    console.error('getSupportTicketsForAdmin', error.message);
+    return [];
+  }
+  return (data ?? []) as unknown as AgentSupportTicketWithAgent[];
+}
+
+export async function getSupportTicketForAdminById(
+  id: string,
+): Promise<AgentSupportTicketWithAgent | null> {
+  const supabase = await createClient();
+  if (!supabase) return null;
+  const { data, error } = await supabase
+    .from('agent_support_tickets')
+    .select(
+      `${SUPPORT_TICKET_COLUMNS}, agent:profiles!agent_support_tickets_agent_id_fkey(id, full_name, email, phone_number, photo_url, agent_state)`,
+    )
+    .eq('id', id)
+    .maybeSingle();
+  if (error) {
+    console.error('getSupportTicketForAdminById', error.message);
+    return null;
+  }
+  return (data as AgentSupportTicketWithAgent | null) ?? null;
+}
+
+export async function getDocumentsForClient(clientId: string): Promise<ApplicationDocumentRow[]> {
+  const supabase = await createClient();
+  if (!supabase) return [];
+  const { data, error } = await supabase
+    .from('application_documents')
+    .select(APPLICATION_DOCUMENT_COLUMNS)
+    .eq('client_id', clientId)
+    .order('created_at', { ascending: false });
+  if (error) {
+    console.error('getDocumentsForClient', error.message);
+    return [];
+  }
+  return (data ?? []) as ApplicationDocumentRow[];
+}
+
+export async function getDocumentsForApplications(
+  applicationIds: string[],
+): Promise<Record<string, ApplicationDocumentRow[]>> {
+  if (!applicationIds.length) return {};
+  const supabase = await createClient();
+  if (!supabase) return {};
+  const { data, error } = await supabase
+    .from('application_documents')
+    .select(APPLICATION_DOCUMENT_COLUMNS)
+    .in('application_id', applicationIds);
+  if (error) {
+    console.error('getDocumentsForApplications', error.message);
+    return {};
+  }
+  const grouped: Record<string, ApplicationDocumentRow[]> = {};
+  for (const row of (data ?? []) as ApplicationDocumentRow[]) {
+    if (!grouped[row.application_id]) grouped[row.application_id] = [];
+    grouped[row.application_id].push(row);
+  }
+  return grouped;
+}
+
+export async function getStageHistoryForApplications(
+  applicationIds: string[],
+): Promise<Record<string, ApplicationStageHistoryRow[]>> {
+  if (!applicationIds.length) return {};
+  const supabase = await createClient();
+  if (!supabase) return {};
+  const { data, error } = await supabase
+    .from('application_stage_history')
+    .select(APPLICATION_STAGE_HISTORY_COLUMNS)
+    .in('application_id', applicationIds)
+    .order('changed_at', { ascending: false });
+  if (error) {
+    console.error('getStageHistoryForApplications', error.message);
+    return {};
+  }
+  const grouped: Record<string, ApplicationStageHistoryRow[]> = {};
+  for (const row of (data ?? []) as ApplicationStageHistoryRow[]) {
+    if (!grouped[row.application_id]) grouped[row.application_id] = [];
+    grouped[row.application_id].push(row);
+  }
+  return grouped;
+}
+
+export async function getClientServices(userId: string): Promise<ClientServiceRow[]> {
+  const supabase = await createClient();
+  if (!supabase) return [];
+  const { data, error } = await supabase
+    .from('client_services')
+    .select(CLIENT_SERVICE_COLUMNS)
+    .eq('user_id', userId)
+    .order('created_at', { ascending: true });
+  if (error) {
+    console.error('getClientServices', error.message);
+    return [];
+  }
+  return (data ?? []) as ClientServiceRow[];
+}
+
+export async function getFavoriteProperties(userId: string): Promise<FavoritePropertyRow[]> {
+  const supabase = await createClient();
+  if (!supabase) return [];
+  const { data, error } = await supabase
+    .from('favorite_properties')
+    .select(FAVORITE_COLUMNS)
+    .eq('user_id', userId);
+  if (error) {
+    console.error('getFavoriteProperties', error.message);
+    return [];
+  }
+  return (data ?? []) as FavoritePropertyRow[];
+}
+
+export async function getCompareProperties(userId: string): Promise<ComparePropertyRow[]> {
+  const supabase = await createClient();
+  if (!supabase) return [];
+  const { data, error } = await supabase
+    .from('compare_properties')
+    .select(COMPARE_COLUMNS)
+    .eq('user_id', userId);
+  if (error) {
+    console.error('getCompareProperties', error.message);
+    return [];
+  }
+  return (data ?? []) as ComparePropertyRow[];
+}
+
+export async function getSavedSearches(userId: string): Promise<SavedSearchRow[]> {
+  const supabase = await createClient();
+  if (!supabase) return [];
+  const { data, error } = await supabase
+    .from('saved_searches')
+    .select(SAVED_SEARCH_COLUMNS)
+    .eq('user_id', userId)
+    .eq('service', 'real_estate')
+    .order('created_at', { ascending: false });
+  if (error) {
+    console.error('getSavedSearches', error.message);
+    return [];
+  }
+  return (data ?? []) as SavedSearchRow[];
+}
+
+export async function getConstructionProjectsForClient(userId: string): Promise<ConstructionProjectRow[]> {
+  const supabase = await createClient();
+  if (!supabase) return [];
+  const { data, error } = await supabase
+    .from('construction_projects')
+    .select(CONSTRUCTION_PROJECT_COLUMNS)
+    .eq('client_id', userId)
+    .order('created_at', { ascending: false });
+  if (error) {
+    console.error('getConstructionProjectsForClient', error.message);
+    return [];
+  }
+  return (data ?? []) as ConstructionProjectRow[];
+}
+
+export async function getConstructionProjectsForAdmin(): Promise<ConstructionProjectRow[]> {
+  const supabase = await createClient();
+  if (!supabase) return [];
+  const { data, error } = await supabase
+    .from('construction_projects')
+    .select(CONSTRUCTION_PROJECT_COLUMNS)
+    .order('created_at', { ascending: false });
+  if (error) {
+    console.error('getConstructionProjectsForAdmin', error.message);
+    return [];
+  }
+  return (data ?? []) as ConstructionProjectRow[];
+}
+
+export async function getConstructionHistoryByProjectIds(
+  projectIds: string[],
+): Promise<Record<string, ConstructionStageHistoryRow[]>> {
+  if (!projectIds.length) return {};
+  const supabase = await createClient();
+  if (!supabase) return {};
+  const { data, error } = await supabase
+    .from('construction_stage_history')
+    .select(CONSTRUCTION_STAGE_HISTORY_COLUMNS)
+    .in('project_id', projectIds)
+    .order('changed_at', { ascending: false });
+  if (error) {
+    console.error('getConstructionHistoryByProjectIds', error.message);
+    return {};
+  }
+  const grouped: Record<string, ConstructionStageHistoryRow[]> = {};
+  for (const row of (data ?? []) as ConstructionStageHistoryRow[]) {
+    if (!grouped[row.project_id]) grouped[row.project_id] = [];
+    grouped[row.project_id].push(row);
+  }
+  return grouped;
+}
+
+export async function getNotificationsForUser(userId: string, limit = 8): Promise<NotificationRow[]> {
+  const supabase = await createClient();
+  if (!supabase) return [];
+  const { data, error } = await supabase
+    .from('notifications')
+    .select(NOTIFICATION_COLUMNS)
+    .eq('user_id', userId)
+    .order('created_at', { ascending: false })
+    .limit(limit);
+  if (error) {
+    console.error('getNotificationsForUser', error.message);
+    return [];
+  }
+  return (data ?? []) as NotificationRow[];
+}
+
+export async function getAgentListingUnlockNotice(userId: string): Promise<NotificationRow | null> {
+  const supabase = await createClient();
+  if (!supabase) return null;
+
+  const { data, error } = await supabase
+    .from('notifications')
+    .select(NOTIFICATION_COLUMNS)
+    .eq('user_id', userId)
+    .eq('type', 'agent_listing_unlocked')
+    .eq('is_read', false)
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (error) {
+    console.error('getAgentListingUnlockNotice', error.message);
+    return null;
+  }
+
+  return (data as NotificationRow | null) ?? null;
+}
+
+export async function getUnreadNotificationsCount(userId: string): Promise<number> {
+  const supabase = await createClient();
+  if (!supabase) return 0;
+  const { count, error } = await supabase
+    .from('notifications')
+    .select('id', { count: 'exact', head: true })
+    .eq('user_id', userId)
+    .eq('is_read', false);
+
+  if (error) {
+    console.error('getUnreadNotificationsCount', error.message);
+    return 0;
+  }
+
+  return count ?? 0;
+}
+
+const getCachedFeaturedSuccessStories = unstable_cache(
+  async (limit: number): Promise<SuccessStoryRow[]> => {
+    const supabase = createPublicReadonlyClient();
+    if (!supabase) return [];
+
+    const { data, error } = await supabase
+      .from('success_stories')
+      .select(SUCCESS_STORY_COLUMNS)
+      .eq('published', true)
+      .eq('featured', true)
+      .order('sort_order', { ascending: true })
+      .order('created_at', { ascending: false })
+      .limit(limit);
+
+    if (error) {
+      console.error('getFeaturedSuccessStories', error.message);
+      return [];
+    }
+
+    return (data ?? []) as SuccessStoryRow[];
+  },
+  ['featured-success-stories'],
+  { revalidate: 300, tags: ['success-stories'] },
+);
+
+export async function getFeaturedSuccessStories(limit = 6): Promise<SuccessStoryRow[]> {
+  return getCachedFeaturedSuccessStories(limit);
+}
+
+const getCachedPublishedSuccessStories = unstable_cache(
+  async (limit: number, service?: string | null): Promise<SuccessStoryRow[]> => {
+    const supabase = createPublicReadonlyClient();
+    if (!supabase) return [];
+
+    let query = supabase
+      .from('success_stories')
+      .select(SUCCESS_STORY_COLUMNS)
+      .eq('published', true)
+      .order('featured', { ascending: false })
+      .order('sort_order', { ascending: true })
+      .order('created_at', { ascending: false })
+      .limit(limit);
+
+    if (service && ['travel', 'real_estate', 'construction'].includes(service)) {
+      query = query.eq('service', service);
+    }
+
+    const { data, error } = await query;
+    if (error) {
+      console.error('getPublishedSuccessStories', error.message);
+      return [];
+    }
+
+    return (data ?? []) as SuccessStoryRow[];
+  },
+  ['published-success-stories'],
+  { revalidate: 300, tags: ['success-stories'] },
+);
+
+export async function getPublishedSuccessStories(
+  limit = 24,
+  service?: string | null,
+): Promise<SuccessStoryRow[]> {
+  return getCachedPublishedSuccessStories(limit, service);
+}
+
+export async function getSuccessStoryBySlug(slug: string): Promise<SuccessStoryRow | null> {
+  const supabase = createPublicReadonlyClient();
+  if (!supabase) return null;
+
+  const { data, error } = await supabase
+    .from('success_stories')
+    .select(SUCCESS_STORY_COLUMNS)
+    .eq('published', true)
+    .eq('slug', slug)
+    .maybeSingle();
+
+  if (error) {
+    console.error('getSuccessStoryBySlug', error.message);
+    return null;
+  }
+
+  return (data as SuccessStoryRow | null) ?? null;
+}
+
+export async function getAllSuccessStoriesForAdmin(): Promise<SuccessStoryRow[]> {
+  const supabase = await createClient();
+  if (!supabase) return [];
+  const { data, error } = await supabase
+    .from('success_stories')
+    .select(SUCCESS_STORY_COLUMNS)
+    .order('featured', { ascending: false })
+    .order('sort_order', { ascending: true })
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    console.error('getAllSuccessStoriesForAdmin', error.message);
+    return [];
+  }
+
+  return (data ?? []) as SuccessStoryRow[];
+}
+
+export async function getSuccessStoryByIdForAdmin(id: string): Promise<SuccessStoryRow | null> {
+  const supabase = await createClient();
+  if (!supabase) return null;
+  const { data, error } = await supabase
+    .from('success_stories')
+    .select(SUCCESS_STORY_COLUMNS)
+    .eq('id', id)
+    .maybeSingle();
+
+  if (error) {
+    console.error('getSuccessStoryByIdForAdmin', error.message);
+    return null;
+  }
+
+  return (data as SuccessStoryRow | null) ?? null;
+}

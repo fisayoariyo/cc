@@ -1,0 +1,51 @@
+---
+description: Next.js server action forms — pending state and navigation (no useTransition + refresh)
+globs: **/*.{tsx,ts}
+alwaysApply: false
+---
+
+# Server action submit patterns (Next.js App Router)
+
+## Why this exists
+
+`useTransition` + `start(() => { void (async () => { await serverAction() })() })` does **not** reliably track async server actions. The button can stay stuck on "Saving…" or finish before work completes. Adding `router.refresh()` after `router.push()` forces an extra full RSC refetch and makes navigation feel slow.
+
+Use the project hook **`useOnboardingSubmit`** (`src/components/auth/use-onboarding-submit.ts`) for agent onboarding, or the same pattern elsewhere.
+
+## Do
+
+```tsx
+const { isSubmitting, notice, submit } = useOnboardingSubmit('/next/path');
+
+<form onSubmit={(e) => {
+  e.preventDefault();
+  void submit(() => saveSomething(null, new FormData(e.currentTarget)));
+}}>
+  <Button disabled={isSubmitting}>{isSubmitting ? 'Saving...' : 'Continue'}</Button>
+</form>
+```
+
+- **`useState` for `isSubmitting`** (or `useActionState` / form `action` + `useFormStatus`)
+- **`router.push(nextPath)` only** on success — no `router.refresh()` after push
+- **Targeted `revalidatePath('/specific/route')`** in the server action, not a broad refresh on the client
+- **Handle `NEXT_REDIRECT`** if the action calls `redirect()` (see `isNextRedirectError` in the hook)
+
+## Don't
+
+```tsx
+// BAD — transition ends before async work; pending state is wrong
+const [pending, start] = useTransition();
+start(() => {
+  void (async () => {
+    await saveAgentLocation(null, fd);
+    router.push('/next');
+    router.refresh(); // BAD — redundant slow refetch
+  })();
+});
+```
+
+## Prefer for new forms
+
+1. `useActionState(action, initialState)` + `<form action={formAction}>` when possible
+2. Else `useState` + explicit `try/finally` (or `useOnboardingSubmit`)
+3. Never assume `useTransition` tracks awaited server actions

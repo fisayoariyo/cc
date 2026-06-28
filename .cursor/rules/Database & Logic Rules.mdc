@@ -1,0 +1,32 @@
+---
+alwaysApply: false
+---
+description: Rules for database schema design, data fetching patterns, and server-side business logic.
+globs: lib/actions//*, lib/db//, app/api/**/
+alwaysApply: false
+
+Database & Logic Rules
+
+Schema Generation
+
+Source of Truth: Refer to the "Database Schema" section in the PRD for all table and column names.
+
+SQL Generation: Always generate valid PostgreSQL/Supabase SQL for any new tables or Row Level Security policies.
+
+Naming: Use snake_case for database columns and PascalCase for TypeScript interfaces.
+
+Server Actions & Mutations
+
+All database writes (POST/PATCH/DELETE) must be handled via Next.js Server Actions ('use server').
+
+Use Zod for server-side validation on every form submission.
+
+Every mutation must be guarded by an identity check using supabase.auth.getUser().
+
+Data Handling
+
+Currency: Store financial values as numeric or integer (representing kobo) to avoid rounding errors. Default currency is NGN (₦).
+
+Enums: Use the exact status strings from the PRD (e.g., pending, active, sold, archived).
+
+Images: Upload images to Supabase Storage buckets. Store only the URL strings in the database tables.

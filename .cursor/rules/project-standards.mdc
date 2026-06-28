@@ -1,0 +1,36 @@
+---
+alwaysApply: true
+---
+Project Architecture & Standards
+
+Core Stack
+
+Framework: Next.js 15 (App Router)
+
+Database/Auth: Supabase (PostgreSQL + Auth SSR)
+
+Language: TypeScript (Strict mode)
+
+Source of Truth
+
+Always refer to prd.pdf for feature logic, specific fields, and user flows.
+
+Note: This is a clean Next.js project. No database schema has been built yet. The AI must assist in generating the initial SQL migrations/schema based on the PRD requirements before writing data-fetching code.
+
+Critical Architectural Rules
+
+Route Groups: Organize the app directory into these specific groups:
+
+(marketing): Public-facing pages (Home, About, Contact).
+
+(real-estate): Property listings, search, and construction info.
+
+(travel): Travel services and visa quiz.
+
+(auth): Login, Register, Password Recovery.
+
+(dashboard): Contains nested layouts for /admin, /agent, and /client.
+
+Components: Default to Server Components for data fetching. Use Client Components ('use client') only for interactivity (forms, buttons, real-time filters).
+
+Naming: use kebab-case for directories/files and PascalCase for React components.

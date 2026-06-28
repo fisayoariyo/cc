@@ -1,0 +1,11 @@
+---
+alwaysApply: true
+---
+# Next.js App Router Rules (Strict)
+- Use Next.js 15+ App Router only (app/ directory).
+- Prefer Server Components by default. Add "use client" only when interactivity is required.
+- Use Server Actions for mutations.
+- File conventions: page.tsx, layout.tsx, loading.tsx, error.tsx.
+- Dynamic routes use [slug] folders + async params/searchParams.
+- All routing must be file-based (no React Router unless explicitly migrating).
+- Optimize for Vercel deployment.

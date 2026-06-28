@@ -1,0 +1,34 @@
+---
+alwaysApply: false
+---
+description: Rules for handling Supabase connections, Auth SSR, and Role-Based Security.
+globs: lib/supabase//*, middleware.ts, app/(auth)//, app/(admin)/**/, app/(agent)/**/*
+alwaysApply: false
+
+Supabase, Auth & Security
+
+Initial Setup Requirements
+
+Environment Variables: Before coding, ensure .env.local contains NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY.
+
+Schema Initialization: Since the account is new, the AI must provide a complete SQL migration script (Tables: profiles, properties, travel_applications) for the user to run in the Supabase SQL Editor before implementing data-fetching logic.
+
+Auth Implementation
+
+Use @supabase/ssr for session management.
+
+Roles: Verify user roles (admin, agent, client) by querying the profiles table.
+
+Middleware: Maintain middleware.ts to protect private route groups. Redirect users based on their role and authentication status.
+
+Data Fetching Pattern
+
+Use lib/supabase/server.ts for Server Component queries.
+
+Use lib/supabase/client.ts for Client Component interactivity.
+
+Security: Never bypass Row Level Security (RLS). Every database table must have RLS enabled.
+
+Agent Specifics
+
+Implementation must check for verified: true and onboarding_paid: true (the ₦5,000 fee from PRD) before allowing agents to submit listings.

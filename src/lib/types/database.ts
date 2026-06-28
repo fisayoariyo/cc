@@ -1,0 +1,247 @@
+/** Mirrors the live public schema export; travel stages are stored as text keys. */
+
+export type UserRole = 'admin' | 'agent' | 'client';
+export type ClientServiceType = 'travel' | 'real_estate' | 'construction';
+export type SuccessStoryServiceType = ClientServiceType;
+
+export type PropertyStatus =
+  | 'draft'
+  | 'pending'
+  | 'edits_requested'
+  | 'active'
+  | 'rejected'
+  | 'sold'
+  | 'archived';
+
+export type PropertyCategory = 'Buy' | 'Rent' | 'Short-let';
+
+export type TravelStageKey = string;
+
+export type InquiryStatus = 'new' | 'actioned' | 'archived';
+
+export type AgentOnboardingStep = 'location' | 'documents' | 'details' | 'submitted';
+
+export type ProfileRow = {
+  id: string;
+  full_name: string | null;
+  email: string | null;
+  role: UserRole;
+  status: string | null;
+  onboarding_paid: boolean | null;
+  phone_number: string | null;
+  passport_number: string | null;
+  gender: string | null;
+  agent_state: string | null;
+  agent_lga: string | null;
+  agent_address: string | null;
+  nin: string | null;
+  photo_url: string | null;
+  next_of_kin_name: string | null;
+  next_of_kin_phone: string | null;
+  next_of_kin_relationship: string | null;
+  onboarding_step: AgentOnboardingStep | null;
+  created_at: string;
+  updated_at: string;
+};
+
+export type PropertyRow = {
+  id: string;
+  title: string;
+  description: string | null;
+  price: number;
+  location: string;
+  category: PropertyCategory | null;
+  property_type: string | null;
+  images: string[] | null;
+  amenities: string[] | null;
+  status: PropertyStatus;
+  admin_notes: string | null;
+  reviewed_at: string | null;
+  reviewed_by: string | null;
+  is_featured: boolean | null;
+  agent_id: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+export type ClientServiceRow = {
+  id: string;
+  user_id: string;
+  service: ClientServiceType;
+  created_at: string;
+};
+
+export type SavedSearchRow = {
+  id: string;
+  user_id: string;
+  service: ClientServiceType;
+  title: string;
+  query: Record<string, unknown>;
+  created_at: string;
+};
+
+export type FavoritePropertyRow = {
+  id: string;
+  user_id: string;
+  property_id: string;
+  created_at: string;
+};
+
+export type ComparePropertyRow = {
+  id: string;
+  user_id: string;
+  property_id: string;
+  created_at: string;
+};
+
+export type TravelApplicationRow = {
+  id: string;
+  client_id: string | null;
+  service_type: string | null;
+  destination: string | null;
+  current_stage: TravelStageKey;
+  notes: string | null;
+  deletion_request_status: 'pending' | 'rejected' | null;
+  deletion_requested_at: string | null;
+  deletion_requested_by: string | null;
+  deletion_reviewed_at: string | null;
+  deletion_reviewed_by: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+export type InquiryRow = {
+  id: string;
+  full_name: string;
+  email: string;
+  phone: string | null;
+  inquiry_type: string;
+  message: string;
+  channel: string;
+  status: InquiryStatus;
+  created_at: string;
+  updated_at: string;
+};
+
+export type AgentSupportTicketRow = {
+  id: string;
+  ticket_code: string;
+  agent_id: string;
+  issue_type: string;
+  listing_reference: string | null;
+  description: string;
+  status: 'pending' | 'resolved';
+  resolved_at: string | null;
+  resolved_by: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+export type AgentSupportTicketWithAgent = AgentSupportTicketRow & {
+  agent: Pick<ProfileRow, 'id' | 'full_name' | 'email' | 'phone_number' | 'photo_url' | 'agent_state'>;
+};
+
+export type ApplicationDocumentRow = {
+  id: string;
+  application_id: string;
+  client_id: string;
+  file_path: string;
+  document_type: string | null;
+  status: string;
+  admin_note: string | null;
+  reviewed_at: string | null;
+  reviewed_by: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+export type ApplicationStageHistoryRow = {
+  id: string;
+  application_id: string;
+  stage_key: string;
+  stage_label: string;
+  note_to_client: string | null;
+  changed_by: string | null;
+  changed_at: string;
+};
+
+export type ConstructionProjectRow = {
+  id: string;
+  client_id: string;
+  title: string;
+  project_type: string;
+  location: string;
+  budget_range: string | null;
+  timeline: string | null;
+  description: string | null;
+  current_stage: string;
+  status: string;
+  created_by: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+export type ConstructionStageHistoryRow = {
+  id: string;
+  project_id: string;
+  stage_key: string;
+  stage_label: string;
+  note_to_client: string | null;
+  changed_by: string | null;
+  changed_at: string;
+};
+
+export type NotificationRow = {
+  id: string;
+  user_id: string;
+  title: string;
+  body: string;
+  type: string;
+  link_url: string | null;
+  metadata: Record<string, unknown>;
+  is_read: boolean;
+  created_at: string;
+};
+
+export type SuccessStoryRow = {
+  id: string;
+  slug: string;
+  title: string;
+  summary: string;
+  story_body: string;
+  service: SuccessStoryServiceType;
+  client_label: string | null;
+  location: string | null;
+  outcome: string | null;
+  cover_image_url: string;
+  cover_image_alt: string | null;
+  highlight_video_url: string | null;
+  highlight_video_poster_url: string | null;
+  gallery_image_urls: string[];
+  gallery_video_urls: string[];
+  published: boolean;
+  featured: boolean;
+  sort_order: number;
+  seo_title: string | null;
+  seo_description: string | null;
+  created_by: string | null;
+  updated_by: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+export type CaseMessageVisibility = 'client' | 'internal';
+
+export type CaseMessageRow = {
+  id: string;
+  inquiry_id: string | null;
+  travel_application_id: string | null;
+  construction_project_id: string | null;
+  sender_id: string | null;
+  sender_name: string | null;
+  sender_email: string | null;
+  body: string;
+  visibility: CaseMessageVisibility;
+  mentioned_user_ids: string[];
+  created_at: string;
+};

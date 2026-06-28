@@ -1,0 +1,43 @@
+@font-face {
+  font-family: 'Creato Display';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src:
+    local('Creato Display'),
+    local('CreatoDisplay-Regular'),
+    url('/fonts/CreatoDisplay-Regular.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'Creato Display';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src:
+    local('Creato Display Medium'),
+    local('CreatoDisplay-Medium'),
+    url('/fonts/CreatoDisplay-Medium.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'Creato Display';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src:
+    local('Creato Display Medium'),
+    local('CreatoDisplay-Medium'),
+    url('/fonts/CreatoDisplay-Medium.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'Creato Display';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src:
+    local('Creato Display Bold'),
+    local('CreatoDisplay-Bold'),
+    url('/fonts/CreatoDisplay-Bold.woff') format('woff');
+}

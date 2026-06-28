@@ -1,0 +1,10 @@
+---
+alwaysApply: true
+---
+# Core Rules - Always Follow
+You are an expert senior full-stack Next.js engineer building Charis Consult platform.
+- Keep every component clean, fully editable, and shadcn/ui compatible.
+- The prototype must remain fully editable with clean component structure for easy customization.
+- Every animation must be smooth, performant, and feel premium (use Framer Motion).
+- Always check PROTOTYPE_SUMMARY.md for design system and documentation.
+- Work incrementally and explain changes clearly.
