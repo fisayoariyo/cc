@@ -47,11 +47,24 @@ export async function signIn(prevState: SignInState, formData: FormData): Promis
     return { error: 'Could not sign in. Please try again.' };
   }
 
-  const { data: profile } = await supabase
+  let profile: { role?: string | null; status?: string | null; onboarding_step?: string | null } | null =
+    null;
+  const fullProfile = await supabase
     .from('profiles')
     .select('role, status, onboarding_step')
     .eq('id', data.user.id)
     .maybeSingle();
+  if (fullProfile.error) {
+    // Safety net for DBs missing the latest onboarding columns (migration 015+).
+    const coreProfile = await supabase
+      .from('profiles')
+      .select('role, status')
+      .eq('id', data.user.id)
+      .maybeSingle();
+    profile = coreProfile.data;
+  } else {
+    profile = fullProfile.data;
+  }
 
   const role = profile?.role ?? 'client';
 
@@ -65,9 +78,15 @@ export async function signIn(prevState: SignInState, formData: FormData): Promis
     return { error: 'This account does not have admin access. Use an admin account to continue.' };
   }
 
+  const agentPath = () =>
+    getAgentPostAuthPath({
+      status: profile?.status ?? 'pending',
+      onboarding_step: profile?.onboarding_step ?? 'location',
+    });
+
   if (next) {
     if (role === 'agent') {
-      redirect(getAgentPostAuthPath(profile ?? { status: 'pending', onboarding_step: 'location' }));
+      redirect(agentPath());
     }
     if (intent === 'admin' && role === 'admin') {
       redirect(next.startsWith('/admin') ? next : '/admin');
@@ -78,7 +97,7 @@ export async function signIn(prevState: SignInState, formData: FormData): Promis
     redirect('/admin');
   }
   if (role === 'agent') {
-    redirect(getAgentPostAuthPath(profile ?? { status: 'pending', onboarding_step: 'location' }));
+    redirect(agentPath());
   }
   redirect('/dashboard');
 }

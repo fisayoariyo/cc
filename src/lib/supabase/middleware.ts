@@ -88,13 +88,45 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  const { data: profile, error: profileError } = await supabase
+  type ProfileRow = {
+    full_name?: string | null;
+    role?: string | null;
+    status?: string | null;
+    onboarding_paid?: boolean | null;
+    onboarding_step?: string | null;
+    photo_url?: string | null;
+    phone_number?: string | null;
+    agent_state?: string | null;
+    agent_lga?: string | null;
+  };
+
+  let profile: ProfileRow | null = null;
+  let profileError: { message: string } | null = null;
+
+  const fullProfile = await supabase
     .from('profiles')
     .select(
       'full_name, role, status, onboarding_paid, onboarding_step, photo_url, phone_number, agent_state, agent_lga',
     )
     .eq('id', user.id)
     .maybeSingle();
+
+  if (fullProfile.error) {
+    // Safety net: if the production DB hasn't run the latest profile migrations
+    // (e.g. the onboarding columns from 015+), fall back to the core columns so
+    // auth still works and role checks are still enforced instead of locking the
+    // user out. Apply the pending migrations to restore full behavior.
+    const coreProfile = await supabase
+      .from('profiles')
+      .select('full_name, role, status')
+      .eq('id', user.id)
+      .maybeSingle();
+    profile = coreProfile.data;
+    profileError = coreProfile.error;
+  } else {
+    profile = fullProfile.data;
+  }
+
   if (profileError) {
     const url = request.nextUrl.clone();
     url.pathname = '/login';
