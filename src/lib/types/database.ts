@@ -46,6 +46,7 @@ export type ProfileRow = {
 
 export type PropertyRow = {
   id: string;
+  slug: string;
   title: string;
   description: string | null;
   price: number;

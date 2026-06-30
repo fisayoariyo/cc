@@ -1,0 +1,99 @@
+---
+alwaysApply: true
+---
+# Charis Engineering Standard (Google × Cursor baseline)
+
+## Stack (fixed)
+
+| Layer | Choice | Why |
+|-------|--------|-----|
+| Framework | Next.js 15 App Router | RSC-first, Vercel-native, file-based routing |
+| Language | TypeScript strict | Catch bugs at compile time |
+| Database | Supabase PostgreSQL | RLS as last line of defense |
+| Auth | Supabase Auth SSR | Cookie sessions via `@supabase/ssr` |
+| UI | shadcn/ui + Tailwind | Editable, accessible components |
+| Motion | Framer Motion / GSAP | Premium scroll narratives only where PRD requires |
+| Deploy | Vercel | Edge middleware, ISR, preview deploys |
+
+No payment gateway until product requires it. Agent onboarding fee = **bank transfer + admin confirmation** (manual reconciliation).
+
+## Architecture layers
+
+```
+Browser → middleware.ts (session refresh + route gate)
+       → Server Component (read, no secrets)
+       → Server Action / Route Handler (mutations, validated)
+       → Supabase (RLS-enforced)
+```
+
+**Rules:**
+1. **Server Components by default.** Add `'use client'` only for interactivity.
+2. **Never trust client input.** Validate in Server Actions; RLS is backup, not primary.
+3. **Never trust request headers for auth.** `getViewerContext()` must call `supabase.auth.getUser()` and load `role` from DB.
+4. **Fail closed.** Missing env on protected routes → redirect, not open access.
+5. **Defense in depth.** Middleware gate + layout guard + action role check + RLS.
+
+## Auth & route flows
+
+| Role | Login | Post-auth | Protected prefix |
+|------|-------|-----------|------------------|
+| Client | `/login` | `/dashboard` → service picker | `/dashboard`, `/travel/dashboard`, `/real-estate/dashboard`, `/real-estate/construction/dashboard` |
+| Agent | `/login?role=agent` | Onboarding → under-review → verified | `/agent` |
+| Admin | `/admin/login` | `/admin` | `/admin` |
+
+**Agent onboarding flow:** register → email verify → location/details/identity → submitted → admin verifies → bank transfer → WhatsApp receipt → admin confirms payment → listings unlocked.
+
+**Client travel flow:** register (service=travel) → dashboard → create application → upload docs → stage updates via admin.
+
+## Data access patterns
+
+- Public reads: cookie-less anon client + `unstable_cache` + revalidation tags.
+- Authenticated reads: `createClient()` server client.
+- Admin/public writes bypassing RLS: `createAdminClient()` service role only in trusted server actions.
+- Use `.maybeSingle()` + explicit `{ error }` checks — never `.single()`.
+- Secondary writes (notifications, audit rows) must log failures; primary write failure must surface to user.
+
+## Server Actions contract
+
+Every mutation action:
+1. `getViewerContext()` → reject if null or wrong role.
+2. Validate + normalize FormData fields.
+3. Primary DB write → return `{ error }` on failure.
+4. Secondary writes → log errors, don't claim success if primary failed.
+5. `revalidatePath` / `revalidateTag` for affected routes.
+
+## Error handling
+
+- Segment `error.tsx` for page errors (inset in dashboards).
+- Layout errors bubble to parent — layouts should not throw; use redirects for auth.
+- `global-error.tsx` for root layout crashes only.
+- `(site)/not-found.tsx` should include site chrome when added.
+
+## Environment variables
+
+Required:
+- `NEXT_PUBLIC_SUPABASE_URL`
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+
+Server-only (when needed):
+- `SUPABASE_SERVICE_ROLE_KEY` — contact form, admin batch ops
+- `NEXT_PUBLIC_APP_URL` — absolute URLs in emails/links
+
+Optional / not used:
+- ~~Paystack~~ — removed; use manual payment confirmation
+
+## Code review checklist (Cursor / PR)
+
+- [ ] Auth checked at middleware + layout + action?
+- [ ] No mock data in production paths?
+- [ ] All Supabase writes check `error`?
+- [ ] No `'use client'` on data-fetching pages?
+- [ ] RLS policy exists for new tables?
+- [ ] No secrets in client bundle?
+
+## File conventions
+
+- kebab-case files/directories; PascalCase React components.
+- Colocate `actions.ts` with the route segment they serve.
+- Shared logic in `src/lib/`; types in `src/lib/types/`.
+- Mappers in `src/lib/mappers/` bridge DB rows → UI types.

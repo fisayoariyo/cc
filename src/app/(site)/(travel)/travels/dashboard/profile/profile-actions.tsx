@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { CircleHelp, LogOut, ShieldCheck } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
+import { invalidateAgentListingsCache } from '@/components/agent/agent-listings-provider';
 
 export function TravelProfileActions() {
   const router = useRouter();
@@ -13,6 +14,7 @@ export function TravelProfileActions() {
     if (!shouldLogout) return;
 
     const supabase = createClient();
+    invalidateAgentListingsCache();
     await supabase.auth.signOut();
     router.push('/');
     router.refresh();

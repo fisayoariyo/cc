@@ -23,7 +23,7 @@ import type {
 const PROFILE_COLUMNS =
   'id, full_name, email, role, status, onboarding_paid, phone_number, passport_number, gender, agent_state, agent_lga, agent_address, nin, photo_url, next_of_kin_name, next_of_kin_phone, next_of_kin_relationship, onboarding_step, created_at, updated_at';
 const PROPERTY_COLUMNS =
-  'id, title, description, price, location, category, property_type, images, amenities, status, admin_notes, reviewed_at, reviewed_by, is_featured, agent_id, created_at, updated_at';
+  'id, slug, title, description, price, location, category, property_type, images, amenities, status, admin_notes, reviewed_at, reviewed_by, is_featured, agent_id, created_at, updated_at';
 const TRAVEL_APPLICATION_COLUMNS =
   'id, client_id, service_type, destination, current_stage, notes, deletion_request_status, deletion_requested_at, deletion_requested_by, deletion_reviewed_at, deletion_reviewed_by, created_at, updated_at';
 const INQUIRY_COLUMNS =
@@ -148,6 +148,30 @@ const getCachedActivePropertyById = unstable_cache(
 
 export async function getActivePropertyById(id: string): Promise<PropertyRow | null> {
   return getCachedActivePropertyById(id);
+}
+
+const getCachedActivePropertyBySlug = unstable_cache(
+  async (slug: string): Promise<PropertyRow | null> => {
+    const supabase = createPublicReadonlyClient();
+    if (!supabase) return null;
+    const { data, error } = await supabase
+      .from('properties')
+      .select(PROPERTY_COLUMNS)
+      .eq('slug', slug)
+      .eq('status', 'active')
+      .maybeSingle();
+    if (error) {
+      console.error('getActivePropertyBySlug', error.message);
+      return null;
+    }
+    return data as PropertyRow | null;
+  },
+  ['active-property-slug'],
+  { revalidate: 120, tags: ['active-properties'] },
+);
+
+export async function getActivePropertyBySlug(slug: string): Promise<PropertyRow | null> {
+  return getCachedActivePropertyBySlug(slug);
 }
 
 export async function getAllPropertiesForAdmin(): Promise<PropertyRow[]> {

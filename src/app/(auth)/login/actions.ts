@@ -61,12 +61,20 @@ export async function signIn(prevState: SignInState, formData: FormData): Promis
       .select('role, status')
       .eq('id', data.user.id)
       .maybeSingle();
+    if (coreProfile.error || !coreProfile.data?.role) {
+      await supabase.auth.signOut();
+      return { error: 'Your account profile is incomplete. Contact support.' };
+    }
     profile = coreProfile.data;
   } else {
+    if (!fullProfile.data?.role) {
+      await supabase.auth.signOut();
+      return { error: 'Your account profile is incomplete. Contact support.' };
+    }
     profile = fullProfile.data;
   }
 
-  const role = profile?.role ?? 'client';
+  const role = profile.role;
 
   if (role === 'admin' && intent !== 'admin') {
     await supabase.auth.signOut();
@@ -86,6 +94,9 @@ export async function signIn(prevState: SignInState, formData: FormData): Promis
 
   if (next) {
     if (role === 'agent') {
+      if (next.startsWith('/agent') && profile.status === 'verified') {
+        redirect(next);
+      }
       redirect(agentPath());
     }
     if (intent === 'admin' && role === 'admin') {

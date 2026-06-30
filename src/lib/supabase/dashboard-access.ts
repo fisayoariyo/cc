@@ -13,51 +13,81 @@ import type { AgentViewer } from '@/lib/agent-viewer-types';
 
 export type ViewerContext = AgentViewer;
 
-export const getViewerContext = cache(async (): Promise<ViewerContext | null> => {
-  const requestHeaders = await headers();
-  const headerUserId = requestHeaders.get(VIEWER_HEADER_NAMES.userId);
-
-  if (headerUserId) {
-    return {
-      userId: headerUserId,
-      email: decodeViewerHeaderValue(requestHeaders.get(VIEWER_HEADER_NAMES.email)),
-      fullName: decodeViewerHeaderValue(requestHeaders.get(VIEWER_HEADER_NAMES.fullName)),
-      role: decodeViewerHeaderValue(requestHeaders.get(VIEWER_HEADER_NAMES.role)),
-      status: decodeViewerHeaderValue(requestHeaders.get(VIEWER_HEADER_NAMES.status)),
-      onboardingPaid: requestHeaders.get(VIEWER_HEADER_NAMES.onboardingPaid) === '1',
-      photoUrl: decodeViewerHeaderValue(requestHeaders.get(VIEWER_HEADER_NAMES.photoUrl)),
-      phone: decodeViewerHeaderValue(requestHeaders.get(VIEWER_HEADER_NAMES.phone)),
-      agentState: decodeViewerHeaderValue(requestHeaders.get(VIEWER_HEADER_NAMES.agentState)),
-      agentLga: decodeViewerHeaderValue(requestHeaders.get(VIEWER_HEADER_NAMES.agentLga)),
-    };
-  }
-
+async function loadProfileFromDb(userId: string) {
   const supabase = await createClient();
   if (!supabase) return null;
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
 
-  if (!user) return null;
-
-  const { data: profile } = await supabase
+  const { data: profile, error } = await supabase
     .from('profiles')
     .select('full_name, role, status, onboarding_paid, photo_url, phone_number, agent_state, agent_lga')
-    .eq('id', user.id)
+    .eq('id', userId)
     .maybeSingle();
 
+  if (error || !profile?.role) {
+    return null;
+  }
+
+  return profile;
+}
+
+function viewerFromProfile(
+  user: { id: string; email?: string | null },
+  profile: NonNullable<Awaited<ReturnType<typeof loadProfileFromDb>>>,
+): ViewerContext {
   return {
     userId: user.id,
     email: user.email ?? null,
-    fullName: profile?.full_name ?? null,
-    role: profile?.role ?? null,
-    status: profile?.status ?? null,
-    onboardingPaid: Boolean(profile?.onboarding_paid),
-    photoUrl: profile?.status === 'verified' ? profile?.photo_url ?? null : null,
-    phone: profile?.phone_number ?? null,
-    agentState: profile?.agent_state ?? null,
-    agentLga: profile?.agent_lga ?? null,
+    fullName: profile.full_name ?? null,
+    role: profile.role ?? null,
+    status: profile.status ?? null,
+    onboardingPaid: Boolean(profile.onboarding_paid),
+    photoUrl: profile.status === 'verified' ? profile.photo_url ?? null : null,
+    phone: profile.phone_number ?? null,
+    agentState: profile.agent_state ?? null,
+    agentLga: profile.agent_lga ?? null,
   };
+}
+
+export const getViewerContext = cache(async (): Promise<ViewerContext | null> => {
+  const supabase = await createClient();
+  if (!supabase) return null;
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return null;
+
+  const requestHeaders = await headers();
+  const headerUserId = requestHeaders.get(VIEWER_HEADER_NAMES.userId);
+
+  // Reject spoofed viewer headers on API routes and any request where headers
+  // do not match the verified session user.
+  if (headerUserId && headerUserId !== user.id) {
+    return null;
+  }
+
+  const profile = await loadProfileFromDb(user.id);
+  if (!profile) return null;
+
+  // Middleware-populated headers are a display optimization only after session
+  // verification; role and status always come from the database.
+  if (headerUserId === user.id) {
+    return {
+      ...viewerFromProfile(user, profile),
+      fullName: decodeViewerHeaderValue(requestHeaders.get(VIEWER_HEADER_NAMES.fullName)) ?? profile.full_name ?? null,
+      photoUrl:
+        profile.status === 'verified'
+          ? decodeViewerHeaderValue(requestHeaders.get(VIEWER_HEADER_NAMES.photoUrl)) ??
+            profile.photo_url ??
+            null
+          : null,
+      phone: decodeViewerHeaderValue(requestHeaders.get(VIEWER_HEADER_NAMES.phone)) ?? profile.phone_number ?? null,
+      agentState: decodeViewerHeaderValue(requestHeaders.get(VIEWER_HEADER_NAMES.agentState)) ?? profile.agent_state ?? null,
+      agentLga: decodeViewerHeaderValue(requestHeaders.get(VIEWER_HEADER_NAMES.agentLga)) ?? profile.agent_lga ?? null,
+    };
+  }
+
+  return viewerFromProfile(user, profile);
 });
 
 export const hasClientService = cache(async (userId: string, service: 'travel' | 'real_estate' | 'construction') => {

@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { MoreHorizontal } from 'lucide-react';
 import { ProfileAvatar } from '@/components/dashboard/profile-avatar';
 import { createClient } from '@/lib/supabase/client';
+import { invalidateAgentListingsCache } from '@/components/agent/agent-listings-provider';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -37,6 +38,7 @@ export function DashboardSidebarAccountMenu({
     setPending(true);
     try {
       const supabase = createClient();
+      invalidateAgentListingsCache();
       await supabase.auth.signOut();
     } finally {
       setPending(false);

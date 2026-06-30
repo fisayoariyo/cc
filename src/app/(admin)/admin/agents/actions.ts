@@ -74,7 +74,7 @@ export async function confirmAgentOnboardingPayment(profileId: string) {
 
   if (profileError) return { error: profileError.message };
 
-  await supabase.from('agent_onboarding_payments').insert({
+  const { error: paymentError } = await supabase.from('agent_onboarding_payments').insert({
     user_id: profileId,
     provider: 'admin',
     reference: `admin_confirm_${profileId.replace(/-/g, '')}_${Date.now()}`,
@@ -82,6 +82,9 @@ export async function confirmAgentOnboardingPayment(profileId: string) {
     status: 'success',
     raw_payload: { confirmed_by: viewer.userId },
   });
+  if (paymentError) {
+    console.error('confirmAgentOnboardingPayment', paymentError.message);
+  }
 
   const { notifyAgentListingUnlocked } = await import('@/lib/supabase/notifications');
   await notifyAgentListingUnlocked(profileId);

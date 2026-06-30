@@ -44,13 +44,20 @@ export async function submitInquiry(
     return { error: insertError.message };
   }
 
-  await supabase.from('case_messages').insert({
-    inquiry_id: inquiryRow?.id,
+  if (!inquiryRow?.id) {
+    return { error: 'Could not create inquiry. Please try again.' };
+  }
+
+  const { error: messageError } = await supabase.from('case_messages').insert({
+    inquiry_id: inquiryRow.id,
     sender_name: full_name,
     sender_email: email,
     body: message,
     visibility: 'client',
   });
+  if (messageError) {
+    console.error('submitInquiry case_messages', messageError.message);
+  }
 
   await createNotificationsForAdmins(
     {

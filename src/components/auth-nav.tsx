@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { motion } from 'motion/react';
 import { Building2, ChevronDown, Plane, UserRound } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
+import { invalidateAgentListingsCache } from '@/components/agent/agent-listings-provider';
 import type { SupabaseClient } from '@supabase/supabase-js';
 
 type ProfileRole = 'admin' | 'agent' | 'client';
@@ -137,6 +138,7 @@ export function AuthNav({
 
   const signOut = async () => {
     if (!supabase) return;
+    invalidateAgentListingsCache();
     await supabase.auth.signOut();
     router.refresh();
     setUserId(null);
@@ -289,6 +291,7 @@ export function AuthNavMobile({
 
   const signOut = async () => {
     if (!supabase) return;
+    invalidateAgentListingsCache();
     await supabase.auth.signOut();
     onNavigate();
     router.refresh();

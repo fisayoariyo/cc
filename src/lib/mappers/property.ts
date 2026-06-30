@@ -17,7 +17,7 @@ export function propertyRowToRecord(row: PropertyRow): PropertyRecord {
       .replace(/\s+/g, '-') ?? 'other';
   return {
     id: row.id,
-    slug: row.id,
+    slug: row.slug,
     image,
     images: imgs.length ? imgs : [image],
     title: row.title,
@@ -27,7 +27,10 @@ export function propertyRowToRecord(row: PropertyRow): PropertyRecord {
     baths: 0,
     sqm: 0,
     type: row.category ?? 'Buy',
-    propertyType: 'residential',
+    propertyType:
+      row.property_type === 'commercial' || row.property_type === 'residential'
+        ? row.property_type
+        : 'residential',
     city,
     description: row.description ?? '',
     status: row.status === 'active' ? 'published' : 'draft',

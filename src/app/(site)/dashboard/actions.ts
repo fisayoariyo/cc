@@ -112,37 +112,42 @@ export async function createTravelApplication(
     return { error: error.message };
   }
 
+  if (!data?.id) {
+    return { error: 'Could not create application. Please try again.' };
+  }
+
   const stage = firstStageForService(service_type);
-  await supabase.from('application_stage_history').insert({
-    application_id: data?.id,
+  const { error: historyError } = await supabase.from('application_stage_history').insert({
+    application_id: data.id,
     stage_key: stage,
     stage_label: getStageLabel(service_type, stage),
     changed_by: null,
   });
-
-  if (data?.id) {
-    await createNotification({
-      userId: viewer.userId,
-      title: 'Travel application started',
-      body: `Your ${service_type} application has started. Upload your documents to continue.`,
-      type: 'travel',
-      linkUrl: '/travel/dashboard/applications',
-      metadata: { application_id: data.id, service_type },
-    });
-
-    await createNotificationsForAdmins({
-      title: 'New travel application',
-      body: `${viewer.fullName || viewer.email || 'A client'} started a ${service_type} application for ${destination}.`,
-      type: 'travel_admin',
-      linkUrl: '/admin/travel-applications',
-      metadata: { application_id: data.id, client_id: viewer.userId, service_type },
-    });
+  if (historyError) {
+    console.error('createTravelApplication stage_history', historyError.message);
   }
+
+  await createNotification({
+    userId: viewer.userId,
+    title: 'Travel application started',
+    body: `Your ${service_type} application has started. Upload your documents to continue.`,
+    type: 'travel',
+    linkUrl: '/travel/dashboard/applications',
+    metadata: { application_id: data.id, service_type },
+  });
+
+  await createNotificationsForAdmins({
+    title: 'New travel application',
+    body: `${viewer.fullName || viewer.email || 'A client'} started a ${service_type} application for ${destination}.`,
+    type: 'travel_admin',
+    linkUrl: '/admin/travel-applications',
+    metadata: { application_id: data.id, client_id: viewer.userId, service_type },
+  });
 
   revalidatePath('/travel/dashboard');
   revalidatePath('/travel/dashboard/applications');
   redirect(
-    `/travel/dashboard/applications?created=${encodeURIComponent(data?.id ?? '')}#application-${encodeURIComponent(data?.id ?? '')}`,
+    `/travel/dashboard/applications?created=${encodeURIComponent(data.id)}#application-${encodeURIComponent(data.id)}`,
   );
 }
 
@@ -179,6 +184,15 @@ export async function uploadApplicationDocument(
   const documentType =
     String(formData.get('document_type') ?? '').trim() || inferDocumentTypeFromFileName(file.name);
   if (!documentType) return { error: 'Please enter a document name.' };
+
+  const { data: application, error: applicationError } = await supabase
+    .from('travel_applications')
+    .select('id')
+    .eq('id', applicationId)
+    .eq('client_id', viewer.userId)
+    .maybeSingle();
+  if (applicationError) return { error: applicationError.message };
+  if (!application) return { error: 'Application not found.' };
 
   const ext = file.name.includes('.') ? file.name.split('.').pop() : 'bin';
   const filePath = `${viewer.userId}/${applicationId}/${Date.now()}_${cleanFileName(file.name || `document.${ext}`)}`;

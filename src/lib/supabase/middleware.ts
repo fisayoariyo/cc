@@ -37,7 +37,10 @@ export async function updateSession(request: NextRequest) {
   }
 
   if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
-    return NextResponse.next({ request });
+    const url = request.nextUrl.clone();
+    url.pathname = isAdminRoute ? '/admin/login' : '/login';
+    url.searchParams.set('error', 'Authentication is not configured. Contact support.');
+    return NextResponse.redirect(url);
   }
 
   const requestHeaders = new Headers(request.headers);
@@ -127,11 +130,16 @@ export async function updateSession(request: NextRequest) {
     profile = fullProfile.data;
   }
 
-  if (profileError) {
+  if (profileError || !profile?.role) {
     const url = request.nextUrl.clone();
-    url.pathname = '/login';
+    url.pathname = isAdminRoute ? '/admin/login' : '/login';
     url.searchParams.set('next', request.nextUrl.pathname);
-    url.searchParams.set('error', 'Could not read your profile role. Please sign in again.');
+    url.searchParams.set(
+      'error',
+      profileError
+        ? 'Could not read your profile role. Please sign in again.'
+        : 'Your account profile is incomplete. Contact support.',
+    );
     return NextResponse.redirect(url);
   }
 
