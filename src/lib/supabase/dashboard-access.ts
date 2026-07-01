@@ -17,17 +17,39 @@ async function loadProfileFromDb(userId: string) {
   const supabase = await createClient();
   if (!supabase) return null;
 
-  const { data: profile, error } = await supabase
+  const fullProfile = await supabase
     .from('profiles')
     .select('full_name, role, status, onboarding_paid, photo_url, phone_number, agent_state, agent_lga')
     .eq('id', userId)
     .maybeSingle();
 
-  if (error || !profile?.role) {
+  if (fullProfile.error) {
+    // Mirror middleware fallback when optional onboarding columns are not migrated yet.
+    const coreProfile = await supabase
+      .from('profiles')
+      .select('full_name, role, status')
+      .eq('id', userId)
+      .maybeSingle();
+
+    if (coreProfile.error || !coreProfile.data?.role) {
+      return null;
+    }
+
+    return {
+      ...coreProfile.data,
+      onboarding_paid: null,
+      photo_url: null,
+      phone_number: null,
+      agent_state: null,
+      agent_lga: null,
+    };
+  }
+
+  if (!fullProfile.data?.role) {
     return null;
   }
 
-  return profile;
+  return fullProfile.data;
 }
 
 function viewerFromProfile(
