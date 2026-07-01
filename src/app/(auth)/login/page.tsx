@@ -1,6 +1,7 @@
 import { LoginForm } from './login-form';
+import { LoginPortalPicker } from './login-portal-picker';
 import { redirect } from 'next/navigation';
-import { serviceFromLoginContext } from '@/lib/auth/login-redirect';
+import { serviceFromLoginContext, shouldShowLoginPicker } from '@/lib/auth/login-redirect';
 
 function first(v: string | string[] | undefined): string | undefined {
   if (Array.isArray(v)) return v[0];
@@ -38,6 +39,12 @@ export default async function LoginPage({
   }
 
   const resolvedService = serviceFromLoginContext({ role, service, nextPath });
+
+  if (shouldShowLoginPicker({ role, resolvedService, nextPath })) {
+    return (
+      <LoginPortalPicker nextPath={nextPath} errorFromUrl={err} messageFromUrl={message} />
+    );
+  }
 
   return (
     <LoginForm

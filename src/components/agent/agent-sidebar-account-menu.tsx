@@ -16,7 +16,7 @@ export function AgentSidebarAccountMenu({
       fullName={fullName}
       photoUrl={photoUrl}
       fallbackLabel={fallbackLabel}
-      logoutHref="/login?role=agent"
+      logoutHref="/login"
       logoutDescription="Are you sure you want to log out? You will need to sign in again to access your agent dashboard."
     />
   );

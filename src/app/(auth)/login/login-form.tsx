@@ -5,16 +5,12 @@ import { useActionState } from 'react';
 import Link from 'next/link';
 import { Eye, EyeOff, LockKeyhole, Mail } from 'lucide-react';
 import { signIn, type SignInState } from './actions';
-import {
-  AGENT_AUTH_CONTENT_WIDTH,
-  AgentAuthShell,
-  CLIENT_AUTH_CONTENT_WIDTH,
-  type AuthShellVariant,
-} from '@/components/auth/AgentAuthShell';
+import { AGENT_AUTH_CONTENT_WIDTH, AgentAuthShell, type AuthShellVariant } from '@/components/auth/AgentAuthShell';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { cn } from '@/components/ui/utils';
+import { AgentAuthBackArrow } from '@/components/auth/agent-auth-page-body';
 import { AgentFormFeedback } from '@/components/auth/agent-form-feedback';
 import {
   AGENT_FIELD_BLOCK,
@@ -24,6 +20,7 @@ import {
   AGENT_PRIMARY_BTN,
   AGENT_SECONDARY_BTN,
 } from '@/components/auth/agent-auth-styles';
+import { buildLoginPickerHref } from '@/lib/auth/login-redirect';
 
 const LOGIN_FORM_ID = 'portal-login-form';
 
@@ -51,25 +48,21 @@ export function LoginForm({
   const [showPassword, setShowPassword] = useState(false);
 
   const displayError = state?.error ?? errorFromUrl;
-  const shellVariant: AuthShellVariant = agentMode ? 'agent' : service ?? 'generic';
-  const useBrandedLayout = agentMode || Boolean(service);
+  const shellVariant: AuthShellVariant = agentMode ? 'agent' : service ?? 'travel';
 
   const forgotPasswordHref = agentMode
     ? '/forgot-password?role=agent'
-    : service
-      ? `/forgot-password?role=client&service=${service}`
-      : '/forgot-password';
+    : `/forgot-password?role=client&service=${service ?? 'travel'}`;
   const registerHref = agentMode
     ? '/register?role=agent'
-    : service
-      ? `/register?role=client&service=${service}`
-      : '/register';
+    : `/register?role=client&service=${service ?? 'travel'}`;
 
-  const description = agentMode
-    ? LOGIN_DESCRIPTION.agent
-    : service
-      ? LOGIN_DESCRIPTION[service]
-      : 'Sign in with your email and password to open the right Charis Consult dashboard.';
+  const description = agentMode ? LOGIN_DESCRIPTION.agent : LOGIN_DESCRIPTION[service ?? 'travel'];
+  const pickerHref = buildLoginPickerHref({
+    next: nextPath,
+    error: errorFromUrl,
+    message: messageFromUrl,
+  });
 
   const formFields = (
     <>
@@ -128,19 +121,6 @@ export function LoginForm({
     </>
   );
 
-  const brandedActions = (
-    <>
-      {messageFromUrl ? <AgentFormFeedback variant="success">{messageFromUrl}</AgentFormFeedback> : null}
-      {displayError ? <AgentFormFeedback>{displayError}</AgentFormFeedback> : null}
-      <Button type="submit" form={LOGIN_FORM_ID} className={AGENT_PRIMARY_BTN} disabled={isPending}>
-        {isPending ? 'Signing in...' : 'Continue'}
-      </Button>
-      <Button asChild variant="secondary" className={AGENT_SECONDARY_BTN}>
-        <Link href={registerHref}>I don&apos;t have an account</Link>
-      </Button>
-    </>
-  );
-
   return (
     <AgentAuthShell
       title="Log in to your account"
@@ -152,55 +132,31 @@ export function LoginForm({
           ? 'Return to your onboarding status, update your review progress, and continue into your agent workspace once approved.'
           : undefined
       }
-      contentWidthClass={useBrandedLayout ? AGENT_AUTH_CONTENT_WIDTH : CLIENT_AUTH_CONTENT_WIDTH}
-      agentAuthMobile={useBrandedLayout}
-      footerMode={useBrandedLayout ? 'inline' : undefined}
-      showMobileLogo={!useBrandedLayout}
-      actions={useBrandedLayout ? brandedActions : undefined}
-    >
-      {useBrandedLayout ? (
-        <form id={LOGIN_FORM_ID} action={formAction} className={AGENT_FORM_STACK}>
-          {nextPath ? <input type="hidden" name="next" value={nextPath} /> : null}
-          {formFields}
-        </form>
-      ) : (
-        <div className="space-y-5">
-          {displayError ? (
-            <div
-              className="rounded-[18px] border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive"
-              role="alert"
-            >
-              {displayError}
-            </div>
-          ) : null}
-          {messageFromUrl ? (
-            <div className="rounded-[18px] border border-border bg-muted/50 px-4 py-3 text-sm text-foreground">
-              {messageFromUrl}
-            </div>
-          ) : null}
-
-          <form action={formAction} className="space-y-5">
-            {nextPath ? <input type="hidden" name="next" value={nextPath} /> : null}
-            {formFields}
-
-            <Button
-              type="submit"
-              className="h-12 w-full rounded-full bg-[#3B0063] text-lg font-semibold text-white hover:bg-[#2E004D]"
-              disabled={isPending}
-            >
-              {isPending ? 'Signing in...' : 'Continue'}
-            </Button>
-          </form>
-
-          <Button
-            asChild
-            variant="secondary"
-            className="h-12 w-full rounded-full border border-[#d9c8eb] bg-[#f3ebfa] text-lg font-medium text-[#3B0063] hover:bg-[#ebe0f5]"
-          >
+      leading={<AgentAuthBackArrow href={pickerHref} label="Back to sign-in options" />}
+      contentWidthClass={AGENT_AUTH_CONTENT_WIDTH}
+      agentAuthMobile
+      footerMode="inline"
+      showMobileLogo={false}
+      actions={
+        <>
+          {messageFromUrl ? <AgentFormFeedback variant="success">{messageFromUrl}</AgentFormFeedback> : null}
+          {displayError ? <AgentFormFeedback>{displayError}</AgentFormFeedback> : null}
+          <Button type="submit" form={LOGIN_FORM_ID} className={AGENT_PRIMARY_BTN} disabled={isPending}>
+            {isPending ? 'Signing in...' : 'Continue'}
+          </Button>
+          <Button asChild variant="secondary" className={AGENT_SECONDARY_BTN}>
             <Link href={registerHref}>I don&apos;t have an account</Link>
           </Button>
-        </div>
-      )}
+          <Button asChild variant="secondary" className={AGENT_SECONDARY_BTN}>
+            <Link href="/">Back to home</Link>
+          </Button>
+        </>
+      }
+    >
+      <form id={LOGIN_FORM_ID} action={formAction} className={AGENT_FORM_STACK}>
+        {nextPath ? <input type="hidden" name="next" value={nextPath} /> : null}
+        {formFields}
+      </form>
     </AgentAuthShell>
   );
 }

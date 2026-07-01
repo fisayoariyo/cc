@@ -1,10 +1,9 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { motion } from 'motion/react';
-import { Building2, ChevronDown, Plane, UserRound } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { invalidateAgentListingsCache } from '@/components/agent/agent-listings-provider';
 import type { SupabaseClient } from '@supabase/supabase-js';
@@ -22,27 +21,6 @@ function dashboardHref(role: ProfileRole | null): string {
   return '/dashboard';
 }
 
-const SIGN_IN_OPTIONS = [
-  {
-    href: '/login?role=agent&next=/agent',
-    label: 'Real Estate Agent',
-    description: 'Agent dashboard and onboarding',
-    icon: UserRound,
-  },
-  {
-    href: '/login?role=client&service=travel&next=/travel/dashboard',
-    label: 'Travel Client',
-    description: 'Travel applications and updates',
-    icon: Plane,
-  },
-  {
-    href: '/login?role=client&service=real_estate&next=/real-estate/dashboard',
-    label: 'Real Estate Client',
-    description: 'Saved properties and compare list',
-    icon: Building2,
-  },
-] as const;
-
 export function AuthNav({
   navOnDarkImage,
   initialState,
@@ -58,8 +36,6 @@ export function AuthNav({
   const [userId, setUserId] = useState<string | null>(initialState?.userId ?? null);
   const [role, setRole] = useState<ProfileRole | null>(initialState?.role ?? null);
   const [loading, setLoading] = useState(initialState?.resolved ? false : true);
-  const [signInOpen, setSignInOpen] = useState(false);
-  const signInMenuRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     if (!hasSupabaseConfig) {
@@ -105,36 +81,12 @@ export function AuthNav({
   }, [supabase, load]);
 
   useEffect(() => {
-    SIGN_IN_OPTIONS.forEach((option) => router.prefetch(option.href));
+    router.prefetch('/login');
     router.prefetch('/contact');
     if (userId) {
       router.prefetch(dashboardHref(role));
     }
   }, [router, userId, role]);
-
-  useEffect(() => {
-    if (!signInOpen) return;
-
-    const handlePointerDown = (event: PointerEvent) => {
-      const target = event.target as Node | null;
-      if (signInMenuRef.current && target && !signInMenuRef.current.contains(target)) {
-        setSignInOpen(false);
-      }
-    };
-
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        setSignInOpen(false);
-      }
-    };
-
-    document.addEventListener('pointerdown', handlePointerDown);
-    document.addEventListener('keydown', handleKeyDown);
-    return () => {
-      document.removeEventListener('pointerdown', handlePointerDown);
-      document.removeEventListener('keydown', handleKeyDown);
-    };
-  }, [signInOpen]);
 
   const signOut = async () => {
     if (!supabase) return;
@@ -147,9 +99,6 @@ export function AuthNav({
 
   const muted = navOnDarkImage ? 'text-white/90 hover:text-white' : 'text-muted-foreground hover:text-primary';
   const active = navOnDarkImage ? 'text-white' : 'text-primary';
-  const panelTone = navOnDarkImage
-    ? 'border-white/15 bg-[#0E1D31]/95 text-white shadow-[0_24px_60px_rgba(2,12,27,0.45)]'
-    : 'border-border bg-card text-foreground shadow-xl';
 
   if (!initialState?.resolved && ((hasSupabaseConfig && !supabase) || loading)) {
     return (
@@ -161,44 +110,10 @@ export function AuthNav({
 
   if (!userId) {
     return (
-      <div className="hidden md:flex items-center gap-3 relative">
-        <div ref={signInMenuRef} className="relative">
-          <button
-            type="button"
-            onClick={() => setSignInOpen((value) => !value)}
-            className={`inline-flex items-center gap-2 text-sm font-medium ${muted}`}
-            aria-expanded={signInOpen}
-            aria-haspopup="menu"
-          >
-            Sign in
-            <ChevronDown className={`h-4 w-4 transition-transform ${signInOpen ? 'rotate-180' : ''}`} />
-          </button>
-          {signInOpen ? (
-            <div
-              className={`absolute right-0 top-[calc(100%+12px)] w-[280px] rounded-2xl border p-2 ${panelTone}`}
-              role="menu"
-            >
-              <div className="space-y-1">
-                {SIGN_IN_OPTIONS.map((option) => (
-                  <Link
-                    key={option.href}
-                    href={option.href}
-                    onClick={() => setSignInOpen(false)}
-                    className="flex items-start gap-3 rounded-xl px-3 py-3 transition hover:bg-white/10"
-                  >
-                    <option.icon className="mt-0.5 h-4 w-4 shrink-0" />
-                    <span className="space-y-0.5">
-                      <span className="block text-sm font-medium">{option.label}</span>
-                      <span className={`block text-xs ${navOnDarkImage ? 'text-white/70' : 'text-muted-foreground'}`}>
-                        {option.description}
-                      </span>
-                    </span>
-                  </Link>
-                ))}
-              </div>
-            </div>
-          ) : null}
-        </div>
+      <div className="hidden md:flex items-center gap-3">
+        <Link href="/login" className={`text-sm font-medium ${muted}`}>
+          Sign in
+        </Link>
         <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
           <Link
             href="/contact"
@@ -238,7 +153,6 @@ export function AuthNavMobile({
   const [userId, setUserId] = useState<string | null>(initialState?.userId ?? null);
   const [role, setRole] = useState<ProfileRole | null>(initialState?.role ?? null);
   const [ready, setReady] = useState(initialState?.resolved ? true : false);
-  const [signInOpen, setSignInOpen] = useState(false);
 
   useEffect(() => {
     if (!hasSupabaseConfig) {
@@ -282,7 +196,7 @@ export function AuthNavMobile({
   }, [supabase, load]);
 
   useEffect(() => {
-    SIGN_IN_OPTIONS.forEach((option) => router.prefetch(option.href));
+    router.prefetch('/login');
     router.prefetch('/contact');
     if (userId) {
       router.prefetch(dashboardHref(role));
@@ -306,35 +220,13 @@ export function AuthNavMobile({
   if (!userId) {
     return (
       <>
-        <div className="space-y-3">
-          <button
-            type="button"
-            onClick={() => setSignInOpen((value) => !value)}
-            className={`flex w-full items-center justify-between text-left text-base font-medium ${link}`}
-            aria-expanded={signInOpen}
-          >
-            <span>Sign in</span>
-            <ChevronDown className={`h-4 w-4 transition-transform ${signInOpen ? 'rotate-180' : ''}`} />
-          </button>
-          {signInOpen ? (
-            <div className="space-y-2 rounded-2xl border border-border bg-muted/50 p-3">
-              {SIGN_IN_OPTIONS.map((option) => (
-                <Link
-                  key={option.href}
-                  href={option.href}
-                  onClick={onNavigate}
-                  className="flex items-start gap-3 rounded-xl bg-card px-3 py-3"
-                >
-                  <option.icon className="mt-0.5 h-4 w-4 shrink-0 text-foreground" />
-                  <span className="space-y-0.5">
-                    <span className="block text-sm font-medium text-foreground">{option.label}</span>
-                    <span className="block text-xs text-muted-foreground">{option.description}</span>
-                  </span>
-                </Link>
-              ))}
-            </div>
-          ) : null}
-        </div>
+        <Link
+          href="/login"
+          className={`block text-base font-medium ${link}`}
+          onClick={onNavigate}
+        >
+          Sign in
+        </Link>
         <Link
           href="/contact"
           className="block w-full text-center px-6 py-2.5 bg-primary text-primary-foreground text-sm font-medium rounded-full"

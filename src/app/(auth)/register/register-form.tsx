@@ -291,6 +291,9 @@ export function RegisterForm({
             <Button asChild variant="secondary" className={AGENT_SECONDARY_BTN}>
               <Link href={loginHref}>I already have an account</Link>
             </Button>
+            <Button asChild variant="secondary" className={AGENT_SECONDARY_BTN}>
+              <Link href="/">Back to home</Link>
+            </Button>
           </>
         ) : undefined
       }
@@ -462,7 +465,7 @@ export function RegisterForm({
             <Button asChild variant="secondary" className={AGENT_SECONDARY_BTN}>
               <Link href={loginHref}>I already have an account</Link>
             </Button>
-            <Button asChild variant="ghost" className="h-12 w-full rounded-full text-base text-slate-600">
+            <Button asChild variant="secondary" className={AGENT_SECONDARY_BTN}>
               <Link href="/">Back to home</Link>
             </Button>
           </div>
