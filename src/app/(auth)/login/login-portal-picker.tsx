@@ -5,8 +5,6 @@ import { ArrowRight, Building2, Hammer, Plane, UserRound } from 'lucide-react';
 import { AgentAuthBackArrow } from '@/components/auth/agent-auth-page-body';
 import { AgentFormFeedback } from '@/components/auth/agent-form-feedback';
 import { AGENT_AUTH_CONTENT_WIDTH, AgentAuthShell } from '@/components/auth/AgentAuthShell';
-import { Button } from '@/components/ui/button';
-import { AGENT_SECONDARY_BTN } from '@/components/auth/agent-auth-styles';
 import { buildPortalLoginHref } from '@/lib/auth/login-redirect';
 
 const PORTALS = [
@@ -64,11 +62,6 @@ export function LoginPortalPicker({
       footerMode="inline"
       showMobileLogo={false}
       leading={<AgentAuthBackArrow href="/" label="Back to home" />}
-      actions={
-        <Button asChild variant="secondary" className={AGENT_SECONDARY_BTN}>
-          <Link href="/">Back to home</Link>
-        </Button>
-      }
     >
       <div className="space-y-3">
         {errorFromUrl ? <AgentFormFeedback>{errorFromUrl}</AgentFormFeedback> : null}

@@ -42,13 +42,8 @@ export function buildLoginRedirectPath(nextPath: string, error?: string) {
   return `${url.pathname}?${url.searchParams.toString()}`;
 }
 
-export function buildLoginPickerHref(preserve?: {
-  next?: string;
-  error?: string;
-  message?: string;
-}) {
+export function buildLoginPickerHref(preserve?: { error?: string; message?: string }) {
   const params = new URLSearchParams();
-  if (preserve?.next) params.set('next', preserve.next);
   if (preserve?.error) params.set('error', preserve.error);
   if (preserve?.message) params.set('message', preserve.message);
   const qs = params.toString();
@@ -70,21 +65,17 @@ export function buildPortalLoginHref(input: {
   return `/login?${params.toString()}`;
 }
 
-export function shouldShowLoginPicker(input: {
-  role?: string;
-  resolvedService?: ClientService;
-  nextPath?: string;
-}): boolean {
-  if (input.role === 'agent' || input.nextPath?.startsWith('/agent')) {
-    return false;
-  }
-  if (input.role === 'client' && input.resolvedService) {
-    return false;
-  }
-  if (input.resolvedService) {
-    return false;
-  }
+export function shouldShowLoginPicker(input: { role?: string; service?: ClientService }): boolean {
+  if (input.role === 'agent') return false;
+  if (input.role === 'client' && input.service) return false;
   return true;
+}
+
+export function parseExplicitClientService(service?: string): ClientService | undefined {
+  if (service === 'travel' || service === 'real_estate' || service === 'construction') {
+    return service;
+  }
+  return undefined;
 }
 
 export function serviceFromLoginContext(input: {

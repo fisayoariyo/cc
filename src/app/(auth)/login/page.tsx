@@ -1,7 +1,7 @@
 import { LoginForm } from './login-form';
 import { LoginPortalPicker } from './login-portal-picker';
 import { redirect } from 'next/navigation';
-import { serviceFromLoginContext, shouldShowLoginPicker } from '@/lib/auth/login-redirect';
+import { parseExplicitClientService, shouldShowLoginPicker } from '@/lib/auth/login-redirect';
 
 function first(v: string | string[] | undefined): string | undefined {
   if (Array.isArray(v)) return v[0];
@@ -27,7 +27,8 @@ export default async function LoginPage({
   const service = first(sp.service);
   const nextPath =
     next?.startsWith('/') && !next.startsWith('//') ? next : undefined;
-  const agentMode = role === 'agent' || nextPath?.startsWith('/agent');
+  const agentMode = role === 'agent';
+  const explicitService = parseExplicitClientService(service);
 
   if (role === 'admin' || nextPath?.startsWith('/admin')) {
     const params = new URLSearchParams();
@@ -38,9 +39,7 @@ export default async function LoginPage({
     redirect(qs ? `/admin/login?${qs}` : '/admin/login');
   }
 
-  const resolvedService = serviceFromLoginContext({ role, service, nextPath });
-
-  if (shouldShowLoginPicker({ role, resolvedService, nextPath })) {
+  if (shouldShowLoginPicker({ role, service: explicitService })) {
     return (
       <LoginPortalPicker nextPath={nextPath} errorFromUrl={err} messageFromUrl={message} />
     );
@@ -51,8 +50,8 @@ export default async function LoginPage({
       nextPath={nextPath}
       errorFromUrl={err}
       messageFromUrl={message}
-      agentMode={Boolean(agentMode)}
-      service={resolvedService}
+      agentMode={agentMode}
+      service={explicitService}
     />
   );
 }

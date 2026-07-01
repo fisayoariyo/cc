@@ -59,7 +59,6 @@ export function LoginForm({
 
   const description = agentMode ? LOGIN_DESCRIPTION.agent : LOGIN_DESCRIPTION[service ?? 'travel'];
   const pickerHref = buildLoginPickerHref({
-    next: nextPath,
     error: errorFromUrl,
     message: messageFromUrl,
   });
@@ -146,9 +145,6 @@ export function LoginForm({
           </Button>
           <Button asChild variant="secondary" className={AGENT_SECONDARY_BTN}>
             <Link href={registerHref}>I don&apos;t have an account</Link>
-          </Button>
-          <Button asChild variant="secondary" className={AGENT_SECONDARY_BTN}>
-            <Link href="/">Back to home</Link>
           </Button>
         </>
       }
