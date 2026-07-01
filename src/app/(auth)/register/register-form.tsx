@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { ChevronDown, Eye, EyeOff, LockKeyhole, Mail, Phone, UserRound } from 'lucide-react';
 import { signUp, type SignUpState } from './actions';
 import { validateFullNameSingleField } from '@/lib/auth/validation';
-import { AgentBackButton } from '@/components/auth/agent-auth-page-body';
+import { AgentAuthBackArrow } from '@/components/auth/agent-auth-page-body';
 import { AgentFormFeedback } from '@/components/auth/agent-form-feedback';
 import { REGISTER_EMAIL_KEY } from '@/lib/auth/register-email';
 import {
@@ -277,6 +277,7 @@ export function RegisterForm({
           ? 'Complete your details to create your Charis Consult agent account.'
           : CLIENT_COPY[defaultService].description
       }
+      leading={isAgentMode ? <AgentAuthBackArrow href={loginHref} label="Back to agent login" /> : undefined}
       contentWidthClass={isAgentMode ? AGENT_AUTH_CONTENT_WIDTH : CLIENT_AUTH_CONTENT_WIDTH}
       agentAuthMobile={isAgentMode}
       footerMode={isAgentMode ? 'inline' : undefined}

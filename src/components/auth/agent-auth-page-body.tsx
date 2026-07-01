@@ -78,6 +78,18 @@ export function AgentGoBackLink({ href, label = 'Go back' }: { href: string; lab
   );
 }
 
+export function AgentAuthBackArrow({ href, label = 'Go back' }: { href: string; label?: string }) {
+  return (
+    <Link
+      href={href}
+      aria-label={label}
+      className="mb-2 -ml-1 inline-flex h-10 w-10 items-center justify-center rounded-full text-[#6b7280] transition hover:bg-[#f3f4f6] hover:text-[#111827]"
+    >
+      <ArrowLeft className="h-5 w-5" aria-hidden />
+    </Link>
+  );
+}
+
 export function AgentBackButton({ href, label = 'Back' }: { href: string; label?: string }) {
   return (
     <Button asChild variant="secondary" className={AGENT_SECONDARY_BTN}>
