@@ -87,11 +87,28 @@ export default function HomePage({
             transition={{ duration: 1, delay: 0.2 }}
           >
             <motion.h1 className={landingHeroTitle('on-dark', 'mb-5')}>
-              <span className="block">Your Property. Your Journey.</span>
+              <span className="block">
+                <motion.span
+                  initial={{ opacity: 0, y: 24 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.7, delay: 0.4, ease: [0.22, 1, 0.36, 1] }}
+                  className="inline-block"
+                >
+                  Your Property.
+                </motion.span>{' '}
+                <motion.span
+                  initial={{ opacity: 0, y: 24 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.7, delay: 0.95, ease: [0.22, 1, 0.36, 1] }}
+                  className="inline-block"
+                >
+                  Your Journey.
+                </motion.span>
+              </span>
               <motion.span
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 1, delay: 1.2 }}
+                transition={{ duration: 0.8, delay: 1.55 }}
                 className="mt-2 block text-[#f39a1d]"
               >
                 One consultant.
@@ -101,7 +118,7 @@ export default function HomePage({
             <motion.p
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ duration: 1, delay: 1.5 }}
+              transition={{ duration: 1, delay: 1.85 }}
               className="mx-auto mb-10 max-w-3xl text-base leading-relaxed text-white/85 md:text-xl"
             >
               From local and international property listings to visa pathways and building projects, one trusted team across the World.
@@ -110,7 +127,7 @@ export default function HomePage({
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 1, delay: 1.8 }}
+              transition={{ duration: 1, delay: 2.15 }}
               className="flex flex-col justify-center gap-3 sm:flex-row"
             >
               <Link href="/contact">
