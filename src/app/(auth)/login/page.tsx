@@ -1,5 +1,6 @@
 import { LoginForm } from './login-form';
 import { redirect } from 'next/navigation';
+import { serviceFromLoginContext } from '@/lib/auth/login-redirect';
 
 function first(v: string | string[] | undefined): string | undefined {
   if (Array.isArray(v)) return v[0];
@@ -36,13 +37,15 @@ export default async function LoginPage({
     redirect(qs ? `/admin/login?${qs}` : '/admin/login');
   }
 
+  const resolvedService = serviceFromLoginContext({ role, service, nextPath });
+
   return (
     <LoginForm
       nextPath={nextPath}
       errorFromUrl={err}
       messageFromUrl={message}
       agentMode={Boolean(agentMode)}
-      service={service === 'real_estate' ? 'real_estate' : service === 'travel' ? 'travel' : undefined}
+      service={resolvedService}
     />
   );
 }

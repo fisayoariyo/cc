@@ -8,6 +8,7 @@ import {
   LAST_CLIENT_SERVICE_COOKIE,
   LAST_CLIENT_SERVICE_MAX_AGE,
 } from '@/lib/last-client-service';
+import { applyLoginContextParams } from '@/lib/auth/login-redirect';
 
 /**
  * Refreshes the Supabase session on each matched request and returns the response
@@ -79,10 +80,12 @@ export async function updateSession(request: NextRequest) {
   if (!user) {
     const url = request.nextUrl.clone();
     url.pathname = isAdminRoute ? '/admin/login' : '/login';
+    const nextPath = request.nextUrl.pathname;
     if (!isAdminRoute) {
-      url.searchParams.set('next', request.nextUrl.pathname);
-    } else if (request.nextUrl.pathname !== '/admin') {
-      url.searchParams.set('next', request.nextUrl.pathname);
+      url.searchParams.set('next', nextPath);
+      applyLoginContextParams(url, nextPath);
+    } else if (nextPath !== '/admin') {
+      url.searchParams.set('next', nextPath);
     }
     url.searchParams.set(
       'error',
@@ -133,7 +136,11 @@ export async function updateSession(request: NextRequest) {
   if (profileError || !profile?.role) {
     const url = request.nextUrl.clone();
     url.pathname = isAdminRoute ? '/admin/login' : '/login';
-    url.searchParams.set('next', request.nextUrl.pathname);
+    const nextPath = request.nextUrl.pathname;
+    url.searchParams.set('next', nextPath);
+    if (!isAdminRoute) {
+      applyLoginContextParams(url, nextPath);
+    }
     url.searchParams.set(
       'error',
       profileError

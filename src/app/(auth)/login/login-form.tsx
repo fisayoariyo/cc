@@ -36,7 +36,7 @@ export function LoginForm({
   errorFromUrl: string | undefined;
   messageFromUrl: string | undefined;
   agentMode: boolean;
-  service?: 'travel' | 'real_estate';
+  service?: 'travel' | 'real_estate' | 'construction';
 }) {
   const [state, formAction, isPending] = useActionState<SignInState, FormData>(signIn, null);
   const [showPassword, setShowPassword] = useState(false);
@@ -103,11 +103,6 @@ export function LoginForm({
           {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
         </button>
       </div>
-      {displayError && !agentMode ? (
-        <p className="text-sm text-destructive" role="alert">
-          {displayError}
-        </p>
-      ) : null}
     </div>
   );
 

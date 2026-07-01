@@ -205,16 +205,14 @@ export function AgentAuthShell({
                 <AuthPageTitle className={titleClassName}>{title}</AuthPageTitle>
               )}
               {description ? (
-                <>
-                  <p className={agentAuthMobile ? AGENT_AUTH_DESCRIPTION_CLASS : undefined}>
-                    {description}
-                  </p>
-                  {agentAuthMobile ? (
+                agentAuthMobile ? (
+                  <>
+                    <p className={AGENT_AUTH_DESCRIPTION_CLASS}>{description}</p>
                     <p className={AGENT_AUTH_DESCRIPTION_DESKTOP_CLASS}>{description}</p>
-                  ) : (
-                    <p className="text-sm leading-6 text-slate-500 sm:text-[15px]">{description}</p>
-                  )}
-                </>
+                  </>
+                ) : (
+                  <p className="text-sm leading-6 text-slate-500 sm:text-[15px] lg:text-left">{description}</p>
+                )
               ) : null}
             </div>
 

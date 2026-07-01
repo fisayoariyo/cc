@@ -3,6 +3,7 @@ import 'server-only';
 import { cache } from 'react';
 import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
+import { buildLoginRedirectPath } from '@/lib/auth/login-redirect';
 import { createClient } from '@/lib/supabase/server';
 import {
   VIEWER_HEADER_NAMES,
@@ -133,7 +134,7 @@ export async function requireClientDashboardAccess({
   loginNext: string;
 }) {
   const viewer = await getViewerContext();
-  if (!viewer) redirect(`/login?next=${loginNext}`);
+  if (!viewer) redirect(buildLoginRedirectPath(loginNext));
   if (viewer.role === 'admin') redirect('/admin');
   if (viewer.role === 'agent') redirect('/agent');
 
