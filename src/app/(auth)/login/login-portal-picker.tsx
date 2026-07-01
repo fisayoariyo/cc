@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { ArrowRight, Building2, Hammer, Plane, UserRound } from 'lucide-react';
-import { AgentAuthBackArrow } from '@/components/auth/agent-auth-page-body';
+import { AgentAuthBackArrow } from '@/components/auth/agent-auth-back-arrow';
 import { AgentFormFeedback } from '@/components/auth/agent-form-feedback';
 import { AGENT_AUTH_CONTENT_WIDTH, AgentAuthShell } from '@/components/auth/AgentAuthShell';
 import { buildPortalLoginHref } from '@/lib/auth/login-redirect';
@@ -61,7 +61,7 @@ export function LoginPortalPicker({
       agentAuthMobile
       footerMode="inline"
       showMobileLogo={false}
-      leading={<AgentAuthBackArrow href="/" label="Back to home" />}
+      leading={<AgentAuthBackArrow />}
     >
       <div className="space-y-3">
         {errorFromUrl ? <AgentFormFeedback>{errorFromUrl}</AgentFormFeedback> : null}

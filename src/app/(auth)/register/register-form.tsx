@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { ChevronDown, Eye, EyeOff, LockKeyhole, Mail, Phone, UserRound } from 'lucide-react';
 import { signUp, type SignUpState } from './actions';
 import { validateFullNameSingleField } from '@/lib/auth/validation';
-import { AgentAuthBackArrow } from '@/components/auth/agent-auth-page-body';
+import { AgentAuthBackArrow } from '@/components/auth/agent-auth-back-arrow';
 import { AgentFormFeedback } from '@/components/auth/agent-form-feedback';
 import { REGISTER_EMAIL_KEY } from '@/lib/auth/register-email';
 import {
@@ -277,7 +277,7 @@ export function RegisterForm({
       variant={shellVariant}
       title={shellTitle}
       description={shellDescription}
-      leading={<AgentAuthBackArrow href={loginHref} label="Back to login" />}
+      leading={<AgentAuthBackArrow />}
       contentWidthClass={AGENT_AUTH_CONTENT_WIDTH}
       agentAuthMobile
       footerMode="inline"

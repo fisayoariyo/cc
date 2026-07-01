@@ -42,14 +42,6 @@ export function buildLoginRedirectPath(nextPath: string, error?: string) {
   return `${url.pathname}?${url.searchParams.toString()}`;
 }
 
-export function buildLoginPickerHref(preserve?: { error?: string; message?: string }) {
-  const params = new URLSearchParams();
-  if (preserve?.error) params.set('error', preserve.error);
-  if (preserve?.message) params.set('message', preserve.message);
-  const qs = params.toString();
-  return qs ? `/login?${qs}` : '/login';
-}
-
 export function buildPortalLoginHref(input: {
   role: 'client' | 'agent';
   service?: ClientService;
@@ -65,29 +57,20 @@ export function buildPortalLoginHref(input: {
   return `/login?${params.toString()}`;
 }
 
+/** Branded login form requires role=agent or role=client with an explicit service. */
+export function hasBrandedLoginContext(input: { role?: string; service?: ClientService }): boolean {
+  if (input.role === 'agent') return true;
+  if (input.role === 'client' && input.service) return true;
+  return false;
+}
+
 export function shouldShowLoginPicker(input: { role?: string; service?: ClientService }): boolean {
-  if (input.role === 'agent') return false;
-  if (input.role === 'client' && input.service) return false;
-  return true;
+  return !hasBrandedLoginContext(input);
 }
 
 export function parseExplicitClientService(service?: string): ClientService | undefined {
   if (service === 'travel' || service === 'real_estate' || service === 'construction') {
     return service;
-  }
-  return undefined;
-}
-
-export function serviceFromLoginContext(input: {
-  role?: string;
-  service?: string;
-  nextPath?: string;
-}): ClientService | undefined {
-  if (input.service === 'travel' || input.service === 'real_estate' || input.service === 'construction') {
-    return input.service;
-  }
-  if (input.nextPath) {
-    return clientServiceFromPath(input.nextPath);
   }
   return undefined;
 }

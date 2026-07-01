@@ -1,12 +1,13 @@
 import { redirect } from 'next/navigation';
 import AgentDesktopShell from '@/components/agent/AgentDesktopShell';
 import { AgentViewerProvider } from '@/components/agent/agent-viewer-provider';
+import { buildLoginRedirectPath } from '@/lib/auth/login-redirect';
 import { getViewerContext } from '@/lib/supabase/dashboard-access';
 
 export default async function AgentLayout({ children }: { children: React.ReactNode }) {
   const viewer = await getViewerContext();
   if (!viewer) {
-    redirect('/login?next=/agent');
+    redirect(buildLoginRedirectPath('/agent'));
   }
 
   if (viewer.role === 'admin') redirect('/admin');

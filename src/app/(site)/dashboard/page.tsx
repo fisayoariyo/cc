@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
+import { buildLoginRedirectPath } from '@/lib/auth/login-redirect';
 import { getClientServices } from '@/lib/supabase/data';
 import { getViewerContext } from '@/lib/supabase/dashboard-access';
 import { addClientServiceAndContinue } from './actions';
@@ -24,7 +25,7 @@ export default async function DashboardResolverPage({
   searchParams?: Promise<{ error?: string }>;
 }) {
   const viewer = await getViewerContext();
-  if (!viewer) redirect('/login?next=/dashboard');
+  if (!viewer) redirect(buildLoginRedirectPath('/dashboard'));
   if (viewer.role === 'admin') redirect('/admin');
   if (viewer.role === 'agent') redirect(viewer.status === 'verified' ? '/agent' : '/agent/under-review');
 

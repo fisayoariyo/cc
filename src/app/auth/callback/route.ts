@@ -1,6 +1,15 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { getAgentPostAuthPath } from '@/lib/agent-onboarding';
+import { applyLoginContextParams } from '@/lib/auth/login-redirect';
+
+function loginErrorRedirect(origin: string, error: string, next = '/dashboard') {
+  const login = new URL('/login', origin);
+  login.searchParams.set('error', error);
+  login.searchParams.set('next', next);
+  applyLoginContextParams(login, next);
+  return NextResponse.redirect(login);
+}
 
 /**
  * Supabase email confirmation / OAuth redirects here with ?code=… (PKCE).
@@ -18,17 +27,13 @@ export async function GET(request: Request) {
   const err =
     url.searchParams.get('error_description') ?? url.searchParams.get('error');
   if (err) {
-    const login = new URL('/login', origin);
-    login.searchParams.set('error', err);
-    return NextResponse.redirect(login);
+    return loginErrorRedirect(origin, err, next);
   }
 
   if (code) {
     const supabase = await createClient();
     if (!supabase) {
-      const login = new URL('/login', origin);
-      login.searchParams.set('error', 'Authentication is not configured.');
-      return NextResponse.redirect(login);
+      return loginErrorRedirect(origin, 'Authentication is not configured.', next);
     }
     const { error } = await supabase.auth.exchangeCodeForSession(code);
     if (!error) {
@@ -59,12 +64,12 @@ export async function GET(request: Request) {
 
       return NextResponse.redirect(new URL(next, origin));
     }
-    const login = new URL('/login', origin);
-    login.searchParams.set('error', error.message);
-    return NextResponse.redirect(login);
+    return loginErrorRedirect(origin, error.message, next);
   }
 
-  const login = new URL('/login', origin);
-  login.searchParams.set('error', 'Missing confirmation code. Try signing in with your email and password.');
-  return NextResponse.redirect(login);
+  return loginErrorRedirect(
+    origin,
+    'Missing confirmation code. Try signing in with your email and password.',
+    next,
+  );
 }

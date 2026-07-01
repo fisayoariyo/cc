@@ -10,7 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { cn } from '@/components/ui/utils';
-import { AgentAuthBackArrow } from '@/components/auth/agent-auth-page-body';
+import { AgentAuthBackArrow } from '@/components/auth/agent-auth-back-arrow';
 import { AgentFormFeedback } from '@/components/auth/agent-form-feedback';
 import {
   AGENT_FIELD_BLOCK,
@@ -20,7 +20,6 @@ import {
   AGENT_PRIMARY_BTN,
   AGENT_SECONDARY_BTN,
 } from '@/components/auth/agent-auth-styles';
-import { buildLoginPickerHref } from '@/lib/auth/login-redirect';
 
 const LOGIN_FORM_ID = 'portal-login-form';
 
@@ -31,37 +30,41 @@ const LOGIN_DESCRIPTION = {
   construction: 'Sign in to follow construction requests, BOQ updates, and project milestones.',
 } as const;
 
-export function LoginForm({
-  nextPath,
-  errorFromUrl,
-  messageFromUrl,
-  agentMode,
-  service,
-}: {
-  nextPath: string | undefined;
-  errorFromUrl: string | undefined;
-  messageFromUrl: string | undefined;
-  agentMode: boolean;
-  service?: 'travel' | 'real_estate' | 'construction';
-}) {
+type ClientService = 'travel' | 'real_estate' | 'construction';
+
+type LoginFormProps =
+  | {
+      nextPath: string | undefined;
+      errorFromUrl: string | undefined;
+      messageFromUrl: string | undefined;
+      agentMode: true;
+      service?: never;
+    }
+  | {
+      nextPath: string | undefined;
+      errorFromUrl: string | undefined;
+      messageFromUrl: string | undefined;
+      agentMode: false;
+      service: ClientService;
+    };
+
+export function LoginForm(props: LoginFormProps) {
+  const { nextPath, errorFromUrl, messageFromUrl } = props;
   const [state, formAction, isPending] = useActionState<SignInState, FormData>(signIn, null);
   const [showPassword, setShowPassword] = useState(false);
 
   const displayError = state?.error ?? errorFromUrl;
-  const shellVariant: AuthShellVariant = agentMode ? 'agent' : service ?? 'travel';
+  const shellVariant: AuthShellVariant = props.agentMode ? 'agent' : props.service;
+  const clientService = props.agentMode ? null : props.service;
 
-  const forgotPasswordHref = agentMode
+  const forgotPasswordHref = props.agentMode
     ? '/forgot-password?role=agent'
-    : `/forgot-password?role=client&service=${service ?? 'travel'}`;
-  const registerHref = agentMode
+    : `/forgot-password?role=client&service=${clientService}`;
+  const registerHref = props.agentMode
     ? '/register?role=agent'
-    : `/register?role=client&service=${service ?? 'travel'}`;
+    : `/register?role=client&service=${clientService}`;
 
-  const description = agentMode ? LOGIN_DESCRIPTION.agent : LOGIN_DESCRIPTION[service ?? 'travel'];
-  const pickerHref = buildLoginPickerHref({
-    error: errorFromUrl,
-    message: messageFromUrl,
-  });
+  const description = props.agentMode ? LOGIN_DESCRIPTION.agent : LOGIN_DESCRIPTION[props.service];
 
   const formFields = (
     <>
@@ -125,13 +128,13 @@ export function LoginForm({
       title="Log in to your account"
       variant={shellVariant}
       description={description}
-      visualTitle={agentMode ? 'Welcome back to Charis Consult agents' : undefined}
+      visualTitle={props.agentMode ? 'Welcome back to Charis Consult agents' : undefined}
       visualCopy={
-        agentMode
+        props.agentMode
           ? 'Return to your onboarding status, update your review progress, and continue into your agent workspace once approved.'
           : undefined
       }
-      leading={<AgentAuthBackArrow href={pickerHref} label="Back to sign-in options" />}
+      leading={<AgentAuthBackArrow />}
       contentWidthClass={AGENT_AUTH_CONTENT_WIDTH}
       agentAuthMobile
       footerMode="inline"

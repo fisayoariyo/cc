@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
+import { buildLoginRedirectPath } from '@/lib/auth/login-redirect';
 import { AGENT_STATUS_ACTIONS_GAP } from '@/components/auth/agent-auth-styles';
 import { AGENT_AUTH_CONTENT_WIDTH, AgentAuthShell } from '@/components/auth/AgentAuthShell';
 import { AgentGoBackLink } from '@/components/auth/agent-auth-page-body';
@@ -23,7 +24,7 @@ export default async function AgentUnderReviewPage() {
   const viewer = await getViewerContext();
 
   if (!viewer) {
-    redirect('/login?next=/agent/under-review');
+    redirect(buildLoginRedirectPath('/agent/under-review'));
   }
 
   if (viewer.role !== 'agent') {

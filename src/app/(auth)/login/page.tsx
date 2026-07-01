@@ -45,13 +45,30 @@ export default async function LoginPage({
     );
   }
 
+  if (agentMode) {
+    return (
+      <LoginForm
+        nextPath={nextPath}
+        errorFromUrl={err}
+        messageFromUrl={message}
+        agentMode
+      />
+    );
+  }
+
+  if (explicitService) {
+    return (
+      <LoginForm
+        nextPath={nextPath}
+        errorFromUrl={err}
+        messageFromUrl={message}
+        agentMode={false}
+        service={explicitService}
+      />
+    );
+  }
+
   return (
-    <LoginForm
-      nextPath={nextPath}
-      errorFromUrl={err}
-      messageFromUrl={message}
-      agentMode={agentMode}
-      service={explicitService}
-    />
+    <LoginPortalPicker nextPath={nextPath} errorFromUrl={err} messageFromUrl={message} />
   );
 }

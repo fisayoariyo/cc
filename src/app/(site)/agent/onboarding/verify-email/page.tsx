@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import { getAgentOnboardingPath } from '@/lib/agent-onboarding';
+import { buildLoginRedirectPath } from '@/lib/auth/login-redirect';
 import { getViewerContext } from '@/lib/supabase/dashboard-access';
 import { getAgentOnboardingProfile } from '../actions';
 import { VerifyEmailView } from './verify-email-view';
@@ -9,11 +10,11 @@ export const metadata: Metadata = { title: 'Verify email' };
 
 export default async function VerifyEmailPage() {
   const viewer = await getViewerContext();
-  if (!viewer) redirect('/login?next=/agent/onboarding/verify-email');
+  if (!viewer) redirect(buildLoginRedirectPath('/agent/onboarding/verify-email'));
   if (viewer.role !== 'agent') redirect('/dashboard');
 
   const profile = await getAgentOnboardingProfile();
-  if (!profile) redirect('/login?next=/agent/onboarding/verify-email');
+  if (!profile) redirect(buildLoginRedirectPath('/agent/onboarding/verify-email'));
 
   const path = getAgentOnboardingPath(profile);
   if (path !== '/agent/onboarding/verify-email') redirect(path);

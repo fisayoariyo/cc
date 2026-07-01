@@ -40,6 +40,13 @@ export async function updateSession(request: NextRequest) {
   if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
     const url = request.nextUrl.clone();
     url.pathname = isAdminRoute ? '/admin/login' : '/login';
+    const nextPath = request.nextUrl.pathname;
+    if (!isAdminRoute) {
+      url.searchParams.set('next', nextPath);
+      applyLoginContextParams(url, nextPath);
+    } else if (nextPath !== '/admin') {
+      url.searchParams.set('next', nextPath);
+    }
     url.searchParams.set('error', 'Authentication is not configured. Contact support.');
     return NextResponse.redirect(url);
   }
