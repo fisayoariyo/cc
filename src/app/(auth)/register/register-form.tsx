@@ -12,7 +12,6 @@ import { REGISTER_EMAIL_KEY } from '@/lib/auth/register-email';
 import {
   AGENT_AUTH_CONTENT_WIDTH,
   AgentAuthShell,
-  CLIENT_AUTH_CONTENT_WIDTH,
   type AuthShellVariant,
 } from '@/components/auth/AgentAuthShell';
 import { Button } from '@/components/ui/button';
@@ -65,8 +64,11 @@ export function RegisterForm({
   const isAgentMode = defaultRole === 'agent';
   const shellVariant: AuthShellVariant = isAgentMode ? 'agent' : defaultService;
   const loginHref = isAgentMode ? '/login?role=agent' : `/login?role=client&service=${defaultService}`;
-
-  const isSubmitting = isPending || submitting;
+  const registerFormId = isAgentMode ? 'agent-register-form' : 'client-register-form';
+  const shellTitle = isAgentMode ? 'Create Agent Account' : CLIENT_COPY[defaultService].title;
+  const shellDescription = isAgentMode
+    ? 'Complete your details to create your Charis Consult agent account.'
+    : CLIENT_COPY[defaultService].description;
 
   useEffect(() => {
     if (
@@ -80,6 +82,8 @@ export function RegisterForm({
       router.push('/agent/onboarding/verify-email');
     }
   }, [state, router]);
+
+  const isSubmitting = isPending || submitting;
 
   function handleAgentSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -271,35 +275,35 @@ export function RegisterForm({
   return (
     <AgentAuthShell
       variant={shellVariant}
-      title={isAgentMode ? 'Create Agent Account' : CLIENT_COPY[defaultService].title}
-      description={
-        isAgentMode
-          ? 'Complete your details to create your Charis Consult agent account.'
-          : CLIENT_COPY[defaultService].description
-      }
-      leading={isAgentMode ? <AgentAuthBackArrow href={loginHref} label="Back to agent login" /> : undefined}
-      contentWidthClass={isAgentMode ? AGENT_AUTH_CONTENT_WIDTH : CLIENT_AUTH_CONTENT_WIDTH}
-      agentAuthMobile={isAgentMode}
-      footerMode={isAgentMode ? 'inline' : undefined}
+      title={shellTitle}
+      description={shellDescription}
+      leading={<AgentAuthBackArrow href={loginHref} label="Back to login" />}
+      contentWidthClass={AGENT_AUTH_CONTENT_WIDTH}
+      agentAuthMobile
+      footerMode="inline"
+      showMobileLogo={false}
       actions={
-        isAgentMode ? (
-          <>
-            {state && 'error' in state ? <AgentFormFeedback>{state.error}</AgentFormFeedback> : null}
-            <Button type="submit" form="agent-register-form" className={AGENT_PRIMARY_BTN} disabled={isSubmitting}>
-              {isSubmitting ? 'Creating account...' : 'Create account'}
-            </Button>
-            <Button asChild variant="secondary" className={AGENT_SECONDARY_BTN}>
-              <Link href={loginHref}>I already have an account</Link>
-            </Button>
-            <Button asChild variant="secondary" className={AGENT_SECONDARY_BTN}>
-              <Link href="/">Back to home</Link>
-            </Button>
-          </>
-        ) : undefined
+        <>
+          {state && 'success' in state && state.success && state.needsEmailConfirmation && !isAgentMode ? (
+            <AgentFormFeedback variant="success">
+              Check your email to confirm your account before signing in.
+            </AgentFormFeedback>
+          ) : null}
+          {state && 'error' in state ? <AgentFormFeedback>{state.error}</AgentFormFeedback> : null}
+          <Button type="submit" form={registerFormId} className={AGENT_PRIMARY_BTN} disabled={isSubmitting}>
+            {isSubmitting ? 'Creating account...' : 'Create account'}
+          </Button>
+          <Button asChild variant="secondary" className={AGENT_SECONDARY_BTN}>
+            <Link href={loginHref}>I already have an account</Link>
+          </Button>
+          <Button asChild variant="secondary" className={AGENT_SECONDARY_BTN}>
+            <Link href="/">Back to home</Link>
+          </Button>
+        </>
       }
     >
       {isAgentMode ? (
-        <form id="agent-register-form" onSubmit={handleAgentSubmit} className={AGENT_FORM_STACK}>
+        <form id={registerFormId} onSubmit={handleAgentSubmit} className={AGENT_FORM_STACK}>
           <input type="hidden" name="role" value={defaultRole} />
           <input type="hidden" name="service_interest" value={defaultService} />
           <input type="hidden" name="agency_name" value="" />
@@ -307,169 +311,136 @@ export function RegisterForm({
           {agentFormFields}
         </form>
       ) : (
-        <div className="space-y-5">
-          {state && 'success' in state && state.success && state.needsEmailConfirmation ? (
-            <div
-              className="rounded-2xl border border-primary/20 bg-primary/10 px-4 py-3 text-sm text-primary lg:rounded-[18px]"
-              role="status"
-            >
-              Check your email to confirm your account before signing in.
+        <form id={registerFormId} action={formAction} className={AGENT_FORM_STACK}>
+          <input type="hidden" name="role" value={defaultRole} />
+          <input type="hidden" name="service_interest" value={defaultService} />
+          <input type="hidden" name="agency_name" value="" />
+
+          <div className={AGENT_FIELD_BLOCK}>
+            <Label htmlFor="full_name" className={AGENT_LABEL_CLASS}>
+              Full Name
+            </Label>
+            <div className="relative">
+              <UserRound className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+              <Input
+                id="full_name"
+                name="full_name"
+                type="text"
+                autoComplete="name"
+                required
+                placeholder="Write your full name here"
+                className={cn(AGENT_FIELD_CLASS, 'pl-10')}
+              />
             </div>
-          ) : null}
+          </div>
 
-          {state && 'error' in state ? (
-            <div
-              className="rounded-2xl border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive lg:rounded-[18px]"
-              role="alert"
-            >
-              {state.error}
+          <div className={AGENT_FIELD_BLOCK}>
+            <Label htmlFor="email" className={AGENT_LABEL_CLASS}>
+              Email
+            </Label>
+            <div className="relative">
+              <Mail className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+              <Input
+                id="email"
+                name="email"
+                type="email"
+                autoComplete="email"
+                required
+                placeholder="Enter your email here"
+                className={cn(AGENT_FIELD_CLASS, 'pl-10')}
+              />
             </div>
-          ) : null}
+          </div>
 
-          <form action={formAction} className="space-y-4 lg:space-y-5">
-            <input type="hidden" name="role" value={defaultRole} />
-            <input type="hidden" name="service_interest" value={defaultService} />
-            <input type="hidden" name="agency_name" value="" />
-
-            <div className={AGENT_FIELD_BLOCK}>
-              <Label htmlFor="full_name" className={AGENT_LABEL_CLASS}>
-                Full Name
-              </Label>
-              <div className="relative">
-                <UserRound className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+          {defaultService === 'travel' || defaultService === 'construction' ? (
+            <>
+              <div className={AGENT_FIELD_BLOCK}>
+                <Label htmlFor="phone" className={AGENT_LABEL_CLASS}>
+                  Phone number
+                </Label>
                 <Input
-                  id="full_name"
-                  name="full_name"
-                  type="text"
-                  autoComplete="name"
+                  id="phone"
+                  name="phone"
+                  type="tel"
+                  autoComplete="tel"
                   required
-                  placeholder="Write your full name here"
-                  className={cn(AGENT_FIELD_CLASS, 'pl-11')}
+                  placeholder="+234..."
+                  className={AGENT_FIELD_CLASS}
                 />
               </div>
-            </div>
-
-            <div className={AGENT_FIELD_BLOCK}>
-              <Label htmlFor="email" className={AGENT_LABEL_CLASS}>
-                Email
-              </Label>
-              <div className="relative">
-                <Mail className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-                <Input
-                  id="email"
-                  name="email"
-                  type="email"
-                  autoComplete="email"
-                  required
-                  placeholder="Enter your email here"
-                  className={cn(AGENT_FIELD_CLASS, 'pl-11')}
-                />
-              </div>
-            </div>
-
-            {defaultService === 'travel' || defaultService === 'construction' ? (
-              <>
-                <div className={AGENT_FIELD_BLOCK}>
-                  <Label htmlFor="phone" className={AGENT_LABEL_CLASS}>
-                    Phone number
-                  </Label>
-                  <Input
-                    id="phone"
-                    name="phone"
-                    type="tel"
-                    autoComplete="tel"
-                    required
-                    placeholder="+234..."
-                    className={AGENT_FIELD_CLASS}
-                  />
-                </div>
-                {defaultService === 'construction' ? (
-                  <div className={AGENT_FIELD_BLOCK}>
-                    <Label htmlFor="preferred_location" className={AGENT_LABEL_CLASS}>
-                      Project location
-                    </Label>
-                    <Input
-                      id="preferred_location"
-                      name="preferred_location"
-                      type="text"
-                      placeholder="Ibadan, Oyo State"
-                      className={AGENT_FIELD_CLASS}
-                    />
-                  </div>
-                ) : null}
-              </>
-            ) : (
-              <>
+              {defaultService === 'construction' ? (
                 <div className={AGENT_FIELD_BLOCK}>
                   <Label htmlFor="preferred_location" className={AGENT_LABEL_CLASS}>
-                    Preferred location
+                    Project location
                   </Label>
                   <Input
                     id="preferred_location"
                     name="preferred_location"
                     type="text"
-                    required
-                    placeholder="Ibadan"
+                    placeholder="Ibadan, Oyo State"
                     className={AGENT_FIELD_CLASS}
                   />
                 </div>
-                <div className={AGENT_FIELD_BLOCK}>
-                  <Label htmlFor="budget_range" className={AGENT_LABEL_CLASS}>
-                    Budget range
-                  </Label>
-                  <Input
-                    id="budget_range"
-                    name="budget_range"
-                    type="text"
-                    required
-                    placeholder="N50M - N90M"
-                    className={AGENT_FIELD_CLASS}
-                  />
-                </div>
-              </>
-            )}
-
-            <div className={AGENT_FIELD_BLOCK}>
-              <Label htmlFor="password" className={AGENT_LABEL_CLASS}>
-                Password
-              </Label>
-              <div className="relative">
-                <LockKeyhole className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+              ) : null}
+            </>
+          ) : (
+            <>
+              <div className={AGENT_FIELD_BLOCK}>
+                <Label htmlFor="preferred_location" className={AGENT_LABEL_CLASS}>
+                  Preferred location
+                </Label>
                 <Input
-                  id="password"
-                  name="password"
-                  type={showPassword ? 'text' : 'password'}
-                  autoComplete="new-password"
+                  id="preferred_location"
+                  name="preferred_location"
+                  type="text"
                   required
-                  minLength={6}
-                  placeholder="At least 6 characters"
-                  className={cn(AGENT_FIELD_CLASS, 'pl-11 pr-12')}
+                  placeholder="Ibadan"
+                  className={AGENT_FIELD_CLASS}
                 />
-                <button
-                  type="button"
-                  aria-label={showPassword ? 'Hide password' : 'Show password'}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 transition hover:text-slate-700"
-                  onClick={() => setShowPassword((value) => !value)}
-                >
-                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                </button>
               </div>
+              <div className={AGENT_FIELD_BLOCK}>
+                <Label htmlFor="budget_range" className={AGENT_LABEL_CLASS}>
+                  Budget range
+                </Label>
+                <Input
+                  id="budget_range"
+                  name="budget_range"
+                  type="text"
+                  required
+                  placeholder="N50M - N90M"
+                  className={AGENT_FIELD_CLASS}
+                />
+              </div>
+            </>
+          )}
+
+          <div className={AGENT_FIELD_BLOCK}>
+            <Label htmlFor="password" className={AGENT_LABEL_CLASS}>
+              Password
+            </Label>
+            <div className="relative">
+              <LockKeyhole className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+              <Input
+                id="password"
+                name="password"
+                type={showPassword ? 'text' : 'password'}
+                autoComplete="new-password"
+                required
+                minLength={6}
+                placeholder="At least 6 characters"
+                className={cn(AGENT_FIELD_CLASS, 'pl-10 pr-10')}
+              />
+              <button
+                type="button"
+                aria-label={showPassword ? 'Hide password' : 'Show password'}
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 transition hover:text-slate-700"
+                onClick={() => setShowPassword((value) => !value)}
+              >
+                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              </button>
             </div>
-
-            <Button type="submit" className={AGENT_PRIMARY_BTN} disabled={isPending}>
-              {isPending ? 'Creating account...' : 'Create account'}
-            </Button>
-          </form>
-
-          <div className="flex flex-col gap-3">
-            <Button asChild variant="secondary" className={AGENT_SECONDARY_BTN}>
-              <Link href={loginHref}>I already have an account</Link>
-            </Button>
-            <Button asChild variant="secondary" className={AGENT_SECONDARY_BTN}>
-              <Link href="/">Back to home</Link>
-            </Button>
           </div>
-        </div>
+        </form>
       )}
     </AgentAuthShell>
   );
