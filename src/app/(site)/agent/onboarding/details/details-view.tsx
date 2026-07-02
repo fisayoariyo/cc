@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { AGENT_AUTH_CONTENT_WIDTH, AgentAuthShell } from '@/components/auth/AgentAuthShell';
 import { AgentBackButton } from '@/components/auth/agent-auth-page-body';
 import { AgentFormFeedback } from '@/components/auth/agent-form-feedback';
@@ -28,6 +28,7 @@ type Profile = {
 };
 
 export function DetailsView({ profile }: { profile: Profile }) {
+  const formRef = useRef<HTMLFormElement>(null);
   const [kinFirstName, setKinFirstName] = useState('');
   const [kinLastName, setKinLastName] = useState('');
   const [kinFirstError, setKinFirstError] = useState<string | null>(null);
@@ -63,10 +64,12 @@ export function DetailsView({ profile }: { profile: Profile }) {
       actions={actions}
     >
       <form
+        ref={formRef}
         id="details-form"
         className={AGENT_FORM_STACK}
         onSubmit={(e) => {
           e.preventDefault();
+          const form = formRef.current ?? e.currentTarget;
           const kinCheck = validateFirstLastName(kinFirstName, kinLastName);
           if (!kinCheck.ok) {
             if (kinCheck.field === 'first') {
@@ -81,7 +84,7 @@ export function DetailsView({ profile }: { profile: Profile }) {
           setKinFirstError(null);
           setKinLastError(null);
           void submit(async () => {
-            const fd = new FormData(e.currentTarget);
+            const fd = new FormData(form);
             fd.set('next_of_kin_name', `${kinFirstName.trim()} ${kinLastName.trim()}`);
             const saveRes = await saveAgentDetails(null, fd);
             if (saveRes && 'error' in saveRes) return saveRes;

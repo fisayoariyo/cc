@@ -116,6 +116,17 @@ export async function signUp(prevState: SignUpState, formData: FormData): Promis
     return { error: 'Could not create an account. Please try again.' };
   }
 
+  if (role === 'agent' && gender && data.session) {
+    const { error: genderError } = await supabase
+      .from('profiles')
+      .update({ gender })
+      .eq('id', data.user.id)
+      .eq('role', 'agent');
+    if (genderError) {
+      console.error('signUp gender persist', genderError.message);
+    }
+  }
+
   const needsEmailConfirmation = !data.session;
 
   if (!needsEmailConfirmation) {

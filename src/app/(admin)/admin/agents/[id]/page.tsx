@@ -57,6 +57,13 @@ export default async function AdminAgentDetailPage({ params }: { params: Promise
             </Badge>
           </div>
 
+          {agent.onboarding_step !== 'submitted' ? (
+            <p className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900">
+              This agent has not finished submitting onboarding — address and next-of-kin fields may still be empty
+              until they complete the final step.
+            </p>
+          ) : null}
+
           <dl className="grid gap-3 sm:grid-cols-2">
             {[
               { label: 'Email', value: agent.email },

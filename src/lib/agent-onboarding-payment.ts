@@ -15,8 +15,8 @@ export const AGENT_ONBOARDING_BANK = {
   bank: 'UBA',
 } as const;
 
-/** WhatsApp support for payment receipts — +90 542 872 67 90 */
-export const AGENT_RECEIPT_WHATSAPP_E164 = '905428726790';
+/** WhatsApp support for payment receipts — official office line 0907 641 7113 */
+export const AGENT_RECEIPT_WHATSAPP_E164 = '2349076417113';
 
 export function formatAgentOnboardingBankLine() {
   const { accountName, accountNumber, bank } = AGENT_ONBOARDING_BANK;

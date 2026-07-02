@@ -64,7 +64,10 @@ export function AgentListingsProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     let active = true;
 
-    void loadListings().then((next) => {
+    // Show cache instantly, but always revalidate in the background so a remount
+    // after a server-action redirect (e.g. saving a new draft) reflects fresh data.
+    const hasCache = cachedRows !== null;
+    void loadListings(hasCache).then((next) => {
       if (!active) return;
       setRows(next);
       setLoading(false);
@@ -77,11 +80,11 @@ export function AgentListingsProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const prev = prevPathRef.current;
-    const leftEditor =
-      prev.includes('/agent/listings/new') || /\/agent\/listings\/[^/]+\/edit$/.test(prev);
     const onListHub = pathname === '/agent' || pathname === '/agent/listings';
 
-    if (leftEditor && onListHub && prev !== pathname) {
+    // Refresh whenever we arrive on a hub page from a different route, so counts
+    // and the listing grid always reflect the latest saved/submitted listings.
+    if (onListHub && prev !== pathname) {
       refresh();
     }
 

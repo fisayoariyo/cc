@@ -6,6 +6,7 @@ import { createClient } from '@/lib/supabase/server';
 import { getViewerContext } from '@/lib/supabase/dashboard-access';
 import type { PropertyCategory, PropertyStatus } from '@/lib/types/database';
 import { createNotification } from '@/lib/supabase/notifications';
+import { friendlyDbError } from '@/lib/supabase/db-errors';
 import { LISTING_STATUS_VALUES } from '@/lib/workflow-rules';
 
 export type PropertySaveState = { error: string } | null;
@@ -127,12 +128,12 @@ export async function saveProperty(prevState: PropertySaveState, formData: FormD
   if (id) {
     const { error } = await supabase.from('properties').update(payload).eq('id', id);
     if (error) {
-      return { error: error.message };
+      return { error: friendlyDbError(error, 'Could not save the listing. Please try again.') };
     }
   } else {
     const { error } = await supabase.from('properties').insert(payload);
     if (error) {
-      return { error: error.message };
+      return { error: friendlyDbError(error, 'Could not create the listing. Please try again.') };
     }
   }
 

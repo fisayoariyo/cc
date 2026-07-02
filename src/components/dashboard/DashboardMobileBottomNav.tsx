@@ -23,8 +23,12 @@ function defaultMatch(pathname: string, href: string) {
 }
 
 export function dashboardMainBottomPaddingClassName(floating = false) {
-  const offset = floating ? 88 : DASHBOARD_BOTTOM_NAV_HEIGHT;
-  return `pb-[calc(${offset}px+env(safe-area-inset-bottom,0px))]`;
+  // Full literal class strings so Tailwind's scanner generates them (dynamic
+  // template-literal class names are not detected and silently produce no padding,
+  // which lets page content slide under the fixed mobile bottom nav).
+  return floating
+    ? 'pb-[calc(88px+env(safe-area-inset-bottom,0px))]'
+    : 'pb-[calc(72px+env(safe-area-inset-bottom,0px))]';
 }
 
 export function DashboardMobileBottomNav({

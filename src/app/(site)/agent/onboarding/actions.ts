@@ -127,14 +127,27 @@ export async function saveAgentDetails(prev: OnboardingActionState, formData: Fo
       next_of_kin_name: nextOfKinName,
       next_of_kin_phone: nextOfKinPhone,
       next_of_kin_relationship: nextOfKinRelationship,
+      onboarding_step: 'details',
     })
     .eq('id', viewer.userId)
-    .eq('role', 'agent');
+    .eq('role', 'agent')
+    .select('id')
+    .maybeSingle();
 
-  if (error) return { error: error.message };
+  if (error) {
+    if (error.message.includes('agent_address') || error.message.includes('next_of_kin')) {
+      return {
+        error:
+          'Could not save your details. The database may need the latest migration (016_agent_next_of_kin_address). Contact support.',
+      };
+    }
+    return { error: error.message };
+  }
 
   revalidatePath('/agent/onboarding/details');
   revalidatePath('/agent/under-review');
+  revalidatePath('/admin/agents');
+  revalidatePath(`/admin/agents/${viewer.userId}`);
   return { ok: true };
 }
 
@@ -184,6 +197,7 @@ export async function submitAgentOnboarding(): Promise<OnboardingActionState> {
   revalidatePath('/agent/onboarding');
   revalidatePath('/agent/under-review');
   revalidatePath('/admin/agents');
+  revalidatePath(`/admin/agents/${viewer.userId}`);
   redirect('/agent/under-review');
 }
 

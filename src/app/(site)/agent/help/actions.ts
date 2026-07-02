@@ -4,16 +4,29 @@ import { revalidatePath } from 'next/cache';
 import { createClient } from '@/lib/supabase/server';
 import { getViewerContext } from '@/lib/supabase/dashboard-access';
 import { createNotificationsForAdmins } from '@/lib/supabase/notifications';
+import { friendlyDbError } from '@/lib/supabase/db-errors';
 import { AGENT_SUPPORT_ISSUE_TYPES } from '@/lib/support-tickets';
 
 export type SubmitSupportTicketState = { error: string } | { success: true } | null;
 
-async function nextTicketCode(supabase: NonNullable<Awaited<ReturnType<typeof createClient>>>) {
-  const { count } = await supabase
+/** Highest existing numeric suffix + 1, so re-numbering survives deleted rows. */
+async function nextTicketNumber(supabase: NonNullable<Awaited<ReturnType<typeof createClient>>>) {
+  const { data } = await supabase
     .from('agent_support_tickets')
-    .select('id', { count: 'exact', head: true });
-  const next = (count ?? 0) + 1;
-  return `ISS-${String(next).padStart(3, '0')}`;
+    .select('ticket_code')
+    .order('created_at', { ascending: false })
+    .limit(200);
+
+  let max = 0;
+  for (const row of data ?? []) {
+    const match = /(\d+)$/.exec(String((row as { ticket_code?: string }).ticket_code ?? ''));
+    if (match) max = Math.max(max, Number(match[1]));
+  }
+  return max + 1;
+}
+
+function formatTicketCode(n: number) {
+  return `ISS-${String(n).padStart(3, '0')}`;
 }
 
 export async function submitSupportTicket(
@@ -41,23 +54,39 @@ export async function submitSupportTicket(
     return { error: 'Configuration missing. Please try again later.' };
   }
 
-  const ticketCode = await nextTicketCode(supabase);
+  // Retry on unique-code collisions (concurrent submissions / re-numbering races).
+  let ticket: { id: string; ticket_code: string } | null = null;
+  let lastError: { message?: string | null; code?: string | null } | null = null;
+  const baseNumber = await nextTicketNumber(supabase);
 
-  const { data: ticket, error } = await supabase
-    .from('agent_support_tickets')
-    .insert({
-      ticket_code: ticketCode,
-      agent_id: viewer.userId,
-      issue_type: issueType,
-      listing_reference: listingReference || null,
-      description,
-      status: 'pending',
-    })
-    .select('id, ticket_code')
-    .maybeSingle();
+  for (let attempt = 0; attempt < 5; attempt += 1) {
+    const candidate = formatTicketCode(baseNumber + attempt);
+    const { data, error } = await supabase
+      .from('agent_support_tickets')
+      .insert({
+        ticket_code: candidate,
+        agent_id: viewer.userId,
+        issue_type: issueType,
+        listing_reference: listingReference || null,
+        description,
+        status: 'pending',
+      })
+      .select('id, ticket_code')
+      .maybeSingle();
 
-  if (error) {
-    return { error: error.message };
+    if (!error) {
+      ticket = data as { id: string; ticket_code: string } | null;
+      lastError = null;
+      break;
+    }
+
+    lastError = error;
+    const isDuplicate = error.code === '23505' || error.message?.toLowerCase().includes('duplicate key');
+    if (!isDuplicate) break;
+  }
+
+  if (lastError) {
+    return { error: friendlyDbError(lastError, 'Could not submit your ticket. Please try again.') };
   }
 
   await createNotificationsForAdmins({
